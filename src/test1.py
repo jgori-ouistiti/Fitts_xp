@@ -71,6 +71,11 @@ def assign_random_target():
     drawCircle((t.x, t.y), t.color, t.r)
 
 def init_targets(nb_of_target, t_color, t_size):
+
+    for t in play_circle["targets"]:
+        del t
+    play_circle["targets"] = []
+
     theta = 0
     delta_theta = 2*math.pi / nb_of_target
     x,y = play_circle["pos"] #Center of the play circle
@@ -89,10 +94,24 @@ def refresh_screen():
     for t in play_circle["targets"]:
         drawCircle((t.x, t.y), t.color, t.r)
 
+def end_game(alive_time = -1.0):
+    pygame.time.set_timer(pygame.USEREVENT, 0)
+    for t in play_circle["targets"]:
+        del t
+    play_circle["target"] = []
+    screen.fill(BACKGROUND_COLOR)
+    text = my_font.render("Game over !", True, BLACK)
+    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 100))
+    screen.blit(text, text_rect)
+    text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
+    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+    screen.blit(text, text_rect)
+    text = my_font.render("Press SPACE to retry !", True, BLACK)
+    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 + 100))
+    screen.blit(text, text_rect)
+
 def play():
-    global running, screen
-    global timer
-    timer = default_timer
+    global running, screen, timer, my_font
     pygame.init()
     my_font = pygame.font.SysFont("aerial", 60)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -125,23 +144,27 @@ def play():
             if event.type == pygame.USEREVENT:
                 refresh_screen()
                 timer -= 0.1      
+                alive_time += 0.1
                 text = my_font.render("{:.1f}".format(timer), True, RED)
                 text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
                 screen.blit(text, text_rect)
                 pygame.display.update()
+                if timer<=0:
+                    game_started = False
+                    end_game(alive_time)
+                    pygame.display.update()
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_t:
                     addTarget(BLUE, targets_radius)
                     pygame.display.update()
                       
-                if event.key == pygame.K_SPACE:
-                    screen.fill(BACKGROUND_COLOR)
-                    for t in play_circle["targets"]:
-                        del t
+                if event.key == pygame.K_SPACE and game_started == False:
                     init_targets(targets_number, not_targets_color, targets_radius)
                     game_started = True
-                    pygame.display.update()
+                    alive_time = 0
+                    timer = default_timer
+                    refresh_screen()
             if event.type == pygame.QUIT:
                 running = False
 play()
