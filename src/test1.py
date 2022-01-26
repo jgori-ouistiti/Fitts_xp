@@ -63,6 +63,7 @@ def maj_score():
     """
         Retourne le temps et le point associee lorsqu'il appuie sur la map
     """
+    global cursor_distances
     pos = getpos()
     hit = False
     for t in play_circle["targets"]:
@@ -71,7 +72,12 @@ def maj_score():
                 hit = True
                 t.newColor(not_targets_color)
                 t.isTarget = False
-                assign_random_target()
+                actual_target = assign_random_target()
+                
+                #saving the cursor path
+                extraction_data.append(cursor_distances)
+                cursor_distances = []
+                
             #drawCircle((t.x, t.y), t.color, t.r)
     if hit: 
         # a bien viser dans la cible
@@ -79,11 +85,15 @@ def maj_score():
     return timer_miss, -1
 
 def assign_random_target():
+
+    global actual_target
+    
     i = random.randint(0,len(play_circle["targets"]) - 1)
     t = play_circle["targets"][i]
     t.isTarget = True
     t.color = targets_color
     drawCircle((t.x, t.y), t.color, t.r)
+    actual_target = t
 
 def init_targets(nb_of_target, t_color, t_size):
 
@@ -100,9 +110,7 @@ def init_targets(nb_of_target, t_color, t_size):
         play_circle["targets"].append(Cible(pos, t_size, t_color))
         drawCircle(pos, t_color, t_size)
         theta += delta_theta
-        
     assign_random_target()
-    pygame.time.set_timer(pygame.USEREVENT, 100)
     
 def refresh_screen():
     screen.fill(BACKGROUND_COLOR)
@@ -150,9 +158,36 @@ def choix_mode():
     print(mode_max, " : mode maximiser score en un temps constant")
     mode = int(input())
     return mode
+    
+#===========Data retribution part==============
 
+def distance_to_target():
+    x,y = getpos()
+    distance = math.sqrt( (x-actual_target.x)**2 + (y-actual_target.y)**2)
+    cursor_distances.append(distance)
+
+def iter_data():
+    extraction_data.add(cursor_distances)
+    cursor_distances = []
+
+def save_data_in_file(filename):
+    f = open(filename, 'w')
+    f.write(str(extraction_data))
+    f.close()
+
+#==============================================
 def play(mode=mode_simple):
+    
     global running, screen, timer, my_font
+    
+    global actual_target
+    actual_target = None
+    
+    global extraction_data, cursor_distances #set of user's cursor distance of target when playing
+    
+    cursor_distances = []
+    extraction_data = []
+    
     pygame.init()
     my_font = pygame.font.SysFont("aerial", 60)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -194,11 +229,15 @@ def play(mode=mode_simple):
 
                 # affiche la barre de temps
                 refresh_barre_time(timer)
+                
+                #DATA FOR PROJECT
+                distance_to_target()
+
                 if mode==mode_simple:
-                    timer -= 0.1      
-                    alive_time += 0.1
+                    timer -= 0.01      
+                    alive_time += 0.01
                 elif mode==mode_max:
-                    timer -= 0.1
+                    timer -= 0.01
 
                 text_timer = my_font.render("{:.1f}".format(timer), True, RED)
                 text_rect_timer = text.get_rect(center=(WIDTH/2 +200, HEIGHT/2))
@@ -233,9 +272,11 @@ def play(mode=mode_simple):
                         timer = default_timer
                     elif mode==mode_max:
                         timer = limit_timer
+                    pygame.time.set_timer(pygame.USEREVENT, 10)
                     refresh_screen()
             if event.type == pygame.QUIT:
                 running = False
+    save_data_in_file("resultat.txt")
 
 def main():
     print("Bienvenue au jeu des cibles")
