@@ -48,7 +48,7 @@ def addTarget(color, length):
     play_circle["targets"].append(Cible(pos, length, color))
     drawCircle(pos, color, length) 
 
-def shoot():
+def maj_score():
     pos = getpos()
     hit = False
     for t in play_circle["targets"]:
@@ -60,8 +60,8 @@ def shoot():
                 assign_random_target()
             drawCircle((t.x, t.y), t.color, t.r)
     if hit:
-        return timer_bonus
-    return timer_miss
+        return timer_bonus, 1
+    return timer_miss, -1
 
 def assign_random_target():
     i = random.randint(0,len(play_circle["targets"]) - 1)
@@ -94,13 +94,16 @@ def refresh_screen():
     for t in play_circle["targets"]:
         drawCircle((t.x, t.y), t.color, t.r)
 
-def end_game(alive_time = -1.0):
+def end_game(alive_time = -1.0, score=0):
     pygame.time.set_timer(pygame.USEREVENT, 0)
     for t in play_circle["targets"]:
         del t
     play_circle["target"] = []
     screen.fill(BACKGROUND_COLOR)
     text = my_font.render("Game over !", True, BLACK)
+    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 200))
+    screen.blit(text, text_rect)
+    text = my_font.render("score : "+str(score), True, BLACK)
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 100))
     screen.blit(text, text_rect)
     text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
@@ -125,13 +128,16 @@ def play():
     screen.blit(text, text_rect)
     pygame.display.update()
     game_started = False
+    point = 0
     while running:
         ev = pygame.event.get()
 
         for event in ev:
             
             if event.type == pygame.MOUSEBUTTONDOWN and game_started:
-                timer += shoot()
+                temps, point = maj_score()
+                timer += temps
+                score += point
                 pygame.display.update()
                 isReleased = False
             
@@ -145,13 +151,18 @@ def play():
                 refresh_screen()
                 timer -= 0.1      
                 alive_time += 0.1
-                text = my_font.render("{:.1f}".format(timer), True, RED)
-                text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-                screen.blit(text, text_rect)
+                text_timer = my_font.render("{:.1f}".format(timer), True, RED)
+                text_rect_timer = text.get_rect(center=(WIDTH/2 +200, HEIGHT/2))
+                screen.blit(text_timer, text_rect_timer)
+                text_score = my_font.render(str(score), True, RED)
+                text_rect_score = text.get_rect(center=(WIDTH, 100))
+                screen.blit(text_score, text_rect_score)
                 pygame.display.update()
                 if timer<=0:
                     game_started = False
-                    end_game(alive_time)
+                    if score < 0:
+                        score = 0
+                    end_game(alive_time, score)
                     pygame.display.update()
             
             if event.type == pygame.KEYDOWN:
@@ -163,6 +174,7 @@ def play():
                     init_targets(targets_number, not_targets_color, targets_radius)
                     game_started = True
                     alive_time = 0
+                    score = 0
                     timer = default_timer
                     refresh_screen()
             if event.type == pygame.QUIT:
