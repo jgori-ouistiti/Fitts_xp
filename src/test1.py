@@ -160,6 +160,8 @@ def play():
                 pygame.display.update()
                 if timer<=0:
                     game_started = False
+                    if score < 0:
+                        score = 0
                     end_game(alive_time, score)
                     pygame.display.update()
             
