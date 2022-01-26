@@ -170,9 +170,9 @@ def play(mode=mode_simple):
         ev = pygame.event.get()
 
         for event in ev:
-            print("buuuuuh")
+            
             if event.type == pygame.MOUSEBUTTONDOWN and game_started:
-                print("jouuuer")
+                
                 temps, point = maj_score()
                 if mode == mode_simple:
                     timer += temps
@@ -226,7 +226,7 @@ def play(mode=mode_simple):
                     game_started = True
                     alive_time = 0
                     score = 0
-                    print("iciiiiii")
+                    
                     mode = choix_mode()
                     
                     if mode==mode_simple:
