@@ -33,9 +33,12 @@ play_circle = {
         }
         
 #game parameters
+## mode simple
 default_timer = 5.0 #timer default value when starting the 'game'
 timer_bonus = 2.0 #add amount to timer when hitting a target
 timer_miss  = -3.0 #remove amout to timer when missing a target
+## mode maximise score 
+limit_timer = 10.0 #qd limite d'une partie pour le jeu ou on maximise le score en peu de temps
 
 def getpos():
     return pygame.mouse.get_pos()
@@ -103,10 +106,11 @@ def refresh_screen():
         drawCircle((t.x, t.y), t.color, t.r)
 
 def refresh_barre_time(time):
-    if time < 5 : 
-        drawTime(time, RED)
-    else :
-        drawTime(time, BLACK) 
+    if time >= 0:
+        life_color = min(int( (time/5)*255) ,255) #level of red = 255 - level of green 
+    else : 
+        life_color = 0 #temps est negatif donc il n'y a plu de temps donc la barre est rouge
+    drawTime(time, (255 - life_color,life_color,0))
     text = my_font.render("Time", True, BLACK)
     text_rect = text.get_rect(center=(60,90))
     screen.blit(text, text_rect)
@@ -123,14 +127,15 @@ def end_game(alive_time = -1.0, score=0):
     text = my_font.render("Score : "+str(score), True, BLACK)
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 100))
     screen.blit(text, text_rect)
-    text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
-    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-    screen.blit(text, text_rect)
+    if alive_time > 0 :
+        text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
+        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+        screen.blit(text, text_rect)
     text = my_font.render("Press SPACE to retry !", True, BLACK)
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 + 100))
     screen.blit(text, text_rect)
 
-def play():
+def play1():
     global running, screen, timer, my_font
     pygame.init()
     my_font = pygame.font.SysFont("aerial", 60)
@@ -202,4 +207,88 @@ def play():
                     refresh_screen()
             if event.type == pygame.QUIT:
                 running = False
-play()
+
+def play2():
+    global running, screen, timer, my_font
+    pygame.init()
+    my_font = pygame.font.SysFont("aerial", 60)
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("TEST CIBLES")
+    screen.fill(BACKGROUND_COLOR)
+    pygame.display.update()
+    running = True
+    isReleased = True
+    text = my_font.render("PRESS SPACE TO BEGIN", True, BLACK)
+    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+    screen.blit(text, text_rect)
+    pygame.display.update()
+    game_started = False
+    while running:
+        ev = pygame.event.get()
+
+        for event in ev:
+            
+            if event.type == pygame.MOUSEBUTTONDOWN and game_started:
+                _ , point = maj_score()
+                if point>0:
+                    score += point
+                pygame.display.update()
+                isReleased = False
+            
+            if event.type == pygame.MOUSEBUTTONUP:
+                isReleased = True
+
+            if isReleased == False:
+                pygame.display.update()
+      
+            if event.type == pygame.USEREVENT:
+                refresh_screen()
+
+                # affiche la barre de temps
+                refresh_barre_time(timer)
+
+                timer -= 0.1      
+                
+                text_timer = my_font.render("{:.1f}".format(timer), True, RED)
+                text_rect_timer = text.get_rect(center=(WIDTH/2 +200, HEIGHT/2))
+                screen.blit(text_timer, text_rect_timer)
+                text_score = my_font.render("Score : " + str(score), True, GREEN)
+                text_rect_score = text.get_rect(center=(260,50))
+                screen.blit(text_score, text_rect_score)
+
+                pygame.display.update()
+
+                if timer<=0: # temps ecoule, fin de la partie
+                    game_started = False
+                    end_game(score=score)
+                    pygame.display.update()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_t: # permet de creer des nouveaux target avec la touche T
+                    addTarget(BLUE, targets_radius)
+                    pygame.display.update()
+                      
+                if event.key == pygame.K_SPACE and game_started == False: # permet de renouveler la partie
+                    init_targets(targets_number, not_targets_color, targets_radius)
+                    game_started = True
+                    score = 0
+                    timer = limit_timer
+                    refresh_screen()
+            if event.type == pygame.QUIT:
+                running = False
+
+def main():
+    print("Bienvenue au jeu des cibles")
+    print("Veuillez choisir un mode : ")
+    print("1 : mode simple")
+    print("2 : mode maximiser score en un temps constant")
+
+    mode = int(input())
+    if mode == 1:
+        play1()
+    if mode == 2:
+        play2()
+    
+    print("Fin de la game")
+    
+main()
