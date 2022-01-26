@@ -48,18 +48,26 @@ def addTarget(color, length):
     play_circle["targets"].append(Cible(pos, length, color))
     drawCircle(pos, color, length) 
 
-def maj_score():
+def drawTime(time, color):
+    dimension = (115, 75, time*10, 30)
+    pygame.draw.rect(screen, color, dimension )
+
+def maj_score(): 
+    """
+        Retourne le temps et le point associee lorsqu'il appuie sur la map
+    """
     pos = getpos()
     hit = False
     for t in play_circle["targets"]:
-        if t.isInside(pos):
-            if (t.isTarget):
+        if t.isInside(pos): #verifie s'il est dans le cercle
+            if (t.isTarget): #verifie si c'est dans le cercle du target
                 hit = True
                 t.newColor(not_targets_color)
                 t.isTarget = False
                 assign_random_target()
-            drawCircle((t.x, t.y), t.color, t.r)
-    if hit:
+            #drawCircle((t.x, t.y), t.color, t.r)
+    if hit: 
+        # a bien viser dans la cible
         return timer_bonus, 1
     return timer_miss, -1
 
@@ -94,6 +102,15 @@ def refresh_screen():
     for t in play_circle["targets"]:
         drawCircle((t.x, t.y), t.color, t.r)
 
+def refresh_barre_time(time):
+    if time < 5 : 
+        drawTime(time, RED)
+    else :
+        drawTime(time, BLACK) 
+    text = my_font.render("Time", True, BLACK)
+    text_rect = text.get_rect(center=(60,90))
+    screen.blit(text, text_rect)
+
 def end_game(alive_time = -1.0, score=0):
     pygame.time.set_timer(pygame.USEREVENT, 0)
     for t in play_circle["targets"]:
@@ -103,7 +120,7 @@ def end_game(alive_time = -1.0, score=0):
     text = my_font.render("Game over !", True, BLACK)
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 200))
     screen.blit(text, text_rect)
-    text = my_font.render("score : "+str(score), True, BLACK)
+    text = my_font.render("Score : "+str(score), True, BLACK)
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 100))
     screen.blit(text, text_rect)
     text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
@@ -128,7 +145,6 @@ def play():
     screen.blit(text, text_rect)
     pygame.display.update()
     game_started = False
-    point = 0
     while running:
         ev = pygame.event.get()
 
@@ -149,16 +165,23 @@ def play():
       
             if event.type == pygame.USEREVENT:
                 refresh_screen()
+
+                # affiche la barre de temps
+                refresh_barre_time(timer)
+
                 timer -= 0.1      
                 alive_time += 0.1
+                
                 text_timer = my_font.render("{:.1f}".format(timer), True, RED)
                 text_rect_timer = text.get_rect(center=(WIDTH/2 +200, HEIGHT/2))
                 screen.blit(text_timer, text_rect_timer)
-                text_score = my_font.render(str(score), True, RED)
-                text_rect_score = text.get_rect(center=(WIDTH, 100))
+                text_score = my_font.render("Score : " + str(score), True, GREEN)
+                text_rect_score = text.get_rect(center=(260,50))
                 screen.blit(text_score, text_rect_score)
+
                 pygame.display.update()
-                if timer<=0:
+
+                if timer<=0: # temps ecoule, fin de la partie
                     game_started = False
                     if score < 0:
                         score = 0
@@ -166,11 +189,11 @@ def play():
                     pygame.display.update()
             
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_t:
+                if event.key == pygame.K_t: # permet de creer des nouveaux target avec la touche T
                     addTarget(BLUE, targets_radius)
                     pygame.display.update()
                       
-                if event.key == pygame.K_SPACE and game_started == False:
+                if event.key == pygame.K_SPACE and game_started == False: # permet de renouveler la partie
                     init_targets(targets_number, not_targets_color, targets_radius)
                     game_started = True
                     alive_time = 0
