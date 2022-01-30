@@ -4,6 +4,7 @@ import math
 import random
 sys.path.append('./class')
 from cible import *
+from button import *
 
 #window
 WIDTH = 1080
@@ -107,15 +108,24 @@ def init_targets(nb_of_target, t_color, t_size):
     r = play_circle["radius"]
     for i in range(nb_of_target):
         pos = (int(x + r*math.cos(theta)), int(y + r*math.sin(theta)))
-        play_circle["targets"].append(Cible(pos, t_size, t_color))
+        cible = Cible(pos, t_size, t_color)
+        play_circle["targets"].append(cible)
+        drawables.append(cible)
+        
         drawCircle(pos, t_color, t_size)
         theta += delta_theta
     assign_random_target()
     
 def refresh_screen():
     screen.fill(BACKGROUND_COLOR)
-    for t in play_circle["targets"]:
-        drawCircle((t.x, t.y), t.color, t.r)
+    
+    global drawables
+    for d in drawables:
+        if isinstance(d, Button):
+            d.draw(getpos())
+        if isinstance(d, Cible):
+            drawCircle((d.x, d.y), d.color, d.r)
+            
 
 def refresh_barre_time(time):
     if time >= 0:
@@ -159,6 +169,15 @@ def choix_mode():
     mode = int(input())
     return mode
     
+def menu_principal(text, text_rect):
+    if len(play_circle["targets"]) != 0:
+        if play_circle["targets"][0] in drawables:
+            for t in play_circle["targets"]:
+                drawables.remove(t)
+    refresh_screen()
+    screen.blit(text, text_rect)
+    pygame.display.update()
+    
 #===========Data retribution part==============
 
 def distance_to_target():
@@ -178,7 +197,8 @@ def save_data_in_file(filename):
 #==============================================
 def play(mode=mode_simple):
     
-    global running, screen, timer, my_font
+    global running, screen, timer, my_font, drawables
+    drawables = []
     
     global actual_target
     actual_target = None
@@ -198,11 +218,17 @@ def play(mode=mode_simple):
     isReleased = True
     text = my_font.render("PRESS SPACE TO BEGIN", True, BLACK)
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-    screen.blit(text, text_rect)
-    pygame.display.update()
+    play_button = Button((int(WIDTH/2), int(HEIGHT/2)), screen,  100, 50, WHITE, BLACK, "TEST_BUTTON")
+    drawables.append(play_button)
     game_started = False
+    
+    menu = 0
+    
     while running:
         ev = pygame.event.get()
+        
+        if menu == 0:
+            menu_principal(text, text_rect)
 
         for event in ev:
             
@@ -262,6 +288,9 @@ def play(mode=mode_simple):
                       
                 if event.key == pygame.K_SPACE and game_started == False: # permet de renouveler la partie
                     init_targets(targets_number, not_targets_color, targets_radius)
+                    if menu == 0:
+                        drawables.remove(play_button)
+                        menu = 1
                     game_started = True
                     alive_time = 0
                     score = 0
