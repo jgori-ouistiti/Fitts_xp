@@ -61,6 +61,13 @@ class Button:
         if not self.isColorType(color):
             raise Exception("color must be between (0,0,0) and (255, 255, 255)") 
     
+    def isInside(self, cursorPos):
+        xp = cursorPos[0] - self.pos[0]
+        yp = cursorPos[1] - self.pos[1]
+        largeur = int(self.width)
+        longueur = int(self.height)
+        return 0<=xp and xp <= largeur and 0<=yp and yp <= longueur
+            
     def draw(self, cursorPos):
         self.checkPosType(cursorPos)
         

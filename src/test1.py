@@ -51,39 +51,19 @@ def getpos():
 def drawCircle(pos, color, r):
     pygame.draw.circle(screen, color, pos, r)
 
+def drawRect(color, longueur, largeur=30, pos=(115, 75)):
+    """ les valeurs par default servent pour dessiner la barre de temps """
+    # pos = (int, int)
+    # dimension = ( pos, longueur, largeur )
+    x = pos[0]
+    y = pos[1]
+    dimension = (x, y, longueur*10, largeur)
+    pygame.draw.rect(screen, color, dimension )
+
 def addTarget(color, length):
     pos = getpos()
     play_circle["targets"].append(Cible(pos, length, color))
     drawCircle(pos, color, length) 
-
-def drawTime(time, color):
-    dimension = (115, 75, time*10, 30)
-    pygame.draw.rect(screen, color, dimension )
-
-def maj_score(): 
-    """
-        Retourne le temps et le point associee lorsqu'il appuie sur la map
-    """
-    global cursor_distances
-    pos = getpos()
-    hit = False
-    for t in play_circle["targets"]:
-        if t.isInside(pos): #verifie s'il est dans le cercle
-            if (t.isTarget): #verifie si c'est dans le cercle du target
-                hit = True
-                t.newColor(not_targets_color)
-                t.isTarget = False
-                actual_target = assign_random_target()
-                
-                #saving the cursor path
-                extraction_data.append(cursor_distances)
-                cursor_distances = []
-                
-            #drawCircle((t.x, t.y), t.color, t.r)
-    if hit: 
-        # a bien viser dans la cible
-        return timer_bonus, 1
-    return timer_miss, -1
 
 def assign_random_target():
 
@@ -115,60 +95,35 @@ def init_targets(nb_of_target, t_color, t_size):
         drawCircle(pos, t_color, t_size)
         theta += delta_theta
     assign_random_target()
-    
-def refresh_screen():
+
+#=========
+
+def refresh_screen(aff_mode=False):
     screen.fill(BACKGROUND_COLOR)
     
     global drawables
     for d in drawables:
-        if isinstance(d, Button):
+        if isinstance(d, Button) and aff_mode:
             d.draw(getpos())
-        if isinstance(d, Cible):
-            drawCircle((d.x, d.y), d.color, d.r)
-            
+        if isinstance(d, Cible) and aff_mode==False:
+            drawCircle((d.x, d.y), d.color, d.r)   
 
 def refresh_barre_time(time):
     if time >= 0:
         life_color = min(int( (time/5)*255) ,255) #level of red = 255 - level of green 
     else : 
         life_color = 0 #temps est negatif donc il n'y a plu de temps donc la barre est rouge
-    drawTime(time, (255 - life_color,life_color,0))
+    drawRect((255 - life_color,life_color,0), time)
     text = my_font.render("Time", True, BLACK)
     text_rect = text.get_rect(center=(60,90))
     screen.blit(text, text_rect)
 
-def end_game(alive_time = -1.0, score=0):
-    pygame.time.set_timer(pygame.USEREVENT, 0)
-    for t in play_circle["targets"]:
-        del t
-    play_circle["target"] = []
-    screen.fill(BACKGROUND_COLOR)
-    text = my_font.render("Game over !", True, BLACK)
-    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 200))
-    screen.blit(text, text_rect)
-    text = my_font.render("Score : "+str(score), True, BLACK)
-    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 100))
-    screen.blit(text, text_rect)
-    if alive_time > 0 :
-        text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
-        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-        screen.blit(text, text_rect)
-    text = my_font.render("Press SPACE to retry !", True, BLACK)
-    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 + 100))
+def write_screen(mot, booleen, color, dimension):
+    text = my_font.render(mot, booleen, color)
+    text_rect = text.get_rect(center=dimension)
     screen.blit(text, text_rect)
 
-def choix_mode():
-    screen.fill(BACKGROUND_COLOR)
-    text = my_font.render("CHOOSE YOUR MODE on the terminal",True, BLACK)
-    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-    screen.blit(text, text_rect)
-    pygame.display.update()
-    print("Veuillez choisir un mode : ")
-    print(mode_simple , " : mode simple")
-    print(mode_max, " : mode maximiser score en un temps constant")
-    mode = int(input())
-    return mode
-    
+#======== 
 def menu_principal(text, text_rect):
     if len(play_circle["targets"]) != 0:
         if play_circle["targets"][0] in drawables:
@@ -176,9 +131,69 @@ def menu_principal(text, text_rect):
                 drawables.remove(t)
     refresh_screen()
     screen.blit(text, text_rect)
-    pygame.display.update()
+
+def choix_mode(button):
+    print("Veuillez choisir un mode : ")
+    print(mode_simple , " : mode simple")
+    print(mode_max, " : mode maximiser score en un temps constant")
+    #mode = int(input())
+    mode = 0
+    pos = getpos()
+    if button.isInside(pos):
+        mode = mode_simple
+    return mode
+
+def maj_score(): 
+    """
+        Retourne le temps et le point associee lorsqu'il appuie sur la map
+    """
+    global cursor_distances
+    pos = getpos()
+    hit = False
+    for t in play_circle["targets"]:
+        if t.isInside(pos): #verifie s'il est dans le cercle
+            if (t.isTarget): #verifie si c'est dans le cercle du target
+                hit = True
+                t.newColor(not_targets_color)
+                t.isTarget = False
+                actual_target = assign_random_target()
+                
+                #saving the cursor path
+                extraction_data.append(cursor_distances)
+                cursor_distances = []
+                
+            #drawCircle((t.x, t.y), t.color, t.r)
+    if hit: 
+        # a bien viser dans la cible
+        return timer_bonus, 1
+    return timer_miss, -1
+
+def end_game(alive_time = -1.0, score=0):
+    pygame.time.set_timer(pygame.USEREVENT, 0)
+    for t in play_circle["targets"]:
+        del t
+    play_circle["target"] = []
+    screen.fill(BACKGROUND_COLOR)
+    write_screen("Game over !", True, BLACK, (WIDTH/2, HEIGHT/2 - 200) )
+    #text = my_font.render("Game over !", True, BLACK)
+    #text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 200))
+    #screen.blit(text, text_rect)
+    write_screen("Score : "+str(score), True, BLACK,(WIDTH/2, HEIGHT/2 - 100))
+    #text = my_font.render("Score : "+str(score), True, BLACK)
+    #text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 100))
+    #screen.blit(text, text_rect)
+    if alive_time > 0 :
+        text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
+        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+        screen.blit(text, text_rect)
+    write_screen("Press SPACE to retry !", True, BLACK,(WIDTH/2, HEIGHT/2 + 100))
+    #text = my_font.render("Press SPACE to retry !", True, BLACK)
+    #text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 + 100))
+    #screen.blit(text, text_rect)
     
-#===========Data retribution part==============
+    
+    
+#=========== Data retribution part ==============
 
 def distance_to_target():
     x,y = getpos()
@@ -195,9 +210,11 @@ def save_data_in_file(filename):
     f.close()
 
 #==============================================
+
 def play(mode=mode_simple):
     
-    global running, screen, timer, my_font, drawables
+    global running, screen, my_font, drawables
+    timer = default_timer
     drawables = []
     
     global actual_target
@@ -218,22 +235,33 @@ def play(mode=mode_simple):
     isReleased = True
     text = my_font.render("PRESS SPACE TO BEGIN", True, BLACK)
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-    play_button = Button((int(WIDTH/2), int(HEIGHT/2)), screen,  100, 50, WHITE, BLACK, "TEST_BUTTON")
+    screen.blit(text, text_rect)
+
+    play_button = Button((int(WIDTH/3), int(HEIGHT/2)), screen,  100, 50, RED, BLACK, text="MODE_1")
+    
+
     drawables.append(play_button)
+    refresh_screen(True)
+    text_b = my_font.render( play_button.text, True, GREEN )
+    text_button = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+    screen.blit(text_b, text_button)
+    pygame.display.update()
+
     game_started = False
     
     menu = 0
+    choix_fait = False
+    mode = -1
     
     while running:
         ev = pygame.event.get()
         
-        if menu == 0:
-            menu_principal(text, text_rect)
+        #if menu == 0:
+        #    menu_principal(text, text_rect)
 
         for event in ev:
             
             if event.type == pygame.MOUSEBUTTONDOWN and game_started:
-                
                 temps, point = maj_score()
                 if mode == mode_simple:
                     timer += temps
@@ -265,46 +293,97 @@ def play(mode=mode_simple):
                 elif mode==mode_max:
                     timer -= 0.01
 
-                text_timer = my_font.render("{:.1f}".format(timer), True, RED)
-                text_rect_timer = text.get_rect(center=(WIDTH/2 +200, HEIGHT/2))
-                screen.blit(text_timer, text_rect_timer)
-                text_score = my_font.render("Score : " + str(score), True, GREEN)
-                text_rect_score = text.get_rect(center=(260,50))
-                screen.blit(text_score, text_rect_score)
+
+                write_screen("{:.1f}".format(timer), True, RED,(WIDTH/2 , HEIGHT/2))
+                #text_timer = my_font.render("{:.1f}".format(timer), True, RED)
+                #text_rect_timer = text_timer.get_rect(center=(WIDTH/2 , HEIGHT/2))
+                #screen.blit(text_timer, text_rect_timer)
+
+                write_screen("Score : " + str(score), True, GREEN, (260,50))
+                #text_score = my_font.render("Score : " + str(score), True, GREEN)
+                #text_rect_score = text_score.get_rect(center=(260,50))
+                #screen.blit(text_score, text_rect_score)
 
                 pygame.display.update()
 
                 if timer<=0: # temps ecoule, fin de la partie
+                    print("temps negatif")
                     game_started = False
+                    choix_fait=False
+                    menu = 0
+                    mode = -1
                     if score < 0:
                         score = 0
+                    
                     end_game(alive_time, score)
+                    drawables.append(play_button)
                     pygame.display.update()
+                    print("fin")
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_t: # permet de creer des nouveaux target avec la touche T
                     addTarget(BLUE, targets_radius)
                     pygame.display.update()
-                      
-                if event.key == pygame.K_SPACE and game_started == False: # permet de renouveler la partie
+
+                if event.key ==pygame.K_SPACE and choix_fait==True and game_started==False:
                     init_targets(targets_number, not_targets_color, targets_radius)
                     if menu == 0:
+                        print("  choix fait =True  ")
                         drawables.remove(play_button)
+                        refresh_screen()
+                        pygame.display.update()
                         menu = 1
-                    game_started = True
+                    game_started = True 
                     alive_time = 0
                     score = 0
-                    
-                    mode = choix_mode()
-                    
-                    if mode==mode_simple:
-                        timer = default_timer
-                    elif mode==mode_max:
-                        timer = limit_timer
+
                     pygame.time.set_timer(pygame.USEREVENT, 10)
-                    refresh_screen()
+                    
+
+                #elif event.key ==pygame.K_SPACE and game_started==False:
+                #    choix_fait=False
+                #    screen.fill(BACKGROUND_COLOR)
+                #    drawables.append(play_button)
+                #    refresh_screen(True)
+                #    text = my_font.render("CHOOSE YOUR MODE",True, BLACK)
+                #    text_rect = text.get_rect(center=(WIDTH/4, HEIGHT/4))
+                #    screen.blit(text, text_rect)
+                #    pygame.display.update()
+                  
+            if event.type == pygame.MOUSEBUTTONDOWN and game_started == False and choix_fait==False: 
+                print("choix pls")
+                
+                ##affiche les modes
+                drawables.append(play_button)
+                refresh_screen(True)
+                text = my_font.render("CHOOSE YOUR MODE",True, BLACK)
+                text_rect = text.get_rect(center=(WIDTH/4, HEIGHT/4))
+                screen.blit(text, text_rect)
+                mode = choix_mode(play_button) 
+                pygame.display.update()
+                
+                
+                if mode==mode_simple:
+                    timer = default_timer
+                    choix_fait=True
+                elif mode==mode_max:
+                    timer = limit_timer
+                    choix_fait=True
+                print("choix fait, le mode : ", mode, choix_fait)
+                print("jeu a commencer ? Reponse : ", game_started)
+
+                if choix_fait==True:
+                    #drawables.remove(play_button)
+                    screen.fill(BACKGROUND_COLOR)
+                    text = my_font.render("WHEN YOU ARE READY, PRESS SPACE TO BEGIN", True, BLACK)
+                    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+                    screen.blit(text, text_rect)
+                    pygame.display.update()
+                
+                
             if event.type == pygame.QUIT:
                 running = False
+
     save_data_in_file("resultat.txt")
 
 def main():
@@ -312,8 +391,8 @@ def main():
     #print("Veuillez choisir un mode : ")
     #print(mode_simple , " : mode simple")
     #print(mode_max, " : mode maximiser score en un temps constant")
-
     #mode = int(input())
+    
     play()
     
     print("Fin de la game")
