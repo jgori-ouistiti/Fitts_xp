@@ -37,6 +37,10 @@ play_circle = {
 mode_simple = 1
 mode_max = 2
 
+# Taille Rectangle pour les modes
+LONGUEUR = 200
+LARGEUR = 100
+
 #game parameters
 ## mode simple
 default_timer = 10.0 #timer default value when starting the 'game'
@@ -51,7 +55,7 @@ def getpos():
 def drawCircle(pos, color, r):
     pygame.draw.circle(screen, color, pos, r)
 
-def drawRect(color, longueur, largeur=30, pos=(115, 75)):
+def drawRect(color, longueur, largeur=30, pos=(115, 75), mot=""):
     """ les valeurs par default servent pour dessiner la barre de temps """
     # pos = (int, int)
     # dimension = ( pos, longueur, largeur )
@@ -59,6 +63,13 @@ def drawRect(color, longueur, largeur=30, pos=(115, 75)):
     y = pos[1]
     dimension = (x, y, longueur*10, largeur)
     pygame.draw.rect(screen, color, dimension )
+
+def drawMode(rect):
+    rect.draw(getpos())
+    x, y = rect.pos
+    x = int(x+100)
+    y = int(y+50)
+    write_screen(rect.text, True, BLUE, (x,y) )
 
 def addTarget(color, length):
     pos = getpos()
@@ -104,7 +115,8 @@ def refresh_screen(aff_mode=False):
     global drawables
     for d in drawables:
         if isinstance(d, Button) and aff_mode:
-            d.draw(getpos())
+            #d.draw(getpos())
+            drawMode(d)
         if isinstance(d, Cible) and aff_mode==False:
             drawCircle((d.x, d.y), d.color, d.r)   
 
@@ -132,15 +144,16 @@ def menu_principal(text, text_rect):
     refresh_screen()
     screen.blit(text, text_rect)
 
-def choix_mode(button):
+def choix_mode(List_button):
     print("Veuillez choisir un mode : ")
     print(mode_simple , " : mode simple")
     print(mode_max, " : mode maximiser score en un temps constant")
     #mode = int(input())
     mode = 0
     pos = getpos()
-    if button.isInside(pos):
-        mode = mode_simple
+    for button in List_button:
+        if button.isInside(pos):
+            mode = mode_simple
     return mode
 
 def maj_score(): 
@@ -237,14 +250,12 @@ def play(mode=mode_simple):
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
     screen.blit(text, text_rect)
 
-    play_button = Button((int(WIDTH/3), int(HEIGHT/2)), screen,  100, 50, RED, BLACK, text="MODE_1")
-    
+    play_button = Button((int(WIDTH/3), int(HEIGHT/2)), screen,  LONGUEUR, LARGEUR, RED, BLACK, text="MODE_1")
+    play_button2 = Button((int(WIDTH*2/3), int(HEIGHT/2)), screen, LONGUEUR, LARGEUR, GREEN, BLACK, text="MODE_2")
 
     drawables.append(play_button)
-    refresh_screen(True)
-    text_b = my_font.render( play_button.text, True, GREEN )
-    text_button = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-    screen.blit(text_b, text_button)
+    drawables.append(play_button2)
+
     pygame.display.update()
 
     game_started = False
@@ -295,19 +306,11 @@ def play(mode=mode_simple):
 
 
                 write_screen("{:.1f}".format(timer), True, RED,(WIDTH/2 , HEIGHT/2))
-                #text_timer = my_font.render("{:.1f}".format(timer), True, RED)
-                #text_rect_timer = text_timer.get_rect(center=(WIDTH/2 , HEIGHT/2))
-                #screen.blit(text_timer, text_rect_timer)
-
                 write_screen("Score : " + str(score), True, GREEN, (260,50))
-                #text_score = my_font.render("Score : " + str(score), True, GREEN)
-                #text_rect_score = text_score.get_rect(center=(260,50))
-                #screen.blit(text_score, text_rect_score)
-
                 pygame.display.update()
 
                 if timer<=0: # temps ecoule, fin de la partie
-                    print("temps negatif")
+    
                     game_started = False
                     choix_fait=False
                     menu = 0
@@ -317,6 +320,8 @@ def play(mode=mode_simple):
                     
                     end_game(alive_time, score)
                     drawables.append(play_button)
+                    drawables.append(play_button2)
+                    
                     pygame.display.update()
                     print("fin")
             
@@ -328,8 +333,8 @@ def play(mode=mode_simple):
                 if event.key ==pygame.K_SPACE and choix_fait==True and game_started==False:
                     init_targets(targets_number, not_targets_color, targets_radius)
                     if menu == 0:
-                        print("  choix fait =True  ")
                         drawables.remove(play_button)
+                        drawables.remove(play_button2)
                         refresh_screen()
                         pygame.display.update()
                         menu = 1
@@ -351,15 +356,15 @@ def play(mode=mode_simple):
                 #    pygame.display.update()
                   
             if event.type == pygame.MOUSEBUTTONDOWN and game_started == False and choix_fait==False: 
-                print("choix pls")
                 
                 ##affiche les modes
                 drawables.append(play_button)
+                drawables.append(play_button2)
                 refresh_screen(True)
-                text = my_font.render("CHOOSE YOUR MODE",True, BLACK)
-                text_rect = text.get_rect(center=(WIDTH/4, HEIGHT/4))
-                screen.blit(text, text_rect)
-                mode = choix_mode(play_button) 
+
+                write_screen("CHOOSE YOUR MODE",True, BLACK,(WIDTH/3, HEIGHT/3))
+
+                mode = choix_mode([play_button, play_button2]) 
                 pygame.display.update()
                 
                 
@@ -373,7 +378,6 @@ def play(mode=mode_simple):
                 print("jeu a commencer ? Reponse : ", game_started)
 
                 if choix_fait==True:
-                    #drawables.remove(play_button)
                     screen.fill(BACKGROUND_COLOR)
                     text = my_font.render("WHEN YOU ARE READY, PRESS SPACE TO BEGIN", True, BLACK)
                     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
@@ -388,10 +392,6 @@ def play(mode=mode_simple):
 
 def main():
     print("Bienvenue au jeu des cibles")
-    #print("Veuillez choisir un mode : ")
-    #print(mode_simple , " : mode simple")
-    #print(mode_max, " : mode maximiser score en un temps constant")
-    #mode = int(input())
     
     play()
     
