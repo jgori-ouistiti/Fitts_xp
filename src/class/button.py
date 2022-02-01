@@ -1,9 +1,10 @@
 import pygame
 
 class Button:
-    def __init__(self, pos, screen, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
+    def __init__(self, pos, screen, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
     
         self.screen = screen
+        self.mode = mode
     
         self.checkPosType(pos)
         self.pos = pos

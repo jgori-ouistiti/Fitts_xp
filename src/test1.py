@@ -34,8 +34,8 @@ play_circle = {
         }
         
 # Mode :
-mode_simple = 1
-mode_max = 2
+MODE_SIMPLE = 1
+MODE_MAX = 2
 
 # Taille Rectangle pour les modes
 LONGUEUR = 200
@@ -146,14 +146,14 @@ def menu_principal(text, text_rect):
 
 def choix_mode(List_button):
     print("Veuillez choisir un mode : ")
-    print(mode_simple , " : mode simple")
-    print(mode_max, " : mode maximiser score en un temps constant")
+    print(MODE_SIMPLE , " : mode simple")
+    print(MODE_MAX, " : mode maximiser score en un temps constant")
     #mode = int(input())
-    mode = 0
+    mode = -1
     pos = getpos()
     for button in List_button:
         if button.isInside(pos):
-            mode = mode_simple
+            mode = button.mode
     return mode
 
 def maj_score(): 
@@ -224,7 +224,7 @@ def save_data_in_file(filename):
 
 #==============================================
 
-def play(mode=mode_simple):
+def play(mode=MODE_SIMPLE):
     
     global running, screen, my_font, drawables
     timer = default_timer
@@ -250,8 +250,8 @@ def play(mode=mode_simple):
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
     screen.blit(text, text_rect)
 
-    play_button = Button((int(WIDTH/3), int(HEIGHT/2)), screen,  LONGUEUR, LARGEUR, RED, BLACK, text="MODE_1")
-    play_button2 = Button((int(WIDTH*2/3), int(HEIGHT/2)), screen, LONGUEUR, LARGEUR, GREEN, BLACK, text="MODE_2")
+    play_button = Button((int(WIDTH/3), int(HEIGHT/2)), screen, MODE_SIMPLE,  LONGUEUR, LARGEUR, RED, BLACK, text="MODE_1")
+    play_button2 = Button((int(WIDTH*2/3), int(HEIGHT/2)), screen, MODE_MAX, LONGUEUR, LARGEUR, GREEN, BLACK, text="MODE_2")
 
     drawables.append(play_button)
     drawables.append(play_button2)
@@ -274,10 +274,10 @@ def play(mode=mode_simple):
             
             if event.type == pygame.MOUSEBUTTONDOWN and game_started:
                 temps, point = maj_score()
-                if mode == mode_simple:
+                if mode == MODE_SIMPLE:
                     timer += temps
                     score += point
-                elif mode == mode_max: 
+                elif mode == MODE_MAX: 
                     if point>0:
                         score += point
                 pygame.display.update()
@@ -298,10 +298,10 @@ def play(mode=mode_simple):
                 #DATA FOR PROJECT
                 distance_to_target()
 
-                if mode==mode_simple:
+                if mode==MODE_SIMPLE:
                     timer -= 0.01      
                     alive_time += 0.01
-                elif mode==mode_max:
+                elif mode==MODE_MAX:
                     timer -= 0.01
 
 
@@ -368,10 +368,10 @@ def play(mode=mode_simple):
                 pygame.display.update()
                 
                 
-                if mode==mode_simple:
+                if mode==MODE_SIMPLE:
                     timer = default_timer
                     choix_fait=True
-                elif mode==mode_max:
+                elif mode==MODE_MAX:
                     timer = limit_timer
                     choix_fait=True
                 print("choix fait, le mode : ", mode, choix_fait)
