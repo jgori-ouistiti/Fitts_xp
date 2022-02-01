@@ -1,3 +1,5 @@
+from itertools import starmap
+from re import T
 import pygame
 import sys
 import math
@@ -199,7 +201,7 @@ def end_game(alive_time = -1.0, score=0):
         text = my_font.render("You survived " + "{:.1f}".format(alive_time) + " seconds", True, BLACK)
         text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
         screen.blit(text, text_rect)
-    write_screen("Press SPACE to retry !", True, BLACK,(WIDTH/2, HEIGHT/2 + 100))
+    #write_screen("Press SPACE to retry !", True, BLACK,(WIDTH/2, HEIGHT/2 + 100))
     #text = my_font.render("Press SPACE to retry !", True, BLACK)
     #text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 + 100))
     #screen.blit(text, text_rect)
@@ -246,17 +248,22 @@ def play(mode=MODE_SIMPLE):
     pygame.display.update()
     running = True
     isReleased = True
-    text = my_font.render("PRESS SPACE TO BEGIN", True, BLACK)
-    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+    text = my_font.render("WELCOME TO THE GAME", True, BLACK)
+    text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/3))
     screen.blit(text, text_rect)
 
-    play_button = Button((int(WIDTH/3), int(HEIGHT/2)), screen, MODE_SIMPLE,  LONGUEUR, LARGEUR, RED, BLACK, text="MODE_1")
-    play_button2 = Button((int(WIDTH*2/3), int(HEIGHT/2)), screen, MODE_MAX, LONGUEUR, LARGEUR, GREEN, BLACK, text="MODE_2")
+    start = Button((int(WIDTH/2), int(HEIGHT/2)), screen, 0,  LONGUEUR, LARGEUR, RED, BLACK, text="Start")
+    drawMode(start) #dessine le bouton start
+    pygame.display.update()
 
+    play_button = Button((int(WIDTH/3), int(HEIGHT/2)), screen, MODE_SIMPLE,  LONGUEUR, LARGEUR, RED, BLACK, text="Mode 1")
+    play_button2 = Button((int(WIDTH*2/3), int(HEIGHT/2)), screen, MODE_MAX, LONGUEUR, LARGEUR, GREEN, BLACK, text="Mode 2")
+
+    
     drawables.append(play_button)
     drawables.append(play_button2)
 
-    pygame.display.update()
+    
 
     game_started = False
     
@@ -310,7 +317,7 @@ def play(mode=MODE_SIMPLE):
                 pygame.display.update()
 
                 if timer<=0: # temps ecoule, fin de la partie
-    
+                    print("fin")
                     game_started = False
                     choix_fait=False
                     menu = 0
@@ -319,10 +326,15 @@ def play(mode=MODE_SIMPLE):
                         score = 0
                     
                     end_game(alive_time, score)
+                    
+                    #dessine le bouton start, devient le bouton "replay"
+                    start.text = "Replay"
+                    drawMode(start) #dessine le bouton
+                    pygame.display.update()
+                    
                     drawables.append(play_button)
                     drawables.append(play_button2)
                     
-                    pygame.display.update()
                     print("fin")
             
             if event.type == pygame.KEYDOWN:
@@ -357,6 +369,8 @@ def play(mode=MODE_SIMPLE):
                   
             if event.type == pygame.MOUSEBUTTONDOWN and game_started == False and choix_fait==False: 
                 
+                
+
                 ##affiche les modes
                 drawables.append(play_button)
                 drawables.append(play_button2)

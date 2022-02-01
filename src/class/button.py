@@ -4,10 +4,13 @@ class Button:
     def __init__(self, pos, screen, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
     
         self.screen = screen
-        self.mode = mode
     
         self.checkPosType(pos)
         self.pos = pos
+        
+        if not isinstance(mode, int):
+            raise Exception("mode must be of type int")
+        self.mode = mode 
         
         if not isinstance(width, int):
             raise Exception("width must be of type int")
