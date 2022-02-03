@@ -162,7 +162,7 @@ def maj_score():
     """
         Retourne le temps et le point associee lorsqu'il appuie sur la map
     """
-    global cursor_distances
+    global cursor_coords
     pos = getpos()
     hit = False
     for t in play_circle["targets"]:
@@ -174,8 +174,8 @@ def maj_score():
                 actual_target = assign_random_target()
                 
                 #saving the cursor path
-                extraction_data.append(cursor_distances)
-                cursor_distances = []
+                extraction_data.append(cursor_coords)
+                cursor_coords = []
                 
             #drawCircle((t.x, t.y), t.color, t.r)
     if hit: 
@@ -210,14 +210,9 @@ def end_game(alive_time = -1.0, score=0):
     
 #=========== Data retribution part ==============
 
-def distance_to_target():
-    x,y = getpos()
-    distance = math.sqrt( (x-actual_target.x)**2 + (y-actual_target.y)**2)
-    cursor_distances.append(distance)
-
 def iter_data():
-    extraction_data.add(cursor_distances)
-    cursor_distances = []
+    extraction_data.add(cursor_coords)
+    cursor_coords = []
 
 def save_data_in_file(filename):
     f = open(filename, 'w')
@@ -235,9 +230,9 @@ def play(mode=MODE_SIMPLE):
     global actual_target
     actual_target = None
     
-    global extraction_data, cursor_distances #set of user's cursor distance of target when playing
+    global extraction_data, cursor_coords #set of user's cursor distance of target when playing
     
-    cursor_distances = []
+    cursor_coords = []
     extraction_data = []
     
     pygame.init()
@@ -303,7 +298,7 @@ def play(mode=MODE_SIMPLE):
                 refresh_barre_time(timer)
                 
                 #DATA FOR PROJECT
-                distance_to_target()
+                cursor_coords.append(getpos())
 
                 if mode==MODE_SIMPLE:
                     timer -= 0.01      
