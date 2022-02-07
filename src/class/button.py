@@ -1,3 +1,4 @@
+from turtle import width
 import pygame
 
 class Button:
@@ -45,6 +46,8 @@ class Button:
             return False
         if (not isinstance(pos[0], int)) or (not isinstance(pos[1], int)):
             return False
+        if ((pos[0]<0) or (pos[1]<0) or(pos[0]>width) or (pos[1]>height) ) :
+            return False
         return True
         
     def checkPosType(self, pos):
@@ -79,7 +82,8 @@ class Button:
         x, y = self.pos
         
         tmp_selected = True
-        if (xc - x < 0 or xc - x > self.width or yc - y < 0 or yc - y > self.height):
+        #if (xc - x < 0 or xc - x > self.width or yc - y < 0 or yc - y > self.height):
+        if not self.isInside(cursorPos):
             tmp_selected = False
             
         self.isSelected = tmp_selected

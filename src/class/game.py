@@ -1,6 +1,8 @@
+from turtle import pos
 import pygame
 from drawable import *
 from listener import *
+from healthBar import *
 
 #colors
 RED = (255, 0, 0)
@@ -21,17 +23,25 @@ class Game :
 		self.drawables = dict() #Key = Drawable object, value = boolean (True if is on screen, False if not )
 		self.bg_color  = bg_color
 		self.running   = False
+		self.barTime = HealthBar(0, posText=(50,50), posRect=(30,30))
+		self.time = 100
 		
 	def draw(self):
 		for d, v in self.drawables.items():
 			if v:
 				d.draw(self)
-			
+	
+	def refreshBarTime(self):
+		self.time -= 0.1
+		self.barTime=HealthBar(self.time)
+		self.barTime.refresh_barre_time(self)
+
 	def refreshScreen(self):
 		self.screen.fill(self.bg_color)
 		self.draw()
+		self.refreshBarTime()
 		pygame.display.update()
-				
+			
 	def addDrawable(self, d):
 		if (hasattr(d, "__len__")):
 			for d_item in d:
