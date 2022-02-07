@@ -1,4 +1,8 @@
-class Cible:
+from drawable import *
+from listener import *
+import pygame
+
+class Cible(Drawable, Listener):
     def __init__(self, pos , r, color, isTarget = False):
         if not isinstance(pos[0], int):
             raise Exception("x is not an int")
@@ -41,6 +45,15 @@ class Cible:
             if ((c<0) or (c>255)) :
                 raise Exception("byte of color must be between 0 and 255")
         self.color = color
+        
+    def draw(self, game):
+        pygame.draw.circle(game.screen, self.color, (self.x,self.y), self.r)
+        
+    def action(self, game, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.isInside(pygame.mouse.get_pos()):
+            	self.newColor((0,255,0))
+            	self.isTarget = False
 
 
         
