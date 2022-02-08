@@ -23,23 +23,17 @@ class Game :
 		self.drawables = dict() #Key = Drawable object, value = boolean (True if is on screen, False if not )
 		self.bg_color  = bg_color
 		self.running   = False
-		self.barTime = HealthBar(0, posText=(50,50), posRect=(30,30))
+		self.barTime = HealthBar(5, posText=(50,50), posRect=(30,30))
 		self.time = 100
 		
 	def draw(self):
 		for d, v in self.drawables.items():
 			if v:
 				d.draw(self)
-	
-	def refreshBarTime(self):
-		self.time -= 0.1
-		self.barTime=HealthBar(self.time)
-		self.barTime.refresh_barre_time(self)
 
 	def refreshScreen(self):
 		self.screen.fill(self.bg_color)
 		self.draw()
-		self.refreshBarTime()
 		pygame.display.update()
 			
 	def addDrawable(self, d):
@@ -170,6 +164,8 @@ class Game :
 	
 	def play(self):
 		self.running = True
+		self.addDrawable(self.barTime)
+		pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
 		while (self.running):
 			self.refreshScreen()
 			ev = pygame.event.get()
@@ -177,6 +173,10 @@ class Game :
 				self.listen(event)
 				if event.type == pygame.QUIT:
 					self.running = False
+					
+				#timer
+				if event.type == pygame.USEREVENT:
+					self.barTime.addSubTime(-0.01)
 				
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_ESCAPE:
