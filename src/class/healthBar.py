@@ -42,6 +42,9 @@ class HealthBar(Drawable):
         #text = pygame.font.SysFont("aerial", 60).render(self.longueur, True, (0, 0, 0))
         #text_rect = text.get_rect(center=self.posText)#position_text
         #game.screen.blit(text, text_rect)
+        
+    def setTime(self, time):
+        self.timer = time
 
 
     def draw(self, game):

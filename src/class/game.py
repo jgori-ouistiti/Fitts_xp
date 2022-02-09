@@ -25,6 +25,7 @@ class Game :
 		self.running   = False
 		self.barTime = HealthBar(5, posText=(50,50), posRect=(30,30))
 		self.time = 100
+		self.score = 0
 		
 	def draw(self):
 		for d, v in self.drawables.items():
@@ -139,6 +140,10 @@ class Game :
 			self.hideAllDrawable()
 			self.hideAllListener()
 			self.pauseMenu()
+		if menu_title == "endGame":
+		    self.hideAllDrawable()
+		    self.hideAllListener()
+		    self.endGame()
 			
 	def write_screen(self, mot,color, pos, booleen=True ):
 		text = self.font.render(mot, booleen, color)
@@ -161,6 +166,25 @@ class Game :
 						self.showAllListener()
 						self.menu("play")
 			
+	def endGame(self):
+		self.refreshScreen()
+		self.write_screen("GAME OVER", BLACK, (self.width/2, self.height/2 - 30))
+		self.write_screen("Your score : " + str(self.score), BLACK, (self.width/2, self.height/2))
+		self.write_screen("Press ESCAPE to play again", BLACK, (self.width/2, self.height/2 + 30))
+		self.running = True
+		while(self.running):
+			pygame.display.update()
+			ev = pygame.event.get()
+			for event in ev:
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_ESCAPE:
+						self.score = 0
+						self.barTime.setTime(5)
+						self.running = False
+						self.showAllDrawable()
+						self.showAllListener()
+						self.menu("play")
+			
 	
 	def play(self):
 		self.running = True
@@ -177,6 +201,9 @@ class Game :
 				#timer
 				if event.type == pygame.USEREVENT:
 					self.barTime.addSubTime(-0.01)
+					if self.barTime.timer <= 0:
+					    self.running = False
+					    self.menu("endGame")
 				
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_ESCAPE:
