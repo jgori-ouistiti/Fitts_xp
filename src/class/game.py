@@ -181,13 +181,16 @@ class Game :
             raise Exception("Internal error, no target found...")
         
         
-    def menu(self, menu_title):
+    def menu(self, menu_title, current_mode = 'play'):
         if menu_title == "play":
+            if current_mode != "pause":
+                self.barTime.maxtime = 5
+                self.barTime.timer = 5
             self.play()
         if menu_title == "pause":
             self.hideAllDrawable()
             self.hideAllListener()
-            self.pauseMenu()
+            self.pauseMenu(current_mode)
         if menu_title == "endGame":
             self.hideAllDrawable()
             self.hideAllListener()
@@ -196,6 +199,11 @@ class Game :
             self.hideAllDrawable()
             self.hideAllListener()
             self.chooseMode() 
+        if menu_title == "quick":
+            if current_mode != "pause":
+                self.barTime.maxtime = 10
+                self.barTime.timer = 10
+            self.quickMode()
             
     def write_screen(self, mot,color, pos, booleen=True ):
         text = self.font.render(mot, booleen, color)
@@ -212,7 +220,7 @@ class Game :
         self.save_data_in_file("resultat.txt")
         self.running = False
         
-    def pauseMenu(self):
+    def pauseMenu(self, current_mode):
         self.refreshScreen()
         self.write_screen("PAUSE", BLACK, (self.width/2, self.height/2 - 30))
         self.write_screen("Press ESCAPE to continue", BLACK, (self.width/2, self.height/2 + 30))
@@ -228,7 +236,7 @@ class Game :
                         self.running = False
                         self.showAllDrawable()
                         self.showAllListener()
-                        self.menu("play")
+                        self.menu(current_mode,"pause")
                         
     
 
@@ -295,6 +303,48 @@ class Game :
                     self.cursor_position_list.append(self.cursor_position)
                     self.cursor_position = []
                     self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
+                    
+    def quickMode(self):
+        self.running = True
+        self.assignRandomTarget()
+        self.addDrawable(self.barTime)
+        pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
+        
+        self.cursor_position = []
+        self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
+        while (self.running):
+            self.refreshScreen(False)
+            
+            #Display Timer
+            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), BLACK, self.barTime.posText, True)
+            pygame.display.update()
+
+            ev = pygame.event.get()
+            #Tracking mouse position
+            self.cursor_position.append(pygame.mouse.get_pos())
+            for event in ev:
+                L = self.listen(event)
+                if event.type == pygame.QUIT:
+                    self.quitApp()
+                    
+                #Update Timer
+                if event.type == pygame.USEREVENT:
+                    self.barTime.addSubTime(-0.01)
+                    if self.barTime.timer <= 0:
+                        self.running = False
+                        self.menu("endGame")
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                        self.menu("pause", 'quick')
+                if ("cible",True) in L:#On a cliqué sur une cible
+                    #Saving the tracking of mouse
+                    self.cursor_position_list.append(self.cursor_position)
+                    self.cursor_position = []
+                    self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
+                if ("cible", False) in L:
+                    self.barTime.timer -= 1
 
     def chooseMode(self):
         button1 = Button((int(self.width/2 - 250),int(self.height/2 + 30)), 1, 200, 60 , (200, 50, 50), RED, "Survival mode")
@@ -318,4 +368,12 @@ class Game :
                     self.running = False
                     self.showAllDrawable()
                     self.showAllListener()
-                    self.menu("play")
+                    self.menu("play","main")
+                    
+                if ("button",2) in L:
+                    self.removeListenerDrawable([button1, button2])
+                    self.score = 0
+                    self.running = False
+                    self.showAllDrawable()
+                    self.showAllListener()
+                    self.menu("quick","main")
