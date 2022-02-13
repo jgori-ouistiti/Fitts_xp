@@ -1,7 +1,9 @@
 from turtle import width
+from drawable import *
+from listener import *
 import pygame
 
-class Button:
+class Button(Drawable, Listener):
     def __init__(self, pos, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
     
         self.checkPosType(pos)
@@ -98,7 +100,8 @@ class Button:
             
         pygame.draw.rect(self.screen,self.active_color ,[x, y ,self.width ,self.height])
             
-        
+    def action(self, game):
+        return self.__name__    
           
         
     

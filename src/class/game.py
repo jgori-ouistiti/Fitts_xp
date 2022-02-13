@@ -34,10 +34,11 @@ class Game :
 			if v:
 				d.draw(self)
 
-	def refreshScreen(self):
+	def refreshScreen(self, update = True):
 		self.screen.fill(self.bg_color)
 		self.draw()
-		pygame.display.update()
+		if update:
+		    pygame.display.update()
 			
 	def addDrawable(self, d):
 		if (hasattr(d, "__len__")):
@@ -230,7 +231,7 @@ class Game :
 		self.addDrawable(self.barTime)
 		pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
 		while (self.running):
-			self.refreshScreen()
+			self.refreshScreen(False)
 			
 			#Display Timer
 			self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), BLACK, self.barTime.posText, True)
