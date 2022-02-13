@@ -94,8 +94,14 @@ class Button(Drawable, Listener):
                 self.active_color = self.selectedColor
             else:
                 self.active_color = self.color
-            
+         
+        text_x = x + int(self.width/2)
+        text_y = y + int(self.height/2)
+        
+        text_rect = self.text_render.get_rect(center=(text_x, text_y))
+        
         pygame.draw.rect(game.screen,self.active_color ,[x, y ,self.width ,self.height])
+        game.screen.blit(self.text_render, text_rect)
             
     def action(self, game, event):
         if event.type == pygame.MOUSEBUTTONDOWN:    
