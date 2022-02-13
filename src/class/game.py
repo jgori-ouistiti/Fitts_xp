@@ -3,10 +3,12 @@ sys.path.append('../class')
 from target_disposition import *
 from turtle import pos
 import pygame
+import random
 from drawable import *
 from listener import *
 from healthBar import *
 from button import *
+
 
 #colors
 RED = (255, 0, 0)
@@ -30,6 +32,7 @@ class Game :
         self.barTime = HealthBar(5, posText=(110,100), posRect=(30,30))
         self.time = 100
         self.score = 0
+        self.nb_target = 0
         
     def draw(self):
         for d, v in self.drawables.items():
@@ -55,6 +58,8 @@ class Game :
             self.drawables[d] = True
         
     def addListener(self, l):
+        if isinstance(l, Cible):
+            self.nb_target += 1
         if (hasattr(l, "__len__")):
             for l_item in l:
                 if isinstance(l_item, Listener):
@@ -78,8 +83,12 @@ class Game :
         if (hasattr(l, "__len__")):
             for l_item in l:
                 if l_item in self.listener.keys():
+                    if isinstance(l_item, Cible):
+                        self.nb_target -= 1
                     del self.listener[l_item]
         elif l in self.listener.keys():
+            if isinstance(l, Cible):
+                self.nb_target -= 1
             del self.listener[l]
             
     def addListenerDrawable(self, ld):
@@ -88,6 +97,8 @@ class Game :
                 if (not isinstance(ld_item, Drawable) or not isinstance(ld_item, Listener)):
                     print("Warning : ",l_item," found but not a listener or drawable")
                 else:
+                    if isinstance(ld_item, Cible):
+                        self.nb_target += 1
                     self.drawables[ld_item] = True
                     self.listener[ld_item] = True
             return
@@ -97,6 +108,8 @@ class Game :
             raise Exception("ld is not a listener")
         if (not isinstance(ld, Drawable)):
             raise Exception("ld is not drawable")
+        if isinstance(ld, Cible):
+            self.nb_target += 1
         self.drawables[ld] = True
         self.listener[ld] = True
         
@@ -146,7 +159,23 @@ class Game :
                 if tmp:
                     L.append(tmp)
         return L
-            
+        
+    def assignRandomTarget(self):
+        #Set one target the main target to hit
+        new_target_id = random.randint(0,self.nb_target - 1)
+        target = None
+        i = 0
+        for obj in self.listener.keys():
+            if isinstance(obj, Cible):
+                obj.isTarget = False
+                if i == new_target_id:
+                    obj.isTarget = True
+                    target = obj
+                i += 1
+        if target == None:
+            raise Exception("Internal error, no target found...")
+        
+        
     def menu(self, menu_title):
         if menu_title == "play":
             self.play()
@@ -210,6 +239,7 @@ class Game :
     
     def play(self):
         self.running = True
+        self.assignRandomTarget()
         self.addDrawable(self.barTime)
         pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
         while (self.running):
@@ -221,7 +251,7 @@ class Game :
 
             ev = pygame.event.get()
             for event in ev:
-                self.listen(event)
+                L = self.listen(event)
                 if event.type == pygame.QUIT:
                     self.running = False
                     
@@ -236,10 +266,12 @@ class Game :
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         self.menu("pause")
+                if ("cible",True) in L:#On a cliqué sur une cible
+                    self.barTime.timer += 1
 
     def chooseMode(self):
-        button1 = Button((int(self.width/2 - 150),150), 1, 100, 50 , (200, 50, 50), RED, "button1")
-        button2 = Button((int(self.width/2 + 50),150), 1, 100, 50 , (200, 50, 50), RED, "button2") 
+        button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 100, 60 , (200, 50, 50), RED, "button1")
+        button2 = Button((int(self.width/2 + 50),int(self.height /2+ 30)), 1, 100, 60 , (200, 50, 50), RED, "button2") 
         self.addListenerDrawable([button1,button2])
         self.refreshScreen()
         self.write_screen("Choose Your Mode", BLACK, (self.width/2, self.height/2 - 30))

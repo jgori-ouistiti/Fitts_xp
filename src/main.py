@@ -8,10 +8,9 @@ from target_disposition import *
 from healthBar import *
 
 def main():
-	game = Game(600, 300)
+	game = Game(800, 600)
 	running = True
-	cible = Cible((300,50), 10, (255,0,0))
-	game.addListenerDrawable(make_circle_target_list((300,150), 100, 10, (255,0,0), 20))
+	game.addListenerDrawable(make_circle_target_list((400,300), 200, 10, (0,0,255), 50))
 	game.menu("chooseMode")
 	
 if __name__ == "__main__":
