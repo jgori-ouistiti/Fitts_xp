@@ -33,6 +33,10 @@ class Game :
         self.time = 100
         self.score = 0
         self.nb_target = 0
+        self.target_radius = 0
+        self.cursor_position = []
+        self.cursor_position_list = []
+        self.active_target = None
         
     def draw(self):
         for d, v in self.drawables.items():
@@ -170,6 +174,7 @@ class Game :
                 obj.isTarget = False
                 if i == new_target_id:
                     obj.isTarget = True
+                    self.active_target = obj
                     target = obj
                 i += 1
         if target == None:
@@ -196,7 +201,17 @@ class Game :
         text = self.font.render(mot, booleen, color)
         text_rect = text.get_rect(center=pos)
         self.screen.blit(text, text_rect)
+   
+    def save_data_in_file(self, filename):
+        f = open(filename, 'w')
+        f.write("NB_TARGET " + str(self.nb_target) + "\n")
+        f.write(str(self.cursor_position_list))
+        f.close()
     
+    def quitApp(self):
+        self.save_data_in_file("resultat.txt")
+        self.running = False
+        
     def pauseMenu(self):
         self.refreshScreen()
         self.write_screen("PAUSE", BLACK, (self.width/2, self.height/2 - 30))
@@ -207,13 +222,16 @@ class Game :
             ev = pygame.event.get()
             for event in ev:
                 if event.type == pygame.QUIT:
-                        self.running = False
+                        self.quitApp()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         self.showAllDrawable()
                         self.showAllListener()
                         self.menu("play")
+                        
+    
+
             
     def endGame(self):
         self.refreshScreen()
@@ -226,7 +244,7 @@ class Game :
             ev = pygame.event.get()
             for event in ev:
                 if event.type == pygame.QUIT:
-                    self.running = False
+                    self.quitApp()
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -242,6 +260,9 @@ class Game :
         self.assignRandomTarget()
         self.addDrawable(self.barTime)
         pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
+        
+        self.cursor_position = []
+        self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
         while (self.running):
             self.refreshScreen(False)
             
@@ -250,10 +271,12 @@ class Game :
             pygame.display.update()
 
             ev = pygame.event.get()
+            #Tracking mouse position
+            self.cursor_position.append(pygame.mouse.get_pos())
             for event in ev:
                 L = self.listen(event)
                 if event.type == pygame.QUIT:
-                    self.running = False
+                    self.quitApp()
                     
                 #Update Timer
                 if event.type == pygame.USEREVENT:
@@ -268,6 +291,10 @@ class Game :
                         self.menu("pause")
                 if ("cible",True) in L:#On a cliqué sur une cible
                     self.barTime.timer += 1
+                    #Saving the tracking of mouse
+                    self.cursor_position_list.append(self.cursor_position)
+                    self.cursor_position = []
+                    self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
 
     def chooseMode(self):
         button1 = Button((int(self.width/2 - 250),int(self.height/2 + 30)), 1, 200, 60 , (200, 50, 50), RED, "Survival mode")
@@ -284,7 +311,7 @@ class Game :
                 L = self.listen(event)
                 #self.listenMode(event)
                 if event.type == pygame.QUIT:
-                    self.running = False
+                    self.quitApp()
                 if ("button",1) in L:
                     self.removeListenerDrawable([button1, button2])
                     self.score = 0
