@@ -12,8 +12,7 @@ def main():
 	running = True
 	cible = Cible((300,50), 10, (255,0,0))
 	game.addListenerDrawable(make_circle_target_list((300,150), 100, 10, (255,0,0), 20))
-	game.addMode(make_button_mode_list((300,150), 2, [1, 2], 100, 50, (255, 0, 0), (0, 255, 0) ))	 
-	game.menu("play")
+	game.menu("chooseMode")
 	
 if __name__ == "__main__":
 	main()

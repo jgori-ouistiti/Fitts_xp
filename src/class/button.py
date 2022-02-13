@@ -27,7 +27,7 @@ class Button(Drawable, Listener):
         self.checkColorType(selectedColor)
         self.selectedColor = selectedColor
         
-        self.activeColor = self.color
+        self.active_color = self.color
         self.isSelected = False
         self.font = pygame.font.SysFont('Corbel',35)
         self.text = text
@@ -74,34 +74,33 @@ class Button(Drawable, Listener):
         largeur = int(self.width)
         longueur = int(self.height)
         return 0<=xp and xp <= largeur and 0<=yp and yp <= longueur
-    
 
-    def drawButton(self, game): 
-        x, y = self.pos
-        pygame.draw.rect(game.screen,self.color ,[x, y ,self.width ,self.height])
-
-    def draw(self, cursorPos):
-        self.checkPosType(cursorPos)
+    def draw(self, game):
         
-        xc, yc = cursorPos
+        xc, yc = pygame.mouse.get_pos()
         x, y = self.pos
         
-        tmp_selected = True
+        tmp_selected = self.isSelected
+        
         #if (xc - x < 0 or xc - x > self.width or yc - y < 0 or yc - y > self.height):
-        if not self.isInside(cursorPos):
+        if self.isInside(pygame.mouse.get_pos()):
             tmp_selected = False
-            
-        self.isSelected = tmp_selected
-        
-        if self.isSelected:
-            self.active_color = self.selectedColor
         else:
-            self.active_color = self.color
+            tmp_selected = True
+        #Est-ce que la couleur doit changer ?
+        if self.isSelected != tmp_selected : 
+            self.isSelected = tmp_selected
+            if self.isSelected:
+                self.active_color = self.selectedColor
+            else:
+                self.active_color = self.color
             
-        pygame.draw.rect(self.screen,self.active_color ,[x, y ,self.width ,self.height])
+        pygame.draw.rect(game.screen,self.active_color ,[x, y ,self.width ,self.height])
             
-    def action(self, game):
-        return self.__name__    
+    def action(self, game, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:    
+            if (self.isInside(pygame.mouse.get_pos())):
+                return "button", self.mode    
           
         
     
