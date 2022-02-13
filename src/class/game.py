@@ -270,8 +270,8 @@ class Game :
                     self.barTime.timer += 1
 
     def chooseMode(self):
-        button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 100, 60 , (200, 50, 50), RED, "button1")
-        button2 = Button((int(self.width/2 + 50),int(self.height /2+ 30)), 1, 100, 60 , (200, 50, 50), RED, "button2") 
+        button1 = Button((int(self.width/2 - 250),int(self.height/2 + 30)), 1, 200, 60 , (200, 50, 50), RED, "Survival mode")
+        button2 = Button((int(self.width/2 + 50),int(self.height /2+ 30)), 2, 200, 60 , (200, 50, 50), RED, "Speed mode") 
         self.addListenerDrawable([button1,button2])
         self.refreshScreen()
         self.write_screen("Choose Your Mode", BLACK, (self.width/2, self.height/2 - 30))
