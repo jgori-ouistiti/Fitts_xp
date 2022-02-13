@@ -238,8 +238,8 @@ class Game :
                         self.menu("pause")
 
     def chooseMode(self):
-        button1 = Button((int(self.width/2 - 100),150), 1, 100, 50 , RED,(200, 50, 50), "button1")
-        button2 = Button((int(self.width/2 + 100),150), 1, 100, 50 , RED,(200, 50, 50), "button2") 
+        button1 = Button((int(self.width/2 - 100),150), 1, 100, 50 , (200, 50, 50), RED, "button1")
+        button2 = Button((int(self.width/2 + 100),150), 1, 100, 50 , (200, 50, 50), RED, "button2") 
         self.addListenerDrawable([button1,button2])
         self.refreshScreen()
         self.write_screen("Choose Your Mode", BLACK, (self.width/2, self.height/2 - 30))
