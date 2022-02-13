@@ -2,9 +2,7 @@ from turtle import width
 import pygame
 
 class Button:
-    def __init__(self, pos, screen, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
-    
-        self.screen = screen
+    def __init__(self, pos, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
     
         self.checkPosType(pos)
         self.pos = pos
@@ -39,14 +37,14 @@ class Button:
         
     def setText(self, text):
         self.text = text
-        self.text_render = self.font.render(self.text , True , textColor)
+        self.text_render = self.font.render(self.text , True , self.color)
            
     def isPosType(self, pos):
         if len(pos) != 2:
             return False
         if (not isinstance(pos[0], int)) or (not isinstance(pos[1], int)):
             return False
-        if ((pos[0]<0) or (pos[1]<0) or(pos[0]>width) or (pos[1]>height) ) :
+        if ((pos[0]<0) or (pos[1]<0) ) :
             return False
         return True
         
@@ -74,7 +72,12 @@ class Button:
         largeur = int(self.width)
         longueur = int(self.height)
         return 0<=xp and xp <= largeur and 0<=yp and yp <= longueur
-            
+    
+
+    def drawButton(self, game): 
+        x, y = self.pos
+        pygame.draw.rect(game.screen,self.color ,[x, y ,self.width ,self.height])
+
     def draw(self, cursorPos):
         self.checkPosType(cursorPos)
         

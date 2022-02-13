@@ -30,15 +30,17 @@ class HealthBar(Drawable):
     def addSubTime(self, timer):
         self.timer += timer
         if self.timer > 5:
-        	self.timer = 5
-        self.longueur = int(self.timer/5 * 300)
+            self.timer = 5
+            self.longueur = int(self.timer/5 * 300)
         	
         if self.timer >= 0:
             life_color = min(int( (self.timer/5)*255) ,255) #level of red = 255 - level of green 
         else : 
             life_color = 0 #temps est negatif donc il n'y a plu de temps donc la barre est rouge
         self.color = (255 - life_color, life_color, 0)
+        self.longueur = self.timer*10
 
+        
         #text = pygame.font.SysFont("aerial", 60).render(self.longueur, True, (0, 0, 0))
         #text_rect = text.get_rect(center=self.posText)#position_text
         #game.screen.blit(text, text_rect)

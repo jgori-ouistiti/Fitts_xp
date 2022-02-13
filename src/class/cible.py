@@ -52,8 +52,10 @@ class Cible(Drawable, Listener):
     def action(self, game, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.isInside(pygame.mouse.get_pos()):
-            	self.newColor((0,255,0))
-            	self.isTarget = False
+                self.newColor((0,255,0))
+                game.score += 1
+                self.isTarget = False
+
 
 
         

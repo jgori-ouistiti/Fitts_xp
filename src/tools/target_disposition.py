@@ -4,6 +4,7 @@ sys.path.append('../class')
 import math
 import pygame
 from cible import *
+from button import *
 
 def drawCircle(pos, color, r):
 	pygame.draw.circle(screen, color, pos, r)
@@ -46,6 +47,17 @@ def make_circle_target_list(pos, circle_r, nb_of_target, t_color, t_size):
 	for i in range(nb_of_target):
 		pos = (int(x + circle_r*math.cos(theta)), int(y + circle_r*math.sin(theta)))
 		L.append(Cible(pos, t_size, t_color))
+		theta += delta_theta
+	return L
+
+def make_button_mode_list(pos, nb_mode, list_id_mode, width, height, color, selectedColor) :
+	L = []
+	delta_theta = 2*math.pi / nb_mode
+	x, y = pos
+	theta = 0
+	for i in range(nb_mode):
+		pos = (int(x + 100*math.cos(theta)), int(y + 100*math.sin(theta)))
+		L.append(Button(pos, list_id_mode[i], width, height, color, selectedColor))
 		theta += delta_theta
 	return L
 	
