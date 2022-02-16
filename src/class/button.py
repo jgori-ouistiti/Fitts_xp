@@ -1,9 +1,10 @@
+from turtle import width
+from drawable import *
+from listener import *
 import pygame
 
-class Button:
-    def __init__(self, pos, screen, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
-    
-        self.screen = screen
+class Button(Drawable, Listener):
+    def __init__(self, pos, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
     
         self.checkPosType(pos)
         self.pos = pos
@@ -26,7 +27,7 @@ class Button:
         self.checkColorType(selectedColor)
         self.selectedColor = selectedColor
         
-        self.activeColor = self.color
+        self.active_color = self.color
         self.isSelected = False
         self.font = pygame.font.SysFont('Corbel',35)
         self.text = text
@@ -38,12 +39,14 @@ class Button:
         
     def setText(self, text):
         self.text = text
-        self.text_render = self.font.render(self.text , True , textColor)
+        self.text_render = self.font.render(self.text , True , self.color)
            
     def isPosType(self, pos):
         if len(pos) != 2:
             return False
         if (not isinstance(pos[0], int)) or (not isinstance(pos[1], int)):
+            return False
+        if ((pos[0]<0) or (pos[1]<0) ) :
             return False
         return True
         
@@ -71,27 +74,39 @@ class Button:
         largeur = int(self.width)
         longueur = int(self.height)
         return 0<=xp and xp <= largeur and 0<=yp and yp <= longueur
-            
-    def draw(self, cursorPos):
-        self.checkPosType(cursorPos)
+
+    def draw(self, game):
         
-        xc, yc = cursorPos
+        xc, yc = pygame.mouse.get_pos()
         x, y = self.pos
         
-        tmp_selected = True
-        if (xc - x < 0 or xc - x > self.width or yc - y < 0 or yc - y > self.height):
+        tmp_selected = self.isSelected
+        
+        #if (xc - x < 0 or xc - x > self.width or yc - y < 0 or yc - y > self.height):
+        if self.isInside(pygame.mouse.get_pos()):
             tmp_selected = False
-            
-        self.isSelected = tmp_selected
-        
-        if self.isSelected:
-            self.active_color = self.selectedColor
         else:
-            self.active_color = self.color
-            
-        pygame.draw.rect(self.screen,self.active_color ,[x, y ,self.width ,self.height])
-            
+            tmp_selected = True
+        #Est-ce que la couleur doit changer ?
+        if self.isSelected != tmp_selected : 
+            self.isSelected = tmp_selected
+            if self.isSelected:
+                self.active_color = self.selectedColor
+            else:
+                self.active_color = self.color
+         
+        text_x = x + int(self.width/2)
+        text_y = y + int(self.height/2)
         
+        text_rect = self.text_render.get_rect(center=(text_x, text_y))
+        
+        pygame.draw.rect(game.screen,self.active_color ,[x, y ,self.width ,self.height])
+        game.screen.blit(self.text_render, text_rect)
+            
+    def action(self, game, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:    
+            if (self.isInside(pygame.mouse.get_pos())):
+                return "button", self.mode    
           
         
     
