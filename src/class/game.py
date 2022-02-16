@@ -278,15 +278,17 @@ class Game :
             pygame.display.update()
 
             ev = pygame.event.get()
-            #Tracking mouse position
-            self.cursor_position.append(pygame.mouse.get_pos())
+            
+            
             for event in ev:
                 L = self.listen(event)
                 if event.type == pygame.QUIT:
                     self.quitApp()
-                    
-                #Update Timer
+                #Update Timer and collect mouse position
                 if event.type == pygame.USEREVENT:
+                    #Tracking mouse position
+                    self.cursor_position.append(pygame.mouse.get_pos())
+                    #Decrementing timer
                     self.barTime.addSubTime(-0.01)
                     if self.barTime.timer <= 0:
                         self.running = False
