@@ -19,7 +19,6 @@ BLACK = (0, 0, 0)
 
 class Game :
     def __init__(self, width, height, bg_color = WHITE):
-        pygame.init()
         self.font = pygame.font.SysFont("aerial", 60)
         self.screen    = pygame.display.set_mode((width, height))
         pygame.display.set_caption("TEST CIBLES")
