@@ -8,10 +8,10 @@ from drawable import *
 from listener import *
 from healthBar import *
 from button import *
-from colors import *
+import colors as Colors
 
 class Game :
-    def __init__(self, width, height, bg_color = WHITE):
+    def __init__(self, width, height, bg_color = Colors.WHITE):
         self.font = pygame.font.SysFont("aerial", 60)
         self.screen    = pygame.display.set_mode((width, height))
         pygame.display.set_caption("TEST CIBLES")
@@ -214,8 +214,8 @@ class Game :
         
     def pauseMenu(self, current_mode):
         self.refreshScreen()
-        self.write_screen("PAUSE", BLACK, (self.width/2, self.height/2 - 30))
-        self.write_screen("Press ESCAPE to continue", BLACK, (self.width/2, self.height/2 + 30))
+        self.write_screen("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.write_screen("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -235,9 +235,9 @@ class Game :
             
     def endGame(self):
         self.refreshScreen()
-        self.write_screen("GAME OVER", BLACK, (self.width/2, self.height/2 - 50))
-        self.write_screen("Your score : " + str(self.score), BLACK, (self.width/2, self.height/2))
-        self.write_screen("Press ESCAPE to play again", BLACK, (self.width/2, self.height/2 + 50))
+        self.write_screen("GAME OVER", Colors.BLACK, (self.width/2, self.height/2 - 50))
+        self.write_screen("Your score : " + str(self.score), Colors.BLACK, (self.width/2, self.height/2))
+        self.write_screen("Press ESCAPE to play again", Colors.BLACK, (self.width/2, self.height/2 + 50))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -267,7 +267,7 @@ class Game :
             self.refreshScreen(False)
             
             #Display Timer
-            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), BLACK, self.barTime.posText, True)
+            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
             pygame.display.update()
 
             ev = pygame.event.get()
@@ -310,7 +310,7 @@ class Game :
             self.refreshScreen(False)
             
             #Display Timer
-            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), BLACK, self.barTime.posText, True)
+            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
             pygame.display.update()
 
             ev = pygame.event.get()
@@ -345,7 +345,7 @@ class Game :
         button2 = Button((int(self.width/2 + 50),int(self.height /2+ 30)), 2, 200, 60 , (200, 50, 50), RED, "Speed mode") 
         self.addListenerDrawable([button1,button2])
         self.refreshScreen()
-        self.write_screen("Choose Your Mode", BLACK, (self.width/2, self.height/2 - 30))
+        self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2, self.height/2 - 30))
         self.running = True
         while(self.running):
             pygame.display.update()

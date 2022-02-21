@@ -6,7 +6,7 @@ from game import *
 from cible import *
 from target_disposition import *
 from healthBar import *
-from colors import *
+import colors as Colors
 
 def main():
     pygame.init()
@@ -15,7 +15,7 @@ def main():
     HEIGHT = infoObject.current_h - 200
     game = Game(WIDTH, HEIGHT)
     running = True
-    game.addListenerDrawable(make_circle_target_list((WIDTH/2,HEIGHT/2), HEIGHT/3, 10, DARK_GREEN, 90))
+    game.addListenerDrawable(make_circle_target_list((WIDTH/2,HEIGHT/2), HEIGHT/3, 10, Colors.DARK_GREEN, 90))
     game.menu("chooseMode")
     
 if __name__ == "__main__":
