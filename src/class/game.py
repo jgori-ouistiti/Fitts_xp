@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../class')
+sys.path.append('../tools')
 from target_disposition import *
 from turtle import pos
 import pygame
