@@ -1,5 +1,6 @@
 from drawable import *
 from listener import *
+from colors import *
 import pygame
 
 class Cible(Drawable, Listener):
@@ -48,7 +49,7 @@ class Cible(Drawable, Listener):
         
     def draw(self, game):
         if self.isTarget :
-            pygame.draw.circle(game.screen, (255,0,0) , (self.x,self.y), self.r)
+            pygame.draw.circle(game.screen, RED , (self.x,self.y), self.r)
         else:
             pygame.draw.circle(game.screen, self.color, (self.x,self.y), self.r)
         
