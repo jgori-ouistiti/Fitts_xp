@@ -178,16 +178,20 @@ class Game :
             if current_mode != "pause":
                 self.barTime.maxtime = 5
                 self.barTime.timer = 5
+            pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
             self.play()
         if menu_title == "pause":
+            pygame.time.set_timer(pygame.USEREVENT, 0) #Active pygame.USEREVENT toute les 10ms 
             self.hideAllDrawable()
             self.hideAllListener()
             self.pauseMenu(current_mode)
         if menu_title == "endGame":
+            pygame.time.set_timer(pygame.USEREVENT, 0) #Active pygame.USEREVENT toute les 10ms 
             self.hideAllDrawable()
             self.hideAllListener()
             self.endGame()
         if menu_title == "chooseMode":
+            pygame.time.set_timer(pygame.USEREVENT, 0) #Active pygame.USEREVENT toute les 10ms 
             self.hideAllDrawable()
             self.hideAllListener()
             self.chooseMode() 
@@ -195,6 +199,7 @@ class Game :
             if current_mode != "pause":
                 self.barTime.maxtime = 10
                 self.barTime.timer = 10
+            pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
             self.quickMode()
             
     def write_screen(self, mot,color, pos, booleen=True ):
@@ -259,7 +264,6 @@ class Game :
         self.running = True
         self.assignRandomTarget()
         self.addDrawable(self.barTime)
-        pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
         
         self.cursor_position = []
         self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
@@ -302,7 +306,6 @@ class Game :
         self.running = True
         self.assignRandomTarget()
         self.addDrawable(self.barTime)
-        pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
         
         self.cursor_position = []
         self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
