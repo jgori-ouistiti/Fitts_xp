@@ -49,6 +49,28 @@ def make_circle_target_list(pos, circle_r, nb_of_target, t_color, t_size):
 		L.append(Cible(pos, t_size, t_color))
 		theta += delta_theta
 	return L
+	
+def make_2D_distractor_target_list(center, ID, A, p, t_color, jmax = 20):
+    L = []
+    alpha = math.asin((1./2.)*(1./(pow(2, ID)-1)))
+    beta = 2*alpha/p
+    r = math.sqrt(math.pi/(alpha - math.pi/2 + p/math.tan(alpha)) + 1)
+    for i in range(jmax):
+        for j in range(11):
+            a_ij = 0
+            if j%2 == 0:
+                a_ij = A * pow(r,i)
+            else:
+                a_ij = A * pow(r, i + 1./2.)
+            w = int(a_ij/(pow(2, ID) - 1)) + 5
+            x = int(a_ij * math.cos(beta * j) + center[0]/2)
+            if x > center[0] or x < 0:
+                continue
+            y = int(a_ij * math.sin(beta * j) + center[1]/2)
+            if y > center[1] or y < 0:
+                continue
+            L.append(Cible((x,y), w, t_color))
+    return L
 
 def make_button_mode_list(pos, nb_mode, list_id_mode, width, height, color, selectedColor) :
 	L = []
