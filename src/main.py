@@ -16,7 +16,7 @@ def main():
     game = Game(WIDTH, HEIGHT)
     running = True
     #game.addListenerDrawable(make_circle_target_list((WIDTH/2,HEIGHT/2), HEIGHT/3, 10, Colors.DARK_GREEN, 90))
-    game.addListenerDrawable(make_2D_distractor_target_list((WIDTH,HEIGHT), 4, 25, 0.18, Colors.DARK_GREEN))
+    game.addListenerDrawable(make_2D_distractor_target_list((WIDTH,HEIGHT), 3, 40, 0.25, Colors.BLACK))
     game.menu("chooseMode")
     
 if __name__ == "__main__":
