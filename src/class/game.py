@@ -115,9 +115,16 @@ class Game :
                 if item in self.drawables.keys() and item in self.listener.keys():
                     del self.drawables[item]
                     del self.listener[item]
+                    if isinstance(item, Cible):
+                        self.nb_target -= 1
+
         elif ld in self.drawables.keys() and ld in self.listener.keys():
             del self.drawables[ld]
             del self.listener[ld]
+            if isinstance(ld, Cible):
+                self.nb_target -= 1
+
+
         else:
             raise Exception("ld not in listener drawable")
 
@@ -164,7 +171,7 @@ class Game :
         for obj in self.listener.keys():
             if isinstance(obj, Cible):
                 obj.isTarget = False
-                if i == new_target_id:
+                if i == new_target_id:  
                     obj.isTarget = True
                     self.active_target = obj
                     target = obj
@@ -263,26 +270,31 @@ class Game :
                         self.showAllListener()
                         self.menu("chooseMode")
     
-    def play(self):
+    def play(self, mode="", listTarget=[], showTime=True) :
         self.running = True
         
-        targets = make_2D_distractor_target_list((self.width, self.height), (int(self.width/2), int(self.height/2) ), 3, 40, 0.25, Colors.BLACK)
-        self.addListenerDrawable(targets)
+        if listTarget == []:
+            targets = make_2D_distractor_target_list((self.width, self.height), (int(self.width/2), int(self.height/2) ), 3, 40, 0.25, Colors.BLACK)
+            self.addListenerDrawable(targets)
+        else :
+            self.addListenerDrawable(listTarget)
+        
         self.assignRandomTarget()
         
-        self.addDrawable(self.barTime)
+        if showTime : 
+            self.addDrawable(self.barTime)
         
         self.cursor_position = []
         self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
         while (self.running):
-            self.refreshScreen(False)
+            self.refreshScreen(True)
             
-            #Display Timer
-            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
-            pygame.display.update()
+            if showTime :
+                #Display Timer
+                self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
+                pygame.display.update()
 
             ev = pygame.event.get()
-            
             
             for event in ev:
                 L = self.listen(event)
@@ -303,13 +315,18 @@ class Game :
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         self.menu("pause")
+        
                 if ("cible",True) in L:#On a cliqué sur une cible
                     self.barTime.timer += 1
                     #Saving the tracking of mouse
                     self.cursor_position_list.append(self.cursor_position)
                     self.cursor_position = []
                     self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
-                    
+                
+                    if mode=="experiment":
+                        self.removeListenerDrawable(listTarget)
+                        return 1
+
     def quickMode(self):
         self.running = True
         targets = make_2D_distractor_target_list((self.width, self.height), (int(self.width/2), int(self.height/2) ), 3, 40, 0.25, Colors.BLACK)
