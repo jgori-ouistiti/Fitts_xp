@@ -38,7 +38,7 @@ class Experiment :
         pygame.display.update()  
 
         #self.game.write_screen()
-
+        self.game.menu("pause")
         ev = pygame.event.get()
         for event in ev:
             if event.type == pygame.QUIT:
@@ -86,8 +86,6 @@ class Experiment :
                     #for event in ev:
                     #    if event.type == pygame.QUIT:
                     #        self.game.quitApp()
-                    #    if event.type == pygame.KEYDOWN:
-                    #        if event.key == pygame.K_ESCAPE:
 
 
                 ## User have to do the test
