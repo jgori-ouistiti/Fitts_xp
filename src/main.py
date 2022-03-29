@@ -19,12 +19,12 @@ def main():
     #game.addListenerDrawable(make_2D_distractor_target_list((WIDTH,HEIGHT), (int(WIDTH/2), int(HEIGHT/2) ), 3, 40, 0.25, Colors.BLACK))
     
     ## Experience avec Mode 
-    game.menu("chooseMode")
+    #game.menu("chooseMode")
     
     # Experience avec Differents Types de disposition des cibles
-    #game.addTest(3, "circle", make_circle_target_list((WIDTH/2,HEIGHT/2), HEIGHT/3, 10, Colors.DARK_GREEN, 90))
-    #game.addTest(3, "2D    ", make_2D_distractor_target_list((WIDTH,HEIGHT), (int(WIDTH/2), int(HEIGHT/2) ), 3, 40, 0.25, Colors.BLACK))
-    #game.menu("experienceMulti")
+    game.addTest(3, "circle", make_circle_target_list((WIDTH/2,HEIGHT/2), HEIGHT/3, 10, Colors.DARK_GREEN, 90))
+    game.addTest(3, "2D    ", make_2D_distractor_target_list((WIDTH,HEIGHT), (int(WIDTH/2), int(HEIGHT/2) ), 3, 40, 0.25, Colors.BLACK))
+    game.menu("experienceMulti")
 
 if __name__ == "__main__":
     main()

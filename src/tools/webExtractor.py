@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 
 URL = "https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal"
 
-def extractPosition(url):
+def extractPosition(url, displayInfo = True):
     options = Options()
     options.add_argument('--headless')
     driver = webdriver.Firefox(options = options)
@@ -16,20 +16,23 @@ def extractPosition(url):
     elements = driver.find_elements_by_xpath("//a[@href]")
     cibles = []
     for element in elements:
-        print(element.get_attribute("href"))
         position = element.rect
-        print(position)
         if position['x'] < 0 or position['y'] < 0 :
             continue
         if position['height'] <= 0 or position['width'] <= 0:
             continue
+        if displayInfo :
+            print(element.get_attribute("href"), position)
+            print(position)
         cibles.append(position)
     driver.quit()
     return cibles
     
+def transformToTargets(positions):
+    return 0
+    
 def main():
     res = extractPosition(URL)
-    print("Liste des cibles : ",res)
     
 if __name__ == '__main__':
     main()
