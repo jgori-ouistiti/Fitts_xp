@@ -13,7 +13,7 @@ def extractPosition(url, displayInfo = True):
     #elements = driver.find_elements(By.XPATH, '//button')
     #elements += driver.find_elements(By.XPATH, '//link')
     #elements = driver.find_elements_by_id("link")
-    elements = driver.find_elements_by_xpath("//a[@href]")
+    elements = driver.find_elements_by_xpath("//a[@href]") #On récupère tous les liens de la page
     cibles = []
     for element in elements:
         position = element.rect
