@@ -4,6 +4,7 @@ sys.path.append('../class')
 import math
 import pygame
 from cible import *
+from cibleRect import *
 from button import *
 
 def drawCircle(pos, color, r):

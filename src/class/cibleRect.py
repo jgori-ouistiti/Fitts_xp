@@ -1,16 +1,15 @@
 from drawable import *
 from listener import *
+from cible import * 
 from colors import *
 import pygame
 
-class Cible(Drawable, Listener):
+class CibleRect(Cible):
     def __init__(self, pos , width, height, color = BLACK, isTarget = False):
         if not isinstance(pos[0], int):
             raise Exception("x is not an int")
         if not isinstance(pos[1], int):
             raise Exception("y is not an int")
-        if not isinstance(r, int):
-            raise Exception("r is not an int")
         if len(color) != 3:
             raise Exception("color must be a tuple like (R,G,B)")
         for c in color:
@@ -50,9 +49,9 @@ class Cible(Drawable, Listener):
         
     def draw(self, game):
         if self.isTarget :
-            pygame.draw.rect(game.screen, RED , (self.x,self.y,self.width,self.height))
+            pygame.draw.rect(game.screen, RED , pygame.Rect(self.x,self.y,self.width,self.height))
         else:
-            pygame.draw.rect(game.screen, self.color, (self.x,self.y,self.width,self.height))
+            pygame.draw.rect(game.screen, self.color, pygame.Rect(self.x,self.y,self.width,self.height),2)
         
     def action(self, game, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
