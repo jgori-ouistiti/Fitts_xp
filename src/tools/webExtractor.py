@@ -8,12 +8,16 @@ import colors
 
 URL = "https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal"
 
-def extractPosition(url, displayInfo = True):
+def extractPosition(url,WIDTH = 1080, HEIGHT = 1920, displayInfo = True):
     nbOfPos = 0
     if displayInfo:
         print("Collecting position from url :",url)
     options = Options()
     options.add_argument('--headless')
+    options.add_argument("--width="+str(WIDTH))
+    options.add_argument("--height="+str(HEIGHT))
+    
+    
     driver = webdriver.Firefox(options = options)
     driver.get(url)
     
@@ -52,7 +56,7 @@ def transformToTargets(positions, widthLimit, heightLimit, color=colors.BLACK, d
     return targets
     
 def getTargetsFromUrl(url, widthLimit, heightLimit, color = colors.BLACK, displayInfo = True):
-    positions = extractPosition(url, displayInfo)
+    positions = extractPosition(url, WIDTH = widthLimit, HEIGHT = heightLimit, displayInfo = displayInfo)
     targets = transformToTargets(positions, widthLimit, heightLimit, color, displayInfo)
     return targets
     

@@ -1,0 +1,46 @@
+{
+    usr_id :
+    experiences :
+    {
+            exp_id : 4
+            trial : 
+            {
+                {
+                trials_id : 1
+                position target:
+                trajectoire de la souris:
+                temps : },
+                {
+                trials_id : 2
+                position target:
+                trajectoire de la souris:
+                temps : },
+                {
+                trials_id : 3
+                position target:
+                trajectoire de la souris:
+                temps :
+                }
+            },
+            exp_id : 2
+            trial : 
+            {
+                {
+                trials_id : 1
+                position target:
+                trajectoire de la souris:
+                temps : },
+                {
+                trials_id : 2
+                position target:
+                trajectoire de la souris:
+                temps : },
+                {
+                trials_id : 3
+                position target:
+                trajectoire de la souris:
+                temps :
+                }
+            }
+    }  
+}

@@ -9,7 +9,7 @@ from healthBar import *
 import webExtractor as webEx
 import colors as Colors
 
-URL = "https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal"
+URL = "https://moodle-sciences.upmc.fr/moodle-2021/"
 
 def main():
     pygame.init()
