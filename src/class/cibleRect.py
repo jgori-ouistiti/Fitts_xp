@@ -26,26 +26,10 @@ class CibleRect(Cible):
         self.color = color
         self.isTarget = isTarget
 
-    def cliqued(self):
-        if self.isTarget :
-            self.isTarget = False
-            return 0
-        return 1
-
     def isInside(self, coord):
         xp = coord[0] - self.x
         yp = coord[1] - self.y
         return xp > 0 and yp > 0 and xp < self.width and yp < self.height
-
-    def newColor(self, color):
-        if len(color) != 3:
-            raise Exception("color must be a tuple like (R,G,B)")
-        for c in color:
-            if not isinstance(c, int):
-                raise Exception("color is not a tuple of int")
-            if ((c<0) or (c>255)) :
-                raise Exception("byte of color must be between 0 and 255")
-        self.color = color
         
     def draw(self, game):
         if self.isTarget :
@@ -53,16 +37,6 @@ class CibleRect(Cible):
         else:
             pygame.draw.rect(game.screen, self.color, pygame.Rect(self.x,self.y,self.width,self.height),2)
         
-    def action(self, game, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.isInside(pygame.mouse.get_pos()):
-                tmp = self.isTarget
-                if (self.isTarget) :
-                    game.score += 1
-                    game.assignRandomTarget()
-                else:
-                    game.score -= 1
-                return ("cible", tmp)
 
 
 

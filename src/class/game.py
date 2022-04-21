@@ -182,20 +182,18 @@ class Game :
         new_target_id = random.randint(0,self.nb_target - 1)
         target = None
         i = 0
-        for obj in self.listener.keys():
-            if isinstance(obj, Cible):
-                obj.isTarget = False
-                if i == new_target_id:  
-                    obj.isTarget = True
-                    self.active_target = obj
-                    target = obj
-                    if printTarget :
-                        if isinstance(target, CibleRect):
-                            print('target info : x:',target.x, '|y:',target.y,'|width:',target.width,'|height:',target.height)
-                        else:
-                            print('target info : x:',target.x, '|y:',target.y,'|r:',target.r)
-                    break
-                i += 1
+        for obj in self.listTarget:
+            obj.isTarget = False
+            if i == new_target_id:  
+                obj.isTarget = True
+                self.active_target = obj
+                target = obj
+                if printTarget :
+                    if isinstance(target, CibleRect):
+                        print('target info : x:',target.x, '|y:',target.y,'|width:',target.width,'|height:',target.height)
+                    else:
+                        print('target info : x:',target.x, '|y:',target.y,'|r:',target.r)
+            i += 1
         if target == None:
             raise Exception("Internal error, no target found...")
    
@@ -249,7 +247,10 @@ class Game :
                 self.barTime.maxtime = 10
                 self.barTime.timer = 10
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
-            self.quickMode()
+            if self.infiniteTime:
+                self.quickMode(mode="", listTarget=self.listTarget, showTime=False,)
+            else: 
+                self.quickMode(mode="", listTarget=self.listTarget)
         elif menu_title == "experience":
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
             self.experimentMode()
@@ -362,6 +363,7 @@ class Game :
                 if ("cible",True) in L:#On a cliqué sur une cible
                     if not self.infiniteTime:
                         self.barTime.timer += 1
+                        self.score += 1
                     #Saving the tracking of mouse
                     self.cursor_position_list.append(self.cursor_position)
                     self.cursor_position = []
@@ -370,6 +372,10 @@ class Game :
                     if mode=="experienceMulti":
                         self.removeListenerDrawable(targets)
                         return 1
+                elif ("not cible",False) in L: #On n'a pas cliqué sur la bonne cible
+                    if not self.infiniteTime:
+                        self.barTime.timer += -1
+                        self.score += -1
 
     def chooseMode(self):
         button1 = Button((int(self.width/2 - 350),int(self.height/2 + 30)), 1, 200, 60 , (200, 50, 50), RED, "Survival mode")
@@ -415,10 +421,26 @@ class Game :
                     self.showAllListener()
                     self.menu("experience","main")
 
-    def quickMode(self):
+    def quickMode(self, mode="", listTarget=[], showTime=True, displayConsolNbOfTarget = True):
+    
         self.running = True
-        targets = make_2D_distractor_target_list((self.width, self.height), (int(self.width/2), int(self.height/2) ), 3, 40, 0.25, Colors.BLACK)
-        self.addListenerDrawable(targets)
+        
+        targets = listTarget
+        
+        if targets == []:
+        
+            targets = make_2D_distractor_target_list(\
+                (self.width, self.height), \
+                (int(self.width/2), int(self.height/2) ),\
+                3, 40, 0.25, Colors.BLACK)
+                
+            self.addListenerDrawable(targets)
+        else :
+            self.addListenerDrawable(targets)
+        
+        if displayConsolNbOfTarget :
+            print("number of target stored :", self.nb_target)
+        
         self.assignRandomTarget()
         self.addDrawable(self.barTime)
         
@@ -452,12 +474,15 @@ class Game :
                         self.running = False
                         self.menu("pause", 'quick')
                 if ("cible",True) in L:#On a cliqué sur une cible
+                    if not self.infiniteTime:
+                        self.score += 1
                     #Saving the tracking of mouse
                     self.cursor_position_list.append(self.cursor_position)
                     self.cursor_position = []
                     self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
-                if ("cible", False) in L:
-                    self.barTime.timer -= 1             
+                elif ("not cible", False) in L: #On n'a pas cliqué sur la bonne cible
+                    self.barTime.timer += -1 
+                    self.score += -1            
     
     def distractorMode(self, ID = 3, A = 40, p = 0.25, color = Colors.BLACK, nb_trials = 10):
         print("DISTRACTOR MODE")
