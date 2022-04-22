@@ -1,6 +1,6 @@
 from game import *
 
-class GameExperience(Game):
+class GameExperiment(Game):
     
     def __init__(self, width, height, bg_color = Colors.WHITE):
         super().__init__(width, height, bg_color)
