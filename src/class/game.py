@@ -53,11 +53,18 @@ class Game :
             pygame.display.update()
             
     def write_box(self, mot, color, pos, booleen=True):
+        '''Write one line on screen on an invisible box
+        The text is centered on the position pos. So it starts before and ends after.
+        It doesn't break lines and so, can't read things as \n'''
         text = self.font.render(mot, booleen, color)
         text_rect = text.get_rect(center=pos)
         self.screen.blit(text, text_rect)
 
     def write_screen(self, text, color, pos, maxSize = None):
+        '''Write a full text on screen
+        The text starts on the position pos and can break lines.
+        maxSize is for closing the text in a box
+        This methods do not center the text'''
         words = [mot.split(' ') for mot in text.splitlines()]  # 2D array where each row is a list of words.
         space = self.font.size(' ')[0]  # The width of a space.
         x, y = pos
