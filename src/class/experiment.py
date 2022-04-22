@@ -6,96 +6,77 @@ import colors as Colors
 import random
 
 class Experiment :
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.game = Game(self.width, self.height)
+    def __init__(self, targets, exp_name, exp_id, maxTrials = 20):
+        self.targets  = targets
+        self.exp_name = exp_name
+        self.exp_id   = exp_id
+        
+        self.maxTrials = maxTrials
+        
+        if self.maxTrials < 0:
+            raise Exception("maxTrials must be positive")
+        
+        self.trial    = 0
 
-        self.testTotale = 0
+    def begin(self, game):         
+        '''Start the experience
+        WARNING : we can pause the experience so we can exit this method at any time
+        We must use trial variable to know where we are on the experiment
+        '''
+        
+        if self.targets == None or self.targets == []:
+            raise Exception("Experiment has no target initialized")
+        
+        game.running = True
+        
+        game.listTarget = targets = self.targets
+        game.addListenerDrawable(self.targets)
+        
+        game.assignRandomTarget()
+        
+        game.cursor_position = []
+        game.cursor_position.append(("target_pos :",(game.active_target.x,game.active_target.y)))
+        
+        while (game.running and self.trial < self.maxTrials):
+            game.refreshScreen(True)
 
-        # typeTarget : int (pour savoir quel disposition des targets on utilise)
-        # nombreExp : int (pour savoir on repete combien de fois ce disposition des targets)
-        # listTarget : list (c'est une liste des positions des targets)
-        ## self.list : dict( typeTarget : [nombreExp, listTarget] )
-        self.listTest = dict() 
-
-
-    def addTest(self, nombre, typeTarget, listTarget): 
-        """
-            Permet d'ajouter/augmenter de nombre d'experience
-        """
-        if nombre > 0 : 
-            self.testTotale += nombre
-            if typeTarget in self.listTest : #si il existe, alors on augmente le nombre
-                self.listTest[typeTarget][0] += nombre
-            else : #sinon on va la creer, en la rajoutant dans le dictionnaire
-                self.listTest[typeTarget] = [nombre, listTarget] 
+            ev = pygame.event.get()
+            for event in ev:
+            
+                L = game.listen(event)
+                
+                if event.type == pygame.QUIT:
+                    game.quitApp()
+                    return 0
+                    
+                #collect mouse position
+                if event.type == pygame.USEREVENT:
+                    #Tracking mouse position
+                    game.cursor_position.append(pygame.mouse.get_pos())
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game.running = False
+                        game.removeListenerDrawable(targets)
+                        game.menu("pause")
+        
+                if ("cible",True) in L:#On a cliqué sur une cible
+                
+                    self.trial += 1
+                
+                    game.score += 1
+                        
+                    #Saving the tracking of mouse
+                    game.cursor_position_list.append(game.cursor_position)
+                    game.cursor_position = []
+                    game.cursor_position.append(("target_pos :",(game.active_target.x,game.active_target.y)))
+                
+                elif ("not cible",False) in L: #On n'a pas cliqué sur la bonne cible
+                    game.score += -1
+                    
+        #End of the experiment
+        game.running = False
+        game.removeListenerDrawable(targets)
+        game.menu("endExperiment")
         
 
-    def menu(self):
-
-        self.game.screen.fill(Colors.WHITE)
-        pygame.display.update()  
-
-        #self.game.write_screen()
-        self.game.menu("pause")
-        ev = pygame.event.get()
-        for event in ev:
-            if event.type == pygame.QUIT:
-                self.game.quitApp()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: 
-
-                    key, value = random.choice(list(self.listTest))
-
-                    if value[0] > 0 :
-                        if value[0] == 1 : 
-                            listTarget = self.listTest.pop(key)[1]
-                        else : 
-                            value[0] -= 1
-                            listTarget = value[1]
-                        self.game.addListenerDrawable(listTarget)
-                        self.game.play('experiment', listTarget, showTime=False) 
-
-                    
-
-
-
-    def play(self):
-        self.game.screen.fill(Colors.WHITE)
-        pygame.display.update()  
-
-        #self.game.write_screen()
-
-        while(self.testTotale > 0):  
-            ## Choose random a type of test
-            key = random.choice(list(self.listTest))
-            value = self.listTest[key]
-            print("---- key(typeTarget) =", key, "||", "nombre =", value[0])
-
-            if value[0] > 0 :
-                if value[0] == 1 : 
-                    # it is the last test of this type of target, 
-                    # with 'pop', we delete it of the dictionary 
-                    listTarget = self.listTest.pop(key)[1] 
-                else : 
-                    value[0] -= 1
-                    listTarget = value[1]
-                    
-                    #ev = pygame.event.get()
-                    #for event in ev:
-                    #    if event.type == pygame.QUIT:
-                    #        self.game.quitApp()
-
-
-                ## User have to do the test
-                self.game.play('experiment', listTarget, showTime=False) #play effectue l'ajout des cibles dans Listener/Drawable
-                self.testTotale -= 1
-
-            if self.testTotale == 0:
-                break 
-
-        if self.testTotale == 0:
-            print("FIN DE EXPERIENCE")          
-
-    
