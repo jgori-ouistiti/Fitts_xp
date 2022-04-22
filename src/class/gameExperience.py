@@ -4,6 +4,7 @@ class GameExperience(Game):
     
     def __init__(self, width, height, bg_color = Colors.WHITE):
         super().__init__(width, height, bg_color)
+        self.infiniteTime = True
         
     ###--------------------------- Menu avec les differents fonctions (play, pause, etc) ---------------------------###       
     def menu(self, menu_title, current_mode = 'play'):
@@ -130,10 +131,16 @@ class GameExperience(Game):
         '''MAIN MENU
         This menu is the first menu that the user sees
         In GameExperience, we use only one button to start the experiment'''
-        button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Begin Experience")
-        self.addListenerDrawable(button1)
+        button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "BEGIN")
+        self.addListenerDrawable([button1])
         self.refreshScreen()
-        self.write_screen("Welcome", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        
+        text =  "Welcome to our experiment.\n\n"+\
+                "You will encounter multiple experiments. You will have to click as fast as possible "+\
+                "on the red targets.\n\n"+\
+                "Thank you for your participation, click on BEGIN to start."
+        
+        self.write_screen(text, Colors.BLACK, (self.width/2 - 360, self.height/2 - 500), maxSize=(720, 300))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -146,7 +153,7 @@ class GameExperience(Game):
                     self.quitApp()
                 if ("button",1) in L:
                     print("Boutton 1")
-                    self.removeListenerDrawable(button1)
+                    self.removeListenerDrawable([button1])
                     self.score = 0
                     self.running = False
                     self.showAllDrawable()

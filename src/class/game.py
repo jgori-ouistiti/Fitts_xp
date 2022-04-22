@@ -21,7 +21,7 @@ class Game :
         self.drawables = dict() #Key = Drawable object, value = boolean (True if is on screen, False if not )
         self.bg_color  = bg_color #background color
         self.running   = False
-        self.barTime = HealthBar(5, posText=(110,100), posRect=(30,30))
+        self.barTime = HealthBar(5, posText=(30,70), posRect=(30,30))
         self.time = 100
         self.score = 0
         self.nb_target = 0
@@ -51,11 +51,36 @@ class Game :
         self.draw()
         if update:
             pygame.display.update()
-
-    def write_screen(self, mot, color, pos, booleen=True):
+            
+    def write_box(self, mot, color, pos, booleen=True):
         text = self.font.render(mot, booleen, color)
         text_rect = text.get_rect(center=pos)
         self.screen.blit(text, text_rect)
+
+    def write_screen(self, text, color, pos, maxSize = None):
+        words = [mot.split(' ') for mot in text.splitlines()]  # 2D array where each row is a list of words.
+        space = self.font.size(' ')[0]  # The width of a space.
+        x, y = pos
+        if maxSize == None:
+            max_width, max_height = self.screen.get_size()
+        else:
+            max_width, max_height = maxSize
+            max_width += x
+            max_height += y
+        for line in words:
+            for word in line:
+                word_surface = self.font.render(word, 0, color)
+                word_width, word_height = word_surface.get_size()
+                if x + word_width >= max_width:
+                    x = pos[0]  # Reset the x.
+                    y += word_height  # Start on new row.
+                self.screen.blit(word_surface, (x, y))
+                x += word_width + space
+            x = pos[0]  # Reset the x.
+            y += word_height  # Start on new row.
+        #text = self.font.render(mot, booleen, color)
+        #text_rect = text.get_rect(center=pos)
+        #self.screen.blit(text, text_rect)
             
     def addDrawable(self, d):
         if (hasattr(d, "__len__")):
@@ -115,11 +140,11 @@ class Game :
                     self.listener[ld_item] = True
             return
         if (not isinstance(ld, Drawable) and not isinstance(ld, Listener)):
-            raise Exception("ld is not a listener and not drawable")
+            raise Exception("ld is not a listener and not drawable, but is a " + ld.__class__.__name__)
         if (not isinstance(ld, Listener)):
-            raise Exception("ld is not a listener")
+            raise Exception("ld is not a listener, but is a "+ ld.__class__.__name__)
         if (not isinstance(ld, Drawable)):
-            raise Exception("ld is not drawable")
+            raise Exception("ld is not drawable , but is a " + ld.__class__.__name__)
         if isinstance(ld, Cible):
             self.nb_target += 1
         self.drawables[ld] = True
@@ -262,8 +287,8 @@ class Game :
         
     def pauseMenu(self, current_mode):
         self.refreshScreen()
-        self.write_screen("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
-        self.write_screen("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
+        self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.write_box("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -280,9 +305,9 @@ class Game :
             
     def endGame(self):
         self.refreshScreen()
-        self.write_screen("GAME OVER", Colors.BLACK, (self.width/2, self.height/2 - 50))
-        self.write_screen("Your score : " + str(self.score), Colors.BLACK, (self.width/2, self.height/2))
-        self.write_screen("Press ESCAPE to play again", Colors.BLACK, (self.width/2, self.height/2 + 50))
+        self.write_box("GAME OVER", Colors.BLACK, (self.width/2, self.height/2 - 50))
+        self.write_box("Your score : " + str(self.score), Colors.BLACK, (self.width/2, self.height/2))
+        self.write_box("Press ESCAPE to play again", Colors.BLACK, (self.width/2, self.height/2 + 50))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -304,8 +329,9 @@ class Game :
         
         targets = listTarget
         
-        if targets == []:
+        if targets == None or targets == []:
             targets = make_2D_distractor_target_list((self.width, self.height), (int(self.width/2), int(self.height/2) ), 3, 40, 0.25, Colors.BLACK)
+            self.listTarget = targets
             self.addListenerDrawable(targets)
         else :
             self.addListenerDrawable(targets)
@@ -325,7 +351,7 @@ class Game :
             
             if showTime and mode!="experienceMulti":
                 #Display Timer
-                self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
+                self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText)
                 pygame.display.update()
 
             ev = pygame.event.get()
@@ -375,7 +401,7 @@ class Game :
         button2 = Button((int(self.width/2 + 50), int(self.height /2+ 30)), 2, 300, 60 , (200, 50, 50), RED, "Speed mode") 
         self.addListenerDrawable([button1,button2])
         self.refreshScreen()
-        self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2 - 180, self.height/2 - 30))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -433,7 +459,7 @@ class Game :
             self.refreshScreen(False)
             
             #Display Timer
-            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
+            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText)
             pygame.display.update()
 
             ev = pygame.event.get()

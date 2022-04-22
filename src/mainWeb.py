@@ -45,7 +45,8 @@ def main():
     game = Game(WIDTH, HEIGHT)
     running = True
     
-    game.listTarget = Targets
+    if Targets != None:
+        game.listTarget = Targets
     
     game.infiniteTime = False
     

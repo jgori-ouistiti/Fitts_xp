@@ -47,8 +47,6 @@ def main():
     
     game.listTarget = Targets
     
-    game.infiniteTime = False
-    
     game.menu("chooseMode")
 
 if __name__ == "__main__":
