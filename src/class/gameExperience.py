@@ -127,10 +127,13 @@ class GameExperience(Game):
         return {"ID" : ID, "A" : A, "p" : p}, cursor_position_list
         
     def chooseMode(self):
-        button1 = Button((int(self.width/2 - 350),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Begin Experience")
+        '''MAIN MENU
+        This menu is the first menu that the user sees
+        In GameExperience, we use only one button to start the experiment'''
+        button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Begin Experience")
         self.addListenerDrawable(button1)
         self.refreshScreen()
-        self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.write_screen("Welcome", Colors.BLACK, (self.width/2, self.height/2 - 30))
         self.running = True
         while(self.running):
             pygame.display.update()
