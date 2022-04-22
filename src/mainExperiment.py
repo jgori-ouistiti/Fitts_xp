@@ -43,11 +43,15 @@ def main():
             Targets = webEx.getTargetsFromUrl(URL, WIDTH, HEIGHT, displayInfo = True)
             break
             
-    #EXPERIMENT TEST
-    experimentAmazon = Experiment(webEx.getTargetsFromUrl(URLS["amazon"], WIDTH, HEIGHT, displayInfo = True), "Amazon experiment", 1, maxTrials = 5)
-    experimentGoogle = Experiment(webEx.getTargetsFromUrl(URLS["google_search"], WIDTH, HEIGHT, displayInfo = True), "BNP experiment", 1, maxTrials = 5)
-    
+    #=-=-=-=-=-EXPERIMENT TEST=-=-=-=-=-
+    experimentAmazon = Experiment(\
+        webEx.getTargetsFromUrl(URLS["amazon"], WIDTH, HEIGHT, displayInfo = True), "Amazon experiment", 1, maxTrials = 5)
+        
+    experimentGoogle = Experiment(\
+        webEx.getTargetsFromUrl(URLS["google_search"], WIDTH, HEIGHT, displayInfo = True), "BNP experiment", 2, maxTrials = 5)
+    #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     game = GameExperiment(WIDTH, HEIGHT, [experimentAmazon, experimentGoogle])
+    
     running = True
     
     game.listTarget = Targets
