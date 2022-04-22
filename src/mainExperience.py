@@ -2,7 +2,7 @@ import sys
 sys.path.append('./tools')
 sys.path.append('./class')
 from drawable import *
-from game import *
+from gameExperience import *
 from cible import *
 from target_disposition import *
 from healthBar import *
@@ -42,13 +42,10 @@ def main():
             Targets = webEx.getTargetsFromUrl(URL, WIDTH, HEIGHT, displayInfo = True)
             break
     
-    game = Game(WIDTH, HEIGHT)
+    game = GameExperience(WIDTH, HEIGHT)
     running = True
     
-    if Targets != None:
-        game.listTarget = Targets
-    
-    game.infiniteTime = False
+    game.listTarget = Targets
     
     game.menu("chooseMode")
 

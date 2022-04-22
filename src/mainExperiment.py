@@ -2,10 +2,11 @@ import sys
 sys.path.append('./tools')
 sys.path.append('./class')
 from drawable import *
-from gameExperience import *
+from gameExperiment import *
 from cible import *
 from target_disposition import *
 from healthBar import *
+from experiment import *
 import webExtractor as webEx
 import colors as Colors
 
@@ -41,13 +42,19 @@ def main():
             URL = sys.argv[i+1]
             Targets = webEx.getTargetsFromUrl(URL, WIDTH, HEIGHT, displayInfo = True)
             break
+            
+    #=-=-=-=-=-EXPERIMENT TEST=-=-=-=-=-
+    experimentAmazon = Experiment(\
+        webEx.getTargetsFromUrl(URLS["amazon"], WIDTH, HEIGHT, displayInfo = True), "Amazon experiment", 1, maxTrials = 5)
+        
+    experimentGoogle = Experiment(\
+        webEx.getTargetsFromUrl(URLS["google_search"], WIDTH, HEIGHT, displayInfo = True), "BNP experiment", 2, maxTrials = 5)
+    #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    game = GameExperiment(WIDTH, HEIGHT, [experimentAmazon, experimentGoogle])
     
-    game = GameExperience(WIDTH, HEIGHT)
     running = True
     
     game.listTarget = Targets
-    
-    game.infiniteTime = False
     
     game.menu("chooseMode")
 

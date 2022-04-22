@@ -21,7 +21,7 @@ class Game :
         self.drawables = dict() #Key = Drawable object, value = boolean (True if is on screen, False if not )
         self.bg_color  = bg_color #background color
         self.running   = False
-        self.barTime = HealthBar(5, posText=(110,100), posRect=(30,30))
+        self.barTime = HealthBar(5, posText=(30,70), posRect=(30,30))
         self.time = 100
         self.score = 0
         self.nb_target = 0
@@ -51,13 +51,47 @@ class Game :
         self.draw()
         if update:
             pygame.display.update()
-
-    def write_screen(self, mot, color, pos, booleen=True):
+            
+    def write_box(self, mot, color, pos, booleen=True):
+        '''Write one line on screen on an invisible box
+        The text is centered on the position pos. So it starts before and ends after.
+        It doesn't break lines and so, can't read things as \n'''
         text = self.font.render(mot, booleen, color)
         text_rect = text.get_rect(center=pos)
         self.screen.blit(text, text_rect)
+
+    def write_screen(self, text, color, pos, maxSize = None):
+        '''Write a full text on screen
+        The text starts on the position pos and can break lines.
+        maxSize is for closing the text in a box
+        This methods do not center the text'''
+        words = [mot.split(' ') for mot in text.splitlines()]  # 2D array where each row is a list of words.
+        space = self.font.size(' ')[0]  # The width of a space.
+        x, y = pos
+        if maxSize == None:
+            max_width, max_height = self.screen.get_size()
+        else:
+            max_width, max_height = maxSize
+            max_width += x
+            max_height += y
+        for line in words:
+            for word in line:
+                word_surface = self.font.render(word, 0, color)
+                word_width, word_height = word_surface.get_size()
+                if x + word_width >= max_width:
+                    x = pos[0]  # Reset the x.
+                    y += word_height  # Start on new row.
+                self.screen.blit(word_surface, (x, y))
+                x += word_width + space
+            x = pos[0]  # Reset the x.
+            y += word_height  # Start on new row.
+        #text = self.font.render(mot, booleen, color)
+        #text_rect = text.get_rect(center=pos)
+        #self.screen.blit(text, text_rect)
             
     def addDrawable(self, d):
+        '''Add a Drawable d in the list of drawables.
+        Every draw() methods in the items present in the list are automatically called during the screen drawing'''
         if (hasattr(d, "__len__")):
             for d_item in d:
                 if isinstance(d_item, Drawable):
@@ -70,6 +104,9 @@ class Game :
             self.drawables[d] = True
         
     def addListener(self, l):
+        '''Add a Listener l in the list of listeners.
+        When an event is triggered, elements in the list are called 
+        and their action() method is triggered if the event corresponds to them'''
         if isinstance(l, Cible):
             self.nb_target += 1
         if (hasattr(l, "__len__")):
@@ -84,6 +121,8 @@ class Game :
             self.listener[l] = True
         
     def removeDrawable(self, d):
+        '''remove the drawable d from the list.
+        It will desapear on the next screen refreshing'''
         if (hasattr(d, "__len__")):
             for d_item in d:
                 if d_item in self.drawables.keys():
@@ -92,6 +131,8 @@ class Game :
             del self.drawables[d]
             
     def removeListener(self, l):
+        '''remove the listener l from the list.
+        It won't be triggered anymore'''
         if (hasattr(l, "__len__")):
             for l_item in l:
                 if l_item in self.listener.keys():
@@ -104,6 +145,7 @@ class Game :
             del self.listener[l]
             
     def addListenerDrawable(self, ld):
+        '''Add a Listener that is also a Drawable (that can be see on screen)'''
         if (hasattr(ld, "__len__")):
             for ld_item in ld:
                 if (not isinstance(ld_item, Drawable) or not isinstance(ld_item, Listener)):
@@ -115,17 +157,18 @@ class Game :
                     self.listener[ld_item] = True
             return
         if (not isinstance(ld, Drawable) and not isinstance(ld, Listener)):
-            raise Exception("ld is not a listener and not drawable")
+            raise Exception("ld is not a listener and not drawable, but is a " + ld.__class__.__name__)
         if (not isinstance(ld, Listener)):
-            raise Exception("ld is not a listener")
+            raise Exception("ld is not a listener, but is a "+ ld.__class__.__name__)
         if (not isinstance(ld, Drawable)):
-            raise Exception("ld is not drawable")
+            raise Exception("ld is not drawable , but is a " + ld.__class__.__name__)
         if isinstance(ld, Cible):
             self.nb_target += 1
         self.drawables[ld] = True
         self.listener[ld] = True
         
     def removeListenerDrawable(self, ld):
+        '''Remove the Listener and Drawable ld'''
         if (hasattr(ld, "__len__")):
             for item in ld:
                 if item in self.drawables.keys() and item in self.listener.keys():
@@ -143,32 +186,41 @@ class Game :
             raise Exception("ld not in listener drawable")
 
     def hideDrawable(self, d):
+        '''Hide the drawable d from screen but don't remove it. It is used
+        if you want to keep the drawable d without having it on screen for one moment'''
         self.drawables[d] = False
     
     def hideListener(self, l):
+        '''Deactivate the listener l until showListener(l) is called'''
         self.listener[l] = False
         
     def hideListenerDrawable(self, ld):
+        '''Deactivate the listener and drawable l. It won't be triggered nor drawed until show methods are called'''
         self.hideDrawable(ld)
         self.hideListener(ld)
         
     def hideAllDrawable(self):
+        '''Deactivate all drawables in the list'''
         for d in self.drawables.keys():
             self.drawables[d] = False
             
     def hideAllListener(self):
+        '''Deactivate all listener in the list'''
         for l in self.listener.keys():
             self.listener[l] = False
 
     def showAllDrawable(self):
+        '''Show all drawables in the list'''
         for d in self.drawables.keys():
             self.drawables[d] = True
             
     def showAllListener(self):
+        '''Activate all listener in the list'''
         for l in self.listener.keys():
             self.listener[l] = True
             
     def listen(self, event):
+        '''Call the action(event) method on every activated listener'''
         L = []
         for l, v in self.listener.items():
             if v:
@@ -178,6 +230,7 @@ class Game :
         return L
         
     def assignRandomTarget(self, printTarget = True):
+        '''Assign every active targets to False on pick one randomly to assign it to the actual target'''
         #Set one target the main target to hit
         new_target_id = random.randint(0,self.nb_target - 1)
         target = None
@@ -218,6 +271,8 @@ class Game :
 
  ###--------------------------- Menu avec les differents fonctions (play, pause, etc) ---------------------------###       
     def menu(self, menu_title, current_mode = 'play'):
+        '''This method is called when changing the scene.
+        It resets timer if needed'''
         if menu_title == "play":
             if current_mode != "pause":
                 self.barTime.maxtime = 5
@@ -257,13 +312,15 @@ class Game :
       
     
     def quitApp(self):
+        '''Save user's data before quitting'''
         self.save_data_in_file("resultat.txt")
         self.running = False
         
     def pauseMenu(self, current_mode):
+        '''Pause menu'''
         self.refreshScreen()
-        self.write_screen("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
-        self.write_screen("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
+        self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.write_box("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -279,10 +336,12 @@ class Game :
                         self.menu(current_mode,"pause")
             
     def endGame(self):
+        '''End screen showed at user when the game is over
+        It displays the score of the user'''
         self.refreshScreen()
-        self.write_screen("GAME OVER", Colors.BLACK, (self.width/2, self.height/2 - 50))
-        self.write_screen("Your score : " + str(self.score), Colors.BLACK, (self.width/2, self.height/2))
-        self.write_screen("Press ESCAPE to play again", Colors.BLACK, (self.width/2, self.height/2 + 50))
+        self.write_box("GAME OVER", Colors.BLACK, (self.width/2, self.height/2 - 50))
+        self.write_box("Your score : " + str(self.score), Colors.BLACK, (self.width/2, self.height/2))
+        self.write_box("Press ESCAPE to play again", Colors.BLACK, (self.width/2, self.height/2 + 50))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -300,12 +359,20 @@ class Game :
                         self.menu("chooseMode")
     
     def play(self, mode="", listTarget=[], showTime=True, displayConsolNbOfTarget = True) :
+        '''Normal mode
+        The user have a certain amount of time to hit the maximum of targets without clicking on the wrong ones.
+        If success, the user get a little amount of time and get +1 in score
+        if not, the user lose a little amount of time and get -1 in score.
+        
+        The game is over when the timer gets to 0'''
+    
         self.running = True
         
         targets = listTarget
         
-        if targets == []:
+        if targets == None or targets == []:
             targets = make_2D_distractor_target_list((self.width, self.height), (int(self.width/2), int(self.height/2) ), 3, 40, 0.25, Colors.BLACK)
+            self.listTarget = targets
             self.addListenerDrawable(targets)
         else :
             self.addListenerDrawable(targets)
@@ -325,7 +392,7 @@ class Game :
             
             if showTime and mode!="experienceMulti":
                 #Display Timer
-                self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
+                self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText)
                 pygame.display.update()
 
             ev = pygame.event.get()
@@ -371,11 +438,18 @@ class Game :
                         self.score += -1
 
     def chooseMode(self):
+    
+        '''It is the first menu that appears
+        in this class, we have 2 modes, so the user can click on 2 buttons to play these
+        different modes
+        
+        This menu appears again when the user gets a game over (endGame)'''
+        
         button1 = Button((int(self.width/2 - 350),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Survival mode")
         button2 = Button((int(self.width/2 + 50), int(self.height /2+ 30)), 2, 300, 60 , (200, 50, 50), RED, "Speed mode") 
         self.addListenerDrawable([button1,button2])
         self.refreshScreen()
-        self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2 - 180, self.height/2 - 30))
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -405,6 +479,15 @@ class Game :
                     self.menu("quick","main")
 
     def quickMode(self, mode="", listTarget=[], showTime=True, displayConsolNbOfTarget = True):
+        
+        '''Secundary mode (Speed mode)
+        In this mode, the user will have a certain amount of time to hit a maximum of targets.
+        
+        He will get +1 in score if he hits the good target
+        he will get -1 if it is a wrong one.
+        
+        No time are given nor debited.
+        '''
     
         self.running = True
         
@@ -433,7 +516,7 @@ class Game :
             self.refreshScreen(False)
             
             #Display Timer
-            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
+            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText)
             pygame.display.update()
 
             ev = pygame.event.get()
