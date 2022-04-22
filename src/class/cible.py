@@ -53,17 +53,18 @@ class Cible(Drawable, Listener):
         else:
             pygame.draw.circle(game.screen, self.color, (self.x,self.y), self.r)
         
+    def reset(self):
+        self.isTarget = False
+        
     def action(self, game, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.isInside(pygame.mouse.get_pos()):
                 tmp = self.isTarget
                 if (self.isTarget) :
-                    game.score += 1
+                    self.isTarget = False
                     game.assignRandomTarget()
+                    return ("cible", tmp)
                 else:
-                    game.score -= 1
-                return ("cible", tmp)
-
-
-
+                    return("not cible", tmp)
+                
         
