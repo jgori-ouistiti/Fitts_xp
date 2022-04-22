@@ -125,6 +125,31 @@ class GameExperience(Game):
         self.removeListenerDrawable(L_targets)
         #return info parametres, positions de la souris
         return {"ID" : ID, "A" : A, "p" : p}, cursor_position_list
+        
+    def chooseMode(self):
+        button1 = Button((int(self.width/2 - 350),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Begin Experience")
+        self.addListenerDrawable(button1)
+        self.refreshScreen()
+        self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.running = True
+        while(self.running):
+            pygame.display.update()
+            self.draw()
+            ev = pygame.event.get()
+            for event in ev:
+                L = self.listen(event)
+                #self.listenMode(event)
+                if event.type == pygame.QUIT:
+                    self.quitApp()
+                if ("button",1) in L:
+                    print("Boutton 1")
+                    self.removeListenerDrawable(button1)
+                    self.score = 0
+                    self.running = False
+                    self.showAllDrawable()
+                    self.showAllListener()
+                    self.menu("play","main")
+
             
     def experimentMode(self, userid = 0):
         print("experimentMode()")
