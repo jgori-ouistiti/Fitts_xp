@@ -48,7 +48,7 @@ def main():
         webEx.getTargetsFromUrl(URLS["amazon"], WIDTH, HEIGHT, displayInfo = True), "Amazon experiment", 1, maxTrials = 5)
         
     experimentGoogle = Experiment(\
-        webEx.getTargetsFromUrl(URLS["google_search"], WIDTH, HEIGHT, displayInfo = True), "BNP experiment", 2, maxTrials = 5)
+        webEx.getTargetsFromUrl(URLS["google_search"], WIDTH, HEIGHT, displayInfo = True), "Google search experiment", 2, maxTrials = 5)
     #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     game = GameExperiment(WIDTH, HEIGHT, [experimentAmazon, experimentGoogle])
     

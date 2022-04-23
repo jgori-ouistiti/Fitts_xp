@@ -1,22 +1,52 @@
 
 from game import *
+from cibleRect import *
 import sys
 sys.path.append('../tools')
 import colors as Colors
 import random
+import time
 
 class Experiment :
     def __init__(self, targets, exp_name, exp_id, maxTrials = 20):
         self.targets  = targets
-        self.exp_name = exp_name
-        self.exp_id   = exp_id
+        
+        self.data = dict() #contains all user's data ,for this one experiment, about mouse tracking, time, etc...
+        self.data['exp_name'] = exp_name
+        self.data['exp_id']   = exp_id
+        self.data['number_of_targets'] = len(targets)
+        self.data['trials'] = dict()
         
         self.maxTrials = maxTrials
+        
+        self.startOfTrial = 0
         
         if self.maxTrials < 0:
             raise Exception("maxTrials must be positive")
         
         self.trial    = 0
+        
+    def iterateData(self, game):
+        '''do one iteration each click and add mouth tracks and time to self.trials'''
+        
+        trialTime = time.time() - self.startOfTrial
+        target = game.active_target
+        cursor_tracks = game.cursor_position
+        
+        
+        self.data['trials'][self.trial] = dict()
+        
+        self.data['trials'][self.trial]['pos_target'] = (target.x , target.y)
+        if isinstance(target, CibleRect):
+            self.data['trials'][self.trial]['target_type'] = 'rectangle'
+            self.data['trials'][self.trial]['dimension']   = (target.width, target.height)
+        else:
+            self.data['trials'][self.trial]['target_type'] = 'circle'
+            self.data['trials'][self.trial]['radius']      = target.r
+            
+        self.data['trials'][self.trial]['time'] = trialTime
+        self.data['trials'][self.trial]['mouse_tracks'] = cursor_tracks
+        
 
     def begin(self, game):         
         '''Start the experience
@@ -35,7 +65,8 @@ class Experiment :
         game.assignRandomTarget()
         
         game.cursor_position = []
-        game.cursor_position.append(("target_pos :",(game.active_target.x,game.active_target.y)))
+        
+        self.startOfTrial = time.time()
         
         while (game.running and self.trial < self.maxTrials):
             game.refreshScreen(True)
@@ -61,6 +92,8 @@ class Experiment :
                         game.menu("pause")
         
                 if ("cible",True) in L:#On a cliqué sur une cible
+                    
+                    self.iterateData(game)
                 
                     self.trial += 1
                 
@@ -69,7 +102,6 @@ class Experiment :
                     #Saving the tracking of mouse
                     game.cursor_position_list.append(game.cursor_position)
                     game.cursor_position = []
-                    game.cursor_position.append(("target_pos :",(game.active_target.x,game.active_target.y)))
                 
                 elif ("not cible",False) in L: #On n'a pas cliqué sur la bonne cible
                     game.score += -1
@@ -77,6 +109,6 @@ class Experiment :
         #End of the experiment
         game.running = False
         game.removeListenerDrawable(targets)
-        game.menu("endExperiment")
+        game.menu("endExperiment", data = self.data)
         
 
