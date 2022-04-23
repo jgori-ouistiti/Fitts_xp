@@ -1,12 +1,17 @@
 from game import *
 from experiment import *
+import json
 
 class GameExperiment(Game):
     
     def __init__(self, width, height, experiments, bg_color = Colors.WHITE):
         super().__init__(width, height, bg_color)
+        
         self.infiniteTime = True
         self.activeExperiment = 0 #Id or index of the active experiment in the experiments list
+        self.experiments_data = dict() #User's data collected after ends of each experiments
+        self.experiments_data['user_id'] = random.randint(0,1000000)
+        self.experiments_data['experiments'] = dict()
         
         if hasattr(experiments, '__len__'):
             for experiment in experiments:
@@ -19,7 +24,7 @@ class GameExperiment(Game):
             self.experiments = [experiments] # list of experiments objects
         
     ###--------------------------- Menu avec les differents fonctions (play, pause, etc) ---------------------------###       
-    def menu(self, menu_title, current_mode = 'play'):
+    def menu(self, menu_title, current_mode = 'play', data = None):
         if menu_title == "play":
         
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
@@ -37,6 +42,7 @@ class GameExperiment(Game):
             self.chooseMode() 
         elif menu_title == "endExperiment":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
+            self.dumpExperiment(data)
             self.activeExperiment += 1
             if self.activeExperiment == len(self.experiments):
                 #end of experiments, no more experiments
@@ -131,5 +137,21 @@ class GameExperiment(Game):
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
         self.quitApp()
+        
+    def dumpExperiment(self,data):
+        '''Dump one iteration in variable self.experiment
+        It is one iteration called after each end of experiments'''
+        self.experiments_data['experiments'][self.activeExperiment] = data
+        
+    def save_data_in_file(self, filename):
+        '''Overide super method because we now use more complex json files''' 
+        f = open(filename, 'w')
+        json.dump(self.experiments_data, f, indent=4)
+        f.close()
+        
+    def quitApp(self):
+        '''Save user's data before quitting'''
+        self.save_data_in_file("user_"+str(self.experiments_data['user_id'])+".json")
+        self.running = False
 
     
