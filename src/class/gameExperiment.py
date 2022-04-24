@@ -40,6 +40,7 @@ class GameExperiment(Game):
             self.hideAllDrawable()
             self.hideAllListener()
             self.chooseMode() 
+            print("======", self.listTarget)
         elif menu_title == "endExperiment":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.dumpExperiment(data)
@@ -64,7 +65,7 @@ class GameExperiment(Game):
         
         Each experiments calls menu("endExperiment") at the end
         No need to quit app here because endOfExperiment is called at the final end in menu() by the last experiment'''
-        self.experiments[self.activeExperiment].begin(self)
+        (self.experiments[self.activeExperiment]).begin(self)
         
     
         
@@ -126,6 +127,7 @@ class GameExperiment(Game):
         self.write_box("END OF THE EXPERIMENT", Colors.BLACK, (self.width/2, self.height/2 - 60))
         self.write_box("Thanks for helping us participating at this experiment !", Colors.BLACK, (self.width/2, self.height/2))
         self.write_box("You can now close this window or press ESCAPE.", Colors.BLACK, (self.width/2, self.height/2 + 60))
+        group = pygame.sprite.Group(self.inputBoxAvis) 
         self.running = True
         while(self.running):
             pygame.display.update()
@@ -136,6 +138,16 @@ class GameExperiment(Game):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
+                if event.type == pygame.MOUSEBUTTONDOWN:    
+                    if (self.inputBoxAvis.button_ok.isInside(pygame.mouse.get_pos())):
+                        self.avis = self.inputBoxAvis.text #recupere avis
+                        print("AVIS :", self.avis)
+                        self.running = False
+            group.update(self, ev, "Let us a comment")
+            if self.inputBoxAvis.image!=None:
+                group.draw(self.screen)
+            pygame.display.flip()
+
         self.quitApp()
         
     def dumpExperiment(self,data):

@@ -9,6 +9,7 @@ from listener import *
 from healthBar import *
 from button import *
 import colors as Colors
+import textInputBox 
 
 class Game :
     def __init__(self, width, height, bg_color = Colors.WHITE):
@@ -40,6 +41,8 @@ class Game :
         self.listTest = dict() #For experienceMulti
         
         self.infiniteTime = False #Cheat for developpers
+        
+        self.inputBoxAvis = textInputBox.TextInputBox((self.width/2-200,self.height*2/3+100), self.width,self.height, width_texte=400, height_texte=100, bg_color_text = Colors.LIGHT_BLUE)
         
     def draw(self):
         for d, v in self.drawables.items():
@@ -339,12 +342,14 @@ class Game :
         '''End screen showed at user when the game is over
         It displays the score of the user'''
         self.refreshScreen()
-        self.write_box("GAME OVER", Colors.BLACK, (self.width/2, self.height/2 - 50))
-        self.write_box("Your score : " + str(self.score), Colors.BLACK, (self.width/2, self.height/2))
-        self.write_box("Press ESCAPE to play again", Colors.BLACK, (self.width/2, self.height/2 + 50))
+        self.write_box("GAME OVER", Colors.BLACK, (self.width/2, self.height/3 - 50))
+        self.write_box("Your score : " + str(self.score), Colors.BLACK, (self.width/2, self.height/3))
+        self.write_box("Press ESCAPE to play again", Colors.BLACK, (self.width/2, self.height/3 + 50))
         self.running = True
+        group = pygame.sprite.Group(self.inputBoxAvis) 
+        self.avis = ""
         while(self.running):
-            pygame.display.update()
+            #pygame.display.update()
             ev = pygame.event.get()
             for event in ev:
                 if event.type == pygame.QUIT:
@@ -357,6 +362,15 @@ class Game :
                         self.showAllDrawable()
                         self.showAllListener()
                         self.menu("chooseMode")
+                if event.type == pygame.MOUSEBUTTONDOWN:    
+                    if (self.inputBoxAvis.button_ok.isInside(pygame.mouse.get_pos())):
+                        self.avis = self.inputBoxAvis.text #recupere avis
+                        print("AVIS :", self.avis)
+                        running = False
+            group.update(self, ev, "Let us a comment")
+            if self.inputBoxAvis.image!=None:
+                group.draw(self.screen)
+            pygame.display.flip()
     
     def play(self, mode="", listTarget=[], showTime=True, displayConsolNbOfTarget = True) :
         '''Normal mode
