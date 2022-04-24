@@ -8,7 +8,7 @@ class GameExperiment(Game):
         super().__init__(width, height, bg_color)
         
         self.infiniteTime = True
-        self.activeExperiment = 0 #Id or index of the active experiment in the experiments list
+        self.activeExperiment = 0 #correspond exp_id or index of the active experiment in the experiments list
         self.experiments_data = dict() #User's data collected after ends of each experiments
         self.experiments_data['user_id'] = random.randint(0,1000000)
         self.experiments_data['experiments'] = dict()

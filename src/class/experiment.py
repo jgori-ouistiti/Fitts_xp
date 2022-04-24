@@ -24,7 +24,7 @@ class Experiment :
         if self.maxTrials < 0:
             raise Exception("maxTrials must be positive")
         
-        self.trial    = 0
+        self.trial_id    = 0
         
     def iterateData(self, game):
         '''do one iteration each click and add mouth tracks and time to self.trials'''
@@ -34,18 +34,18 @@ class Experiment :
         cursor_tracks = game.cursor_position
         
         
-        self.data['trials'][self.trial] = dict()
+        self.data['trials'][self.trial_id] = dict()
         
-        self.data['trials'][self.trial]['pos_target'] = (target.x , target.y)
+        self.data['trials'][self.trial_id]['pos_target'] = (target.x , target.y)
         if isinstance(target, CibleRect):
-            self.data['trials'][self.trial]['target_type'] = 'rectangle'
-            self.data['trials'][self.trial]['dimension']   = (target.width, target.height)
+            self.data['trials'][self.trial_id]['target_type'] = 'rectangle'
+            self.data['trials'][self.trial_id]['dimension']   = (target.width, target.height)
         else:
-            self.data['trials'][self.trial]['target_type'] = 'circle'
-            self.data['trials'][self.trial]['radius']      = target.r
+            self.data['trials'][self.trial_id]['target_type'] = 'circle'
+            self.data['trials'][self.trial_id]['radius']      = target.r
             
-        self.data['trials'][self.trial]['time'] = trialTime
-        self.data['trials'][self.trial]['mouse_tracks'] = cursor_tracks
+        self.data['trials'][self.trial_id]['time'] = trialTime
+        self.data['trials'][self.trial_id]['mouse_tracks'] = cursor_tracks
         
 
     def begin(self, game):         
@@ -68,7 +68,7 @@ class Experiment :
         
         self.startOfTrial = time.time()
         
-        while (game.running and self.trial < self.maxTrials):
+        while (game.running and self.trial_id < self.maxTrials):
             game.refreshScreen(True)
 
             ev = pygame.event.get()
@@ -95,7 +95,7 @@ class Experiment :
                     
                     self.iterateData(game)
                 
-                    self.trial += 1
+                    self.trial_id += 1
                 
                     game.score += 1
                         
