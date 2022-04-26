@@ -69,6 +69,7 @@ class Experiment :
         self.startOfTrial = time.time()
         
         while (game.running and self.trial_id < self.maxTrials):
+            
             game.refreshScreen(True)
 
             ev = pygame.event.get()
@@ -87,6 +88,7 @@ class Experiment :
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
+                        pygame.mouse.set_visible(True)
                         game.running = False
                         game.removeListenerDrawable(targets)
                         game.menu("pause")

@@ -26,6 +26,7 @@ def getURL(i):
 def main():
 
     pygame.init()
+    pygame.event.set_grab(True)
     
     #Get user's screen resolution
     infoObject = pygame.display.Info()
