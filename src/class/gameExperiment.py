@@ -1,10 +1,11 @@
 from game import *
 from experiment import *
+from cursor import *
 import json
 
 class GameExperiment(Game):
     
-    def __init__(self, width, height, experiments, bg_color = Colors.WHITE):
+    def __init__(self, width, height, experiments, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor3.png'):
         super().__init__(width, height, bg_color)
         
         self.infiniteTime = True
@@ -12,6 +13,8 @@ class GameExperiment(Game):
         self.experiments_data = dict() #User's data collected after ends of each experiments
         self.experiments_data['user_id'] = random.randint(0,1000000)
         self.experiments_data['experiments'] = dict()
+        self.cursor = Cursor(width, height, cursorImage)  
+        self.addListenerDrawable(self.cursor)
         
         if hasattr(experiments, '__len__'):
             for experiment in experiments:
@@ -84,15 +87,22 @@ class GameExperiment(Game):
         
         self.write_screen(text, Colors.BLACK, (self.width/2 - 360, self.height/2 - 500), maxSize=(720, 300))
         self.running = True
+        
+        pygame.mouse.set_visible(False)
+        pygame.event.set_grab(True)
+        
         while(self.running):
+            self.refreshScreen(False)
+            self.write_screen(text, Colors.BLACK, (self.width/2 - 360, self.height/2 - 500), maxSize=(720, 300))
             pygame.display.update()
-            self.draw()
             ev = pygame.event.get()
             for event in ev:
                 L = self.listen(event)
                 #self.listenMode(event)
                 if event.type == pygame.QUIT:
                     self.quitApp()
+                if event.type == pygame.MOUSEMOTION:
+                    self.cursorMove(event.rel)
                 if ("button",1) in L:
                     print("Boutton 1")
                     self.removeListenerDrawable([button1])
@@ -165,5 +175,38 @@ class GameExperiment(Game):
         '''Save user's data before quitting'''
         self.save_data_in_file("user_"+str(self.experiments_data['user_id'])+".json")
         self.running = False
-
-    
+        
+    def pauseMenu(self, current_mode):
+        '''Pause menu'''
+        self.refreshScreen()
+        self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
+        self.write_box("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
+        self.running = True
+        
+        pygame.mouse.set_visible(True)
+        pygame.event.set_grab(False)
+        
+        while(self.running):
+            pygame.display.update()
+            ev = pygame.event.get()
+            for event in ev:
+                if event.type == pygame.QUIT:
+                        self.quitApp()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.mouse.set_visible(False)
+                        pygame.event.set_grab(True)
+                        self.running = False
+                        self.showAllDrawable()
+                        self.showAllListener()
+                        self.menu(current_mode,"pause")
+            
+    def cursorMove(self, pos):
+        self.cursor.move(pos[0], pos[1])  
+        
+    def draw(self):
+        '''always draw the cursor at the end'''
+        for d, v in self.drawables.items():
+            if v == True:
+                d.draw(self)
+        self.cursor.draw(self)

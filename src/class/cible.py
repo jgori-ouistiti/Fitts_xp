@@ -1,6 +1,7 @@
 from drawable import *
 from listener import *
 from colors import *
+import gameExperiment as gE
 import pygame
 
 class Cible(Drawable, Listener):
@@ -57,7 +58,8 @@ class Cible(Drawable, Listener):
         self.isTarget = False
         
     def action(self, game, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
+         
+        if event.type == pygame.MOUSEBUTTONDOWN and not isinstance(game, gE.GameExperiment):
             if self.isInside(pygame.mouse.get_pos()):
                 tmp = self.isTarget
                 if (self.isTarget) :
@@ -66,5 +68,15 @@ class Cible(Drawable, Listener):
                     return ("cible", tmp)
                 else:
                     return("not cible", tmp)
+        else:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.isInside((game.cursor.x, game.cursor.y)):
+                    tmp = self.isTarget
+                    if (self.isTarget) :
+                        self.isTarget = False
+                        game.assignRandomTarget()
+                        return ("cible", tmp)
+                    else:
+                        return("not cible", tmp)
                 
         

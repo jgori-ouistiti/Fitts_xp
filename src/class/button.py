@@ -1,6 +1,6 @@
-from turtle import width
 from drawable import *
 from listener import *
+import gameExperiment as gE
 import pygame
 
 class Button(Drawable, Listener):
@@ -104,9 +104,14 @@ class Button(Drawable, Listener):
         game.screen.blit(self.text_render, text_rect)
             
     def action(self, game, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:    
-            if (self.isInside(pygame.mouse.get_pos())):
-                return "button", self.mode    
+        if not isinstance(game, gE.GameExperiment): 
+            if event.type == pygame.MOUSEBUTTONDOWN:    
+                if (self.isInside(pygame.mouse.get_pos())):
+                    return "button", self.mode   
+        else: 
+            if event.type == pygame.MOUSEBUTTONDOWN:    
+                if (self.isInside((game.cursor.x, game.cursor.y))):
+                    return "button", self.mode 
           
         
     

@@ -70,6 +70,8 @@ class Experiment :
         
         while (game.running and self.trial_id < self.maxTrials):
             
+            pygame.mouse.set_pos = (game.width/2, game.height/2)
+            
             game.refreshScreen(True)
 
             ev = pygame.event.get()
@@ -84,7 +86,7 @@ class Experiment :
                 #collect mouse position
                 if event.type == pygame.USEREVENT:
                     #Tracking mouse position
-                    game.cursor_position.append(pygame.mouse.get_pos())
+                    game.cursor_position.append((game.cursor.x, game.cursor.y))
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -92,6 +94,8 @@ class Experiment :
                         game.running = False
                         game.removeListenerDrawable(targets)
                         game.menu("pause")
+                if event.type == pygame.MOUSEMOTION:
+                    game.cursorMove(event.rel)
         
                 if ("cible",True) in L:#On a cliqué sur une cible
                     
