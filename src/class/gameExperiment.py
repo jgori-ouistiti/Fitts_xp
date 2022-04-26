@@ -151,6 +151,7 @@ class GameExperiment(Game):
             if self.inputBoxAvis.image!=None:
                 group.draw(self.screen)
                 
+            self.draw()
             pygame.display.update()
             
             for event in ev:
