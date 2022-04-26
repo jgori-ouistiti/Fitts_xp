@@ -185,7 +185,7 @@ class GameExperiment(Game):
         
     def quitApp(self):
         '''Save user's data before quitting'''
-        self.save_data_in_file("user_"+str(self.experiments_data['user_id'])+".json")
+        self.save_data_in_file("../reviews/user_"+str(self.experiments_data['user_id'])+".json")
         self.running = False
         
     def pauseMenu(self, current_mode):
