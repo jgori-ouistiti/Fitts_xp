@@ -36,8 +36,6 @@ def main():
     model_filename = 'tools/models.pkl'
     experiments = None
     
-    print("SYS ARGV LEN :",len(sys.argv))
-    
     if not '--url' in sys.argv:
         if os.path.isfile(model_filename):
             experiments = readModel(model_filename, maxTrials = 10)

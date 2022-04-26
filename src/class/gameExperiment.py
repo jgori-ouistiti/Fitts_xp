@@ -43,7 +43,6 @@ class GameExperiment(Game):
             self.hideAllDrawable()
             self.hideAllListener()
             self.chooseMode() 
-            print("======", self.listTarget)
         elif menu_title == "endExperiment":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.dumpExperiment(data)
@@ -104,7 +103,6 @@ class GameExperiment(Game):
                 if event.type == pygame.MOUSEMOTION:
                     self.cursorMove(event.rel)
                 if ("button",1) in L:
-                    print("Boutton 1")
                     self.removeListenerDrawable([button1])
                     self.score = 0
                     self.running = False
