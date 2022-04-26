@@ -117,10 +117,12 @@ class GameExperiment(Game):
         '''This screen is shown between 2 experiments
         It makes a pause for the user'''
         self.refreshScreen()
-        self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
-        self.write_box("Press SPACE to begin next experiment", Colors.BLACK, (self.width/2, self.height/2 + 30))
+        
         self.running = True
         while(self.running):
+            self.refreshScreen(False)
+            self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
+            self.write_box("Press SPACE to begin next experiment", Colors.BLACK, (self.width/2, self.height/2 + 30))
             pygame.display.update()
             ev = pygame.event.get()
             for event in ev:
@@ -130,18 +132,29 @@ class GameExperiment(Game):
                     if event.key == pygame.K_SPACE:
                         self.running = False
                         self.menu("play","pause")
+                if event.type == pygame.MOUSEMOTION:
+                    self.cursorMove(event.rel)
                         
     def endOfExperiment(self):
         '''This screen is shown at the final end'''
         self.refreshScreen()
-        self.write_box("END OF THE EXPERIMENT", Colors.BLACK, (self.width/2, self.height/2 - 60))
-        self.write_box("Thanks for helping us participating at this experiment !", Colors.BLACK, (self.width/2, self.height/2))
-        self.write_box("You can now close this window or press ESCAPE.", Colors.BLACK, (self.width/2, self.height/2 + 60))
+        
         group = pygame.sprite.Group(self.inputBoxAvis) 
         self.running = True
         while(self.running):
-            pygame.display.update()
+            self.refreshScreen(False)
+            self.write_box("END OF THE EXPERIMENT", Colors.BLACK, (self.width/2, self.height/2 - 60))
+            self.write_box("Thanks for helping us participating at this experiment !", Colors.BLACK, (self.width/2, self.height/2))
+            self.write_box("You can now close this window or press ESCAPE.", Colors.BLACK, (self.width/2, self.height/2 + 60))
+            
             ev = pygame.event.get()
+            
+            group.update(self, ev, "Let us a comment")
+            if self.inputBoxAvis.image!=None:
+                group.draw(self.screen)
+                
+            pygame.display.update()
+            
             for event in ev:
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -149,13 +162,13 @@ class GameExperiment(Game):
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                 if event.type == pygame.MOUSEBUTTONDOWN:    
-                    if (self.inputBoxAvis.button_ok.isInside(pygame.mouse.get_pos())):
+                    if (self.inputBoxAvis.button_ok.isInside((self.cursor.x, self.cursor.y))):
                         self.avis = self.inputBoxAvis.text #recupere avis
                         print("AVIS :", self.avis)
+                        self.experiments_data['user_review'] = self.avis
                         self.running = False
-            group.update(self, ev, "Let us a comment")
-            if self.inputBoxAvis.image!=None:
-                group.draw(self.screen)
+                if event.type == pygame.MOUSEMOTION:
+                    self.cursorMove(event.rel)
             pygame.display.flip()
 
         self.quitApp()
