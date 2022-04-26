@@ -5,6 +5,8 @@
 
 # Data used for project relative to user experience
 src/resultat.txt
+src/*.json
+src/tools/*.pkl
 
 # User-specific files
 *.rsuser
