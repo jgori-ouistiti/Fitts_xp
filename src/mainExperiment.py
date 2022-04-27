@@ -9,6 +9,7 @@ from target_disposition import *
 from healthBar import *
 from experiment import *
 from generateModel import *
+from sensitiveCursor import *
 import webExtractor as webEx
 import colors as Colors
 
@@ -59,10 +60,15 @@ def main():
     #experimentGoogle = Experiment(\
     #    webEx.getTargetsFromUrl(URLS["google_search"], WIDTH, HEIGHT, displayInfo = True), "Google search experiment", 2, maxTrials = 5)
     #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    
+    #Change the sensibility for the first experiment (TEST)
+    experiments[0].set_x_sensibility(-1)
+    
     game = GameExperiment(WIDTH, HEIGHT, experiments)
     
-    running = True
     
+    running = True
+ 
     game.menu("chooseMode")
 
 if __name__ == "__main__":

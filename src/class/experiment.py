@@ -8,7 +8,7 @@ import random
 import time
 
 class Experiment :
-    def __init__(self, targets, exp_name, exp_id, maxTrials = 20):
+    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1):
         self.targets  = targets
         
         self.data = dict() #contains all user's data ,for this one experiment, about mouse tracking, time, etc...
@@ -25,6 +25,16 @@ class Experiment :
             raise Exception("maxTrials must be positive")
         
         self.trial_id    = 0
+        
+        #Cursor sensitibility for the experiment
+        self.dx_sens = 1
+        self.dy_sens = 1
+        
+    def set_x_sensibility(self, dx_sens):
+        self.dx_sens = dx_sens
+        
+    def set_y_sensibility(self, dy_sens):
+        self.dy_sens = dy_sens
         
     def iterateData(self, game):
         '''do one iteration each click and add mouth tracks and time to self.trials'''
@@ -43,7 +53,7 @@ class Experiment :
         else:
             self.data['trials'][self.trial_id]['target_type'] = 'circle'
             self.data['trials'][self.trial_id]['radius']      = target.r
-            
+            data
         self.data['trials'][self.trial_id]['time'] = trialTime
         self.data['trials'][self.trial_id]['mouse_tracks'] = cursor_tracks
         
@@ -57,6 +67,9 @@ class Experiment :
         if self.targets == None or self.targets == []:
             raise Exception("Experiment has no target initialized")
         
+        self.data['cursor_x_sensibility'] = self.dx_sens
+        self.data['cursor_y_sensibility'] = self.dy_sens
+        
         game.running = True
         
         game.listTarget = targets = self.targets
@@ -65,6 +78,12 @@ class Experiment :
         game.assignRandomTarget()
         
         game.cursor_position = []
+        
+        #Save the cursor settings (sensibility)
+        dx_cursor, dy_cursor = game.cursor.getSensibility()
+        #Set the cursor sensibility to the experiment sensibility settings
+        game.cursor.set_x_sensibility(self.dx_sens)
+        game.cursor.set_y_sensibility(self.dy_sens)
         
         self.startOfTrial = time.time()
         
@@ -90,10 +109,14 @@ class Experiment :
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
+                        #Reset the cursor sensibility back to previous settings
+                        game.cursor.set_x_sensibility(dx_cursor)
+                        game.cursor.set_y_sensibility(dy_cursor)
                         pygame.mouse.set_visible(True)
                         game.running = False
                         game.removeListenerDrawable(targets)
                         game.menu("pause")
+                        return
                 if event.type == pygame.MOUSEMOTION:
                     game.cursorMove(event.rel)
         
@@ -113,6 +136,9 @@ class Experiment :
                     game.score += -1
                     
         #End of the experiment
+        #Reset the cursor sensibility back to previous settings
+        game.cursor.set_x_sensibility(dx_cursor)
+        game.cursor.set_y_sensibility(dy_cursor)
         game.running = False
         game.removeListenerDrawable(targets)
         game.menu("endExperiment", data = self.data)

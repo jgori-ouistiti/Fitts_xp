@@ -1,11 +1,11 @@
 from game import *
 from experiment import *
-from cursor import *
+from sensitiveCursor import *
 import json
 
 class GameExperiment(Game):
     
-    def __init__(self, width, height, experiments, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor3.png'):
+    def __init__(self, width, height, experiments, cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor3.png'):
         super().__init__(width, height, bg_color)
         
         self.infiniteTime = True
@@ -13,7 +13,10 @@ class GameExperiment(Game):
         self.experiments_data = dict() #User's data collected after ends of each experiments
         self.experiments_data['user_id'] = random.randint(0,1000000)
         self.experiments_data['experiments'] = dict()
-        self.cursor = Cursor(width, height, cursorImage)  
+        if cursor == None:
+            self.cursor = SensitiveCursor(width, height, cursorImage = cursorImage) 
+        else:
+            self.cursor = cursor 
         self.addListenerDrawable(self.cursor)
         
         if hasattr(experiments, '__len__'):
