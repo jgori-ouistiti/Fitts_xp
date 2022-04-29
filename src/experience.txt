@@ -1,1 +1,3 @@
-experience1 url https://www.jeu.fr/ 5
+experience1 url https://www.jeu.fr/ 3
+experience2 cible densite (500,500) 3 40 0.25 20 3
+experience3 cible cercle cercle 100 20 5 3
