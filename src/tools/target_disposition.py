@@ -47,7 +47,6 @@ def make_circle_target_list(pos, circle_r, nb_of_target, t_color, t_size):
 	theta = 0
 	for i in range(nb_of_target):
 		pos = (int(x + circle_r*math.cos(theta)), int(y + circle_r*math.sin(theta)))
-		print("pos : ", pos)
 		L.append(Cible(pos, t_size, t_color))
 		theta += delta_theta
 	return L

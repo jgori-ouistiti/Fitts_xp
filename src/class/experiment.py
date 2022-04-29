@@ -72,7 +72,6 @@ class Experiment :
         game.running = True
         
         game.listTarget = targets = self.targets
-        print("================", game.listTarget)
         game.addListenerDrawable(self.targets)
         
         game.assignRandomTarget()

@@ -7,15 +7,24 @@ import webExtractor as webEx
 from gameExperiment import *
 
 
-def readFileExperiment(filename, WIDTH, HEIGHT):
+def readFileExperiment(filename,width,height):
     f = open(filename, "r")
 
     list_experiences = []
     lines = f.readlines()
 
+    #pour modifier la taille de l'interface
+    pourcentageWidth = int(lines[0].strip("\n"))
+    pourcentageHeight = int(lines[1].strip("\n"))
+
+    WIDTH = width*100/pourcentageWidth          
+    HEIGHT = height*100/pourcentageHeight
+
+
+    # gerener les experiences
+    lines = lines[2:]
     for experience in lines:
         parameters = experience.split(" ")
-        print(parameters)
         
         exp_id = parameters[0] 
         type_experience = parameters[1] 
