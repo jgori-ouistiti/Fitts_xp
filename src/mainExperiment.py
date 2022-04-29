@@ -14,10 +14,11 @@ import webExtractor as webEx
 import colors as Colors
 
 URLS = {"moodle":"https://moodle-sciences.upmc.fr/moodle-2021/",\
-        "wikipedia":"https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal",\
-        "google_search":"https://www.google.com/search?channel=fs&client=ubuntu&q=wikipedia",\
-        "amazon":"https://www.amazon.fr/gp/bestsellers/?ref_=nav_cs_bestsellers",\
-        "bnp":"https://mabanque.bnpparibas/"}
+        #"wikipedia":"https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal",\
+        #"google_search":"https://www.google.com/search?channel=fs&client=ubuntu&q=wikipedia",\
+        #"amazon":"https://www.amazon.fr/gp/bestsellers/?ref_=nav_cs_bestsellers",\
+        #"bnp":"https://mabanque.bnpparibas/"
+        }
 
 def getURL(i):
     if not sys.argv[i] in URLS.keys():
