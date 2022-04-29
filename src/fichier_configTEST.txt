@@ -1,0 +1,13 @@
+Nous avons la syntaxe du fichier de configuration d'experience
+
+exp_id url www... nbMouvement
+exemple : experience1 url https://www.jeu.fr/ 5
+
+exp_id cible typeDisposition(cercle) type_cible(cercle) rayon_D rayon nombreCibles nbMouvement
+exemple : experience2 cible cercle cercle 150 50 5 5
+
+exp_id cible typeDisposition(cercle) type_cible(cercle) rayon_D rayon nombreCibles pos_centre nbMouvement
+exemple : experience3 cible cercle cercle 150 50 5 (300,300) 5
+
+exp_id cible typeDisposition(densite) pos_centre ID A p jmax nbMouvement
+exemple : experience4 cible densite (500,500) 3 40 0.25 20 3

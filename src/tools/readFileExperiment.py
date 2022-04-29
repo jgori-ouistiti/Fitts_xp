@@ -13,31 +13,26 @@ def readFileExperiment(filename, WIDTH, HEIGHT):
     list_experiences = []
     lines = f.readlines()
 
-    print("lines: ", lines)
     for experience in lines:
         parameters = experience.split(" ")
-        print("=========")
         print(parameters)
         
         exp_id = parameters[0] 
         type_experience = parameters[1] 
 
         if type_experience == 'url':
-            print("C'est URL :" )
             exp_name = parameters[2]   
             targets = webEx.getTargetsFromUrl(exp_name, WIDTH, HEIGHT, color=Colors.BLACK, displayInfo=True)
-            print("target : ", targets)
             nbMouv = int(parameters[3].strip("\n"))
-            print("Nb mouvement :", nbMouv)
             list_experiences.append(Experiment(targets, exp_name, exp_id, nbMouv))
-            print("Experience ajouter !")
 
-        elif type_experience == 'cible':
-            print("C'est Cible libre !")
-            disposition = parameters[2] 
-            if disposition == "cercle":
+        elif type_experience == 'cible': 
+            disposition = parameters[2]     #diposition c'est soit "cercle" soit "densite"
+            
+            ## Disposition est en cercle
+            if disposition == "cercle": 
                 type_cible = parameters[3]
-                if type_cible == "cercle":
+                if type_cible == "cercle":  
                     rayon_D = int(parameters[4])        #correspond au rayon pour la disposition en cercle
                     rayon_cercle = int(parameters[5])   #correspond au rayon d'une cible
                     nbCible = int(parameters[6])
@@ -46,7 +41,6 @@ def readFileExperiment(filename, WIDTH, HEIGHT):
                     if pos[0]=="(":
                         pos = pos.strip("(),")
                         pos = (int(pos[0]),int(pos[1]))
-                        print("position : ", pos)
                         i = 8
                     else : 
                         pos = (WIDTH/2, HEIGHT/2)             
@@ -55,6 +49,8 @@ def readFileExperiment(filename, WIDTH, HEIGHT):
                     nbMouv = int(parameters[i].strip("\n"))
                     list_experiences.append(Experiment(targets, type_cible, exp_id, nbMouv))
                 #elif type_cible=="rect":
+
+            ## Disposition est en densite
             elif disposition == "densite":
                 dimensions = (WIDTH, HEIGHT)
 
@@ -69,10 +65,6 @@ def readFileExperiment(filename, WIDTH, HEIGHT):
                 targets = make_2D_distractor_target_list(dimensions, center, ID, A, p, Colors.BLACK, jmax)
                 nbMouv = int(parameters[8].strip("\n"))
                 list_experiences.append(Experiment(targets, disposition, exp_id, nbMouv))
-            
-            print("Experience ajouter !")
-
-        print("=========")
 
     f.close()
     return GameExperiment(WIDTH, HEIGHT, list_experiences)
