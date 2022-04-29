@@ -182,8 +182,8 @@ class GameExperiment(Game):
         
     def save_data_in_file(self, filename):
         '''Overide super method because we now use more complex json files''' 
-        f = open(filename, 'w')
-        json.dump(self.experiments_data, f, indent=4)
+        f = open(filename, 'w', encoding="utf-8")
+        json.dump(self.experiments_data, f, indent=4,ensure_ascii=False)
         f.close()
         
     def quitApp(self):

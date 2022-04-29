@@ -53,7 +53,6 @@ class Experiment :
         else:
             self.data['trials'][self.trial_id]['target_type'] = 'circle'
             self.data['trials'][self.trial_id]['radius']      = target.r
-            data
         self.data['trials'][self.trial_id]['time'] = trialTime
         self.data['trials'][self.trial_id]['mouse_tracks'] = cursor_tracks
         
