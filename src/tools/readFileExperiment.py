@@ -48,7 +48,8 @@ def readFileExperiment(filename,width,height):
                     pos = parameters[7]
                     i = 7
                     if pos[0]=="(":
-                        pos = pos.strip("(),")
+                        pos = pos.strip("()")
+                        pos = pos.split(",")
                         pos = (int(pos[0]),int(pos[1]))
                         i = 8
                     else : 
@@ -64,7 +65,8 @@ def readFileExperiment(filename,width,height):
                 dimensions = (WIDTH, HEIGHT)
 
                 center = parameters[3]
-                center = center.strip("(),")
+                center = center.strip("()")
+                center = center.split(",")
                 center = (int(center[0]),int(center[1]))
 
                 ID = int(parameters[4])
