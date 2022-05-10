@@ -3,12 +3,17 @@ from experiment import *
 from sensitiveCursor import *
 import json
 
+"""
+    This class represent a mini experience without pause's time
+"""
+
 class GameExperiment(Game):
     
-    def __init__(self, width, height, experiments, cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor3.png'):
+    def __init__(self, width, height, experiments, listTimerPause=[], cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor3.png'):
         super().__init__(width, height, bg_color)
         
         self.infiniteTime = True
+        self.listTimerPause = listTimerPause
         self.activeExperiment = 0 #correspond exp_id or index of the active experiment in the experiments list
         self.experiments_data = dict() #User's data collected after ends of each experiments
         self.experiments_data['user_id'] = random.randint(0,1000000)
@@ -28,7 +33,7 @@ class GameExperiment(Game):
             if not isinstance(experiments, Experiment):
                 raise Exception("excepted Experiment or list(Experiment) but got "+experiments.__class__.__name__)
             self.experiments = [experiments] # list of experiments objects
-        
+
     ###--------------------------- Menu avec les differents fonctions (play, pause, etc) ---------------------------###       
     def menu(self, menu_title, current_mode = 'play', data = None):
         if menu_title == "play":
@@ -59,8 +64,9 @@ class GameExperiment(Game):
                 #There is still some experiments
                 self.hideAllDrawable()
                 self.hideAllListener()
+                self.checkPause()
                 self.endExperimentScreen()
-        
+
             
         else:
             raise Exception("Error of menu_title")
@@ -71,9 +77,7 @@ class GameExperiment(Game):
         Each experiments calls menu("endExperiment") at the end
         No need to quit app here because endOfExperiment is called at the final end in menu() by the last experiment'''
         (self.experiments[self.activeExperiment]).begin(self)
-        
-    
-        
+
     def chooseMode(self):
         '''MAIN MENU
         This menu is the first menu that the user sees
@@ -113,7 +117,31 @@ class GameExperiment(Game):
                     self.showAllListener()
                     self.menu("play","main")
 
-            
+    def checkPause(self):
+        '''This screen is shown between 2 experiments
+                It makes a pause for the user with timer '''
+
+        for (id, timerPause) in self.listTimerPause :
+            if (self.activeExperiment-1 == id):
+                self.running = True
+                timer = 0
+                while (self.running and timer <= timerPause*100):
+                    self.refreshScreen(False)
+                    timer += 1
+                    restTime = (timerPause*1000 - timer)
+                    if restTime < 10:
+                        break
+                    self.write_box(" Pause time ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
+                    self.write_box(" Begin in " + str(restTime)[1] + " secondes", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
+                    pygame.display.update()
+                    ev = pygame.event.get()
+                    for event in ev:
+                        if event.type == pygame.QUIT:
+                            self.quitApp()
+                        if event.type == pygame.MOUSEMOTION:
+                            self.cursorMove(event.rel)
+                break;
+
     def endExperimentScreen(self):
         '''This screen is shown between 2 experiments
         It makes a pause for the user'''
@@ -122,7 +150,8 @@ class GameExperiment(Game):
         self.running = True
         while(self.running):
             self.refreshScreen(False)
-            self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
+            #self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
+            self.write_box(" Ready ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
             self.write_box("Press SPACE to begin next experiment", Colors.BLACK, (self.width/2, self.height/2 + 30))
             pygame.display.update()
             ev = pygame.event.get()

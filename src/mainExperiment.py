@@ -12,6 +12,7 @@ from generateModel import *
 from sensitiveCursor import *
 import webExtractor as webEx
 import colors as Colors
+import pygame
 
 URLS = {"moodle":"https://moodle-sciences.upmc.fr/moodle-2021/",\
         #"wikipedia":"https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal",\

@@ -25,14 +25,15 @@ def main():
     infoObject = pygame.display.Info()
     WIDTH = infoObject.current_w - 200      ##on peut les ajouter dans config
     HEIGHT = infoObject.current_h - 200     ##on peut les ajouter dans config
-    
+
+    cursor = None
+    bg_color = Colors.WHITE
+    cursorImage = 'class/cursor/cursor3.png'
+
     filename = "experience.txt" 
     game = fonctions.readFileExperiment(filename, WIDTH, HEIGHT)
-    
     running = True
-
     game.menu("chooseMode")
-
 
 if __name__ == "__main__":
     main()

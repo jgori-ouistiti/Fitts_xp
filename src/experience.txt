@@ -1,5 +1,12 @@
 100
 80
-experience1 url https://www.jeu.fr/ 3
+experience1 url https://www.jeu.fr/ 5
 experience2 cible densite (500,500) 3 40 0.25 20 3
-experience3 cible cercle cercle 100 20 5 (500,500) 3
+experience3 cible cercle cercle 250 25 30 3
+pause : 10
+experience4 cible densite (600,700) 3 40 0.25 20 2
+experience5 url https://www.google.fr/ 3
+experience6 url https://fr.wikipedia.org/wiki/Wikipédia:Accueil_principal 5
+pause : 10
+experience7 cible cercle cercle 100 20 5 (500,500) 3
+experience8 cible densite (900,100) 3 40 0.25 20 4

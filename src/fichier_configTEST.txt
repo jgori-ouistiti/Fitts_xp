@@ -1,5 +1,8 @@
 Nous avons la syntaxe du fichier de configuration d'experience
 
+pause : NbTemps
+exemple : pause:20
+
 exp_id url www... nbMouvement
 exemple : experience1 url https://www.jeu.fr/ 5
 
