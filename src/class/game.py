@@ -461,9 +461,9 @@ class Game :
         
         This menu appears again when the user gets a game over (endGame)'''
         
-        button1 = Button((int(self.width/2 - 350),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Survival mode")
-        button2 = Button((int(self.width/2 + 100), int(self.height /2+ 30)), 2, 300, 60 , (200, 50, 50), RED, "Speed mode")
-        button3 = Button((int(self.width / 2 - 130), int(self.height / 2 + 150)), 1, 300, 60, (200, 50, 50), RED, "Reactive mode")
+        button1 = Button((int(self.width/2 - 500),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Survival mode")
+        button2 = Button((int(self.width/2 - 150), int(self.height /2+ 30)), 2, 300, 60 , (200, 50, 50), RED, "Speed mode")
+        button3 = Button((int(self.width / 2 + 200), int(self.height / 2 + 30)), 3, 300, 60, (200, 50, 50), RED, "Reactive mode")
         listButton = [button1,button2, button3]
         self.addListenerDrawable(listButton)
         self.refreshScreen()
@@ -580,13 +580,14 @@ class Game :
                     self.score += -1
 
     def reactiveMode(self, ID=3, A=40, p=0.25, color=Colors.BLACK, nb_trials=10):
-        print("reactive MODE")
+        print("Reactive MODE")
         print("Avant ajout :", len(self.listener))
         L_targets = make_2D_distractor_target_list((self.width, self.height),
                                                    (int(self.width / 2), int(self.height / 2)), ID, A, p, color)
         self.addListenerDrawable(L_targets)
         self.running = True
         self.nb_target = len(L_targets)
+        self.listTarget = L_targets
         self.assignRandomTarget()
 
         print(self.active_target, self.active_target.x, self.active_target.y, self.width, self.height)
@@ -599,11 +600,11 @@ class Game :
 
         cpt = 0
         while (self.running and cpt < nb_trials):
-            self.refreshScreen(False)
+            self.refreshScreen(True)
 
             # Display Timer
-            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
-            pygame.display.update()
+            #self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
+            #pygame.display.update()
 
             ev = pygame.event.get()
             # Tracking mouse position
@@ -636,7 +637,8 @@ class Game :
                                                                p, color)
                     self.addListenerDrawable(L_targets)
                     self.nb_target = len(L_targets)
-                    self.refreshScreen(False)
+                    self.listTarget = L_targets
+                    self.refreshScreen(True)
                     pygame.display.update()
                     self.assignRandomTarget()
                     cpt += 1
@@ -644,5 +646,6 @@ class Game :
                     self.barTime.timer -= 1
         self.removeListenerDrawable(L_targets)
         # return info parametres, positions de la souris
+        self.menu("chooseMode")
         return {"ID": ID, "A": A, "p": p}, cursor_position_list
 

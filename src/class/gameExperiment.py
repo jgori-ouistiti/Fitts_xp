@@ -115,7 +115,7 @@ class GameExperiment(Game):
                     self.running = False
                     self.showAllDrawable()
                     self.showAllListener()
-                    self.menu("quick","main")
+                    self.menu("play","main")
 
     def checkPause(self):
         '''This screen is shown between 2 experiments

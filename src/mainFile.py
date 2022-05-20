@@ -31,11 +31,11 @@ def main():
     cursorImage = 'class/cursor/cursor3.png'
 
     filename = "experience.txt" 
-    #game = fonctions.readFileExperiment(filename, WIDTH, HEIGHT)
+    game = fonctions.readFileExperiment(filename, WIDTH, HEIGHT)
     running = True
-    #game.menu("chooseMode")
-
-    game = Game(WIDTH, HEIGHT)
     game.menu("chooseMode")
+
+    #game = Game(WIDTH, HEIGHT)
+    #game.menu("chooseMode")
 if __name__ == "__main__":
     main()
