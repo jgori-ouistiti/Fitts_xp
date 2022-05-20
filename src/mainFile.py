@@ -30,11 +30,14 @@ def main():
     bg_color = Colors.WHITE
     cursorImage = 'class/cursor/cursor3.png'
 
-    filename = "experience.txt" 
-    game = fonctions.readFileExperiment(filename, WIDTH, HEIGHT)
     running = True
+
+    ### Permet creation d'une experience à partir d'un fichier
+    filename = "experience.txt"
+    game = fonctions.readFileExperiment(filename, WIDTH, HEIGHT)
     game.menu("chooseMode")
 
+    ### Permet de manupiler les differents modes
     #game = Game(WIDTH, HEIGHT)
     #game.menu("chooseMode")
 if __name__ == "__main__":
