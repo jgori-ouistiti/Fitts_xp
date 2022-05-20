@@ -50,7 +50,7 @@ class GameExperiment(Game):
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.hideAllDrawable()
             self.hideAllListener()
-            self.chooseMode() 
+            self.chooseMode()
         elif menu_title == "endExperiment":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.dumpExperiment(data)
@@ -115,7 +115,7 @@ class GameExperiment(Game):
                     self.running = False
                     self.showAllDrawable()
                     self.showAllListener()
-                    self.menu("play","main")
+                    self.menu("quick","main")
 
     def checkPause(self):
         '''This screen is shown between 2 experiments

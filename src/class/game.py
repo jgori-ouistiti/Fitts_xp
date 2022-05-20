@@ -309,7 +309,9 @@ class Game :
                 self.quickMode(mode="", listTarget=self.listTarget, showTime=False,)
             else: 
                 self.quickMode(mode="", listTarget=self.listTarget)
-            
+        elif menu_title == "reactive":
+            pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms
+            self.reactiveMode()
         else:
             raise Exception("Error of menu_title")
       
@@ -460,8 +462,10 @@ class Game :
         This menu appears again when the user gets a game over (endGame)'''
         
         button1 = Button((int(self.width/2 - 350),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "Survival mode")
-        button2 = Button((int(self.width/2 + 50), int(self.height /2+ 30)), 2, 300, 60 , (200, 50, 50), RED, "Speed mode") 
-        self.addListenerDrawable([button1,button2])
+        button2 = Button((int(self.width/2 + 100), int(self.height /2+ 30)), 2, 300, 60 , (200, 50, 50), RED, "Speed mode")
+        button3 = Button((int(self.width / 2 - 130), int(self.height / 2 + 150)), 1, 300, 60, (200, 50, 50), RED, "Reactive mode")
+        listButton = [button1,button2, button3]
+        self.addListenerDrawable(listButton)
         self.refreshScreen()
         self.write_screen("Choose Your Mode", Colors.BLACK, (self.width/2 - 180, self.height/2 - 30))
         self.running = True
@@ -476,7 +480,7 @@ class Game :
                     self.quitApp()
                 if ("button",1) in L:
                     print("Boutton 1")
-                    self.removeListenerDrawable([button1, button2])
+                    self.removeListenerDrawable(listButton)
                     self.score = 0
                     self.running = False
                     self.showAllDrawable()
@@ -485,12 +489,21 @@ class Game :
                     
                 if ("button",2) in L:
                     print("Boutton 2")
-                    self.removeListenerDrawable([button1, button2])
+                    self.removeListenerDrawable(listButton)
                     self.score = 0
                     self.running = False
                     self.showAllDrawable()
                     self.showAllListener()
                     self.menu("quick","main")
+
+                if ("button",3) in L:
+                    print("Boutton 3")
+                    self.removeListenerDrawable(listButton)
+                    self.score = 0
+                    self.running = False
+                    self.showAllDrawable()
+                    self.showAllListener()
+                    self.menu("reactive","main")
 
     def quickMode(self, mode="", listTarget=[], showTime=True, displayConsolNbOfTarget = True):
         
@@ -508,12 +521,14 @@ class Game :
         targets = listTarget
         
         if targets == []:
-        
-            targets = make_2D_distractor_target_list(\
-                (self.width, self.height), \
-                (int(self.width/2), int(self.height/2) ),\
-                3, 40, 0.25, Colors.BLACK)
-                
+            if self.listTarget != []:
+                targets = self.listTarget
+            else:
+                targets = make_2D_distractor_target_list(\
+                    (self.width, self.height), \
+                    (int(self.width/2), int(self.height/2) ),\
+                    3, 40, 0.25, Colors.BLACK)
+                self.listTarget = targets
             self.addListenerDrawable(targets)
         else :
             self.addListenerDrawable(targets)
@@ -562,7 +577,72 @@ class Game :
                     self.cursor_position.append(("target_pos :",(self.active_target.x,self.active_target.y)))
                 elif ("not cible", False) in L: #On n'a pas cliqué sur la bonne cible
                     self.barTime.timer += -1 
-                    self.score += -1            
-    
-    
-    
+                    self.score += -1
+
+    def reactiveMode(self, ID=3, A=40, p=0.25, color=Colors.BLACK, nb_trials=10):
+        print("reactive MODE")
+        print("Avant ajout :", len(self.listener))
+        L_targets = make_2D_distractor_target_list((self.width, self.height),
+                                                   (int(self.width / 2), int(self.height / 2)), ID, A, p, color)
+        self.addListenerDrawable(L_targets)
+        self.running = True
+        self.nb_target = len(L_targets)
+        self.assignRandomTarget()
+
+        print(self.active_target, self.active_target.x, self.active_target.y, self.width, self.height)
+
+        print("Apres ajout :", len(self.listener))
+
+        cursor_position = []
+        cursor_position_list = []
+        cursor_position.append(("target_pos :", (self.active_target.x, self.active_target.y)))
+
+        cpt = 0
+        while (self.running and cpt < nb_trials):
+            self.refreshScreen(False)
+
+            # Display Timer
+            self.write_screen("Time : " + "{:.1f}".format(self.barTime.timer), Colors.BLACK, self.barTime.posText, True)
+            pygame.display.update()
+
+            ev = pygame.event.get()
+            # Tracking mouse position
+            cursor_position.append(pygame.mouse.get_pos())
+            for event in ev:
+                L = self.listen(event)
+                if event.type == pygame.QUIT:
+                    self.quitApp()
+
+                # Update Timer
+                if event.type == pygame.USEREVENT:
+                    self.barTime.addSubTime(0.01)
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                        self.menu("pause", 'experience')
+                if ("cible", True) in L:  # On a cliqué sur une cible
+                    # Saving the tracking of mouse
+                    cursor_position_list.append(cursor_position)
+                    cursor_position = []
+                    cursor_position.append(("target_pos :", (self.active_target.x, self.active_target.y)))
+                    # Repositioning targets with mouse position
+
+                    # Removing ancient targets
+                    self.removeListenerDrawable(L_targets)
+
+                    # Creating new targets with mouse position
+                    L_targets = make_2D_distractor_target_list((self.width, self.height), pygame.mouse.get_pos(), ID, A,
+                                                               p, color)
+                    self.addListenerDrawable(L_targets)
+                    self.nb_target = len(L_targets)
+                    self.refreshScreen(False)
+                    pygame.display.update()
+                    self.assignRandomTarget()
+                    cpt += 1
+                if ("cible", False) in L:
+                    self.barTime.timer -= 1
+        self.removeListenerDrawable(L_targets)
+        # return info parametres, positions de la souris
+        return {"ID": ID, "A": A, "p": p}, cursor_position_list
+
