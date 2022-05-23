@@ -125,9 +125,9 @@ class GameExperiment(Game):
             if (self.activeExperiment-1 == id):
                 self.running = True
                 timer = 0
+                pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
                 while (self.running and timer <= timerPause*100):
                     self.refreshScreen(False)
-                    timer += 1
                     restTime = (timerPause*1000 - timer)
                     if restTime < 10:
                         break
@@ -140,6 +140,9 @@ class GameExperiment(Game):
                             self.quitApp()
                         if event.type == pygame.MOUSEMOTION:
                             self.cursorMove(event.rel)
+                        if event.type == pygame.USEREVENT: 
+                            timer += 10
+                pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive
                 break;
 
     def endExperimentScreen(self):
