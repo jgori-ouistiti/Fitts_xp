@@ -1,22 +1,23 @@
-import tkinter as tk
+from tkinter import *
+from tkinter import ttk
 from tkinter import colorchooser
-from PIL import ImageTk, Image
+from PIL import Image, ImageTk
 import math
 
-root = tk.Tk()
+root = Tk()
 x_shift = 100
 y_shift = 100
-toolbar_width = 25
+toolbar_width = 40
 
 screen_width = root.winfo_screenwidth() - 2*x_shift
 screen_height = root.winfo_screenheight() - 2*y_shift - toolbar_width
 
-class MFrame(tk.Frame):
+class MFrame(ttk.Frame):
     def __init__(self, root, title="Experiment editor"):
-        super().__init__(root)
+        ttk.Frame.__init__(self, root)
         
         self.master.title(title)
-        self.pack(fill = tk.BOTH, expand = 1)
+        
         
         #List of different shapes followed by the index of the selected shape
         self.shapes = [['circle', 'rectangle'],0]
@@ -30,25 +31,48 @@ class MFrame(tk.Frame):
         #List of all the shapes drawed on screen.
         self.drawings = []
         
-        #Tools canvas part
-        self.tools  = tk.Canvas(self, height = toolbar_width)
-        sq_button_image = Image.open('images/square_button.png')
-        sq_button_image = sq_button_image.resize((25,25), Image.Resampling.LANCZOS)
-        rectangle_button = tk.Button(self.tools, image = ImageTk.PhotoImage(sq_button_image) , command = self.set_rectangle_shape, anchor = tk.W, borderwidth=0)
-        self.tools.create_window(0,0,window = rectangle_button, anchor = tk.NW)
-        self.tools.pack(fill = tk.BOTH)
+        #Tools bar part
+        self.tools  = Frame(self, bd = 1, relief = RAISED)
+        
+        
+        self.rectangle_img = Image.open("images/square_button.png")
+        self.rectangle_img = self.rectangle_img.resize((toolbar_width,toolbar_width))
+        self.circle_img = Image.open("images/circle_button.png")
+        self.circle_img = self.circle_img.resize((toolbar_width, toolbar_width))
+        self.color_img  = Image.open("images/color_button.png")
+        self.color_img  = self.color_img.resize((toolbar_width, toolbar_width))
+        
+        self.photo_rect = ImageTk.PhotoImage(self.rectangle_img)
+        self.photo_circ = ImageTk.PhotoImage(self.circle_img)
+        self.photo_color= ImageTk.PhotoImage(self.color_img)
+        
+        rectangle_button = Button(self.tools, image = self.photo_rect, relief = FLAT, command = self.set_rectangle_shape)
+        circle_button    = Button(self.tools, image = self.photo_circ, relief = FLAT, command = self.set_circle_shape)
+        color_button     = Button(self.tools, image = self.photo_color, relief = FLAT, command = self.new_color)
+        
+        circle_button   .pack(side=LEFT, padx = 2, pady=2)
+        rectangle_button.pack(side=LEFT, padx = 2, pady=2)  
+        color_button    .pack(side=LEFT, padx = 2, pady=2)
+        
+        
+        self.tools.pack(side = TOP, fill = X)
+        #self.tools.create_window(0,0,window = rectangle_button, anchor = NW)
+        
         
         #Shape canvas part
-        self.canvas = tk.Canvas(self)
-        self.canvas.pack(fill = tk.BOTH, expand = 1)
+        self.canvas = Canvas(self, width = screen_width, height = screen_height)
+        self.canvas.pack(side = TOP)
         self.canvas.bind('<Button-1>', self.clicked)
         self.canvas.bind('<B1-Motion>', self.motion)
         self.canvas.bind('<ButtonRelease-1>', self.released)
+        self.canvas.pack(side=TOP)
         
         #Binding shortcuts in both
         root.bind('<Key>', self.key_pressed)
         root.bind('<Control-Key-z>', self.undo)
         root.bind('<Control-Key-Z>', self.undo)
+        
+        self.pack(side=TOP, fill = X)
         
     def draw_circle(self, x, y, r):
         return self.canvas.create_oval(x - r, y - r, x + r, y + r, outline=self.outline, fill=self.fill, width=self.width)
@@ -114,7 +138,9 @@ class MFrame(tk.Frame):
         
     def new_color(self):
         #change the fill color (for now, called when pressing C key)
-        return colorchooser.askcolor(title ="Choose color")
+        color = colorchooser.askcolor(title ="Choose color")
+        self.fill = color[1]
+        return color
         
     def key_pressed(self, event):
         #called each time a key is pressed
@@ -128,8 +154,7 @@ class MFrame(tk.Frame):
         #changing color
         if event.keysym == 'c':
             print("Select new color")
-            self.fill = self.new_color()[1]
-            print("Color selected : ", self.fill)
+            self.new_color()
             
         if event.keysym == 'a':
             print([k[1] for k in self.drawings])
