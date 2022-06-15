@@ -43,7 +43,7 @@ class MFrame(ttk.Frame):
         self.fileMenu.add_command(label = "Open")
         self.fileMenu.add_command(label = "Save", command = self.save_experiment)
         self.fileMenu.add_command(label = "Save as", command = self.save_experiment)
-        self.fileMenu.add_command(label = "Exit")
+        self.fileMenu.add_command(label = "Exit", command = self.quitApp)
         self.menuBar.add_cascade(label = "File", menu = self.fileMenu)
         
         root.config(menu = self.menuBar)
@@ -96,6 +96,10 @@ class MFrame(ttk.Frame):
         root.bind('<Control-Key-S>', self.quick_save)
         
         self.pack(side=TOP, fill = X)
+    
+    def quitApp(self):
+        #to do: "Do you want to save the work ?"
+        root.destroy()
         
     def draw_circle(self, x, y, r):
         return self.canvas.create_oval(x - r, y - r, x + r, y + r, outline=self.outline, fill=self.fill, width=self.width)
