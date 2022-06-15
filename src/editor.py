@@ -1,8 +1,11 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import colorchooser
+from tkinter.filedialog import asksaveasfile
+
 from PIL import Image, ImageTk
 import math
+import json
 
 root = Tk()
 x_shift = 100
@@ -41,19 +44,23 @@ class MFrame(ttk.Frame):
         self.circle_img = self.circle_img.resize((toolbar_width, toolbar_width))
         self.color_img  = Image.open("images/color_button.png")
         self.color_img  = self.color_img.resize((toolbar_width, toolbar_width))
+        self.save_img   = Image.open("images/save_button.png")
+        self.save_img   = self.save_img.resize((toolbar_width, toolbar_width))
         
         self.photo_rect = ImageTk.PhotoImage(self.rectangle_img)
         self.photo_circ = ImageTk.PhotoImage(self.circle_img)
         self.photo_color= ImageTk.PhotoImage(self.color_img)
+        self.photo_save = ImageTk.PhotoImage(self.save_img)
         
         rectangle_button = Button(self.tools, image = self.photo_rect, relief = FLAT, command = self.set_rectangle_shape)
         circle_button    = Button(self.tools, image = self.photo_circ, relief = FLAT, command = self.set_circle_shape)
         color_button     = Button(self.tools, image = self.photo_color, relief = FLAT, command = self.new_color)
+        save_button      = Button(self.tools, image = self.photo_save,  relief = FLAT, command = self.save_experiment)
         
         circle_button   .pack(side=LEFT, padx = 2, pady=2)
         rectangle_button.pack(side=LEFT, padx = 2, pady=2)  
         color_button    .pack(side=LEFT, padx = 2, pady=2)
-        
+        save_button     .pack(side=LEFT, padx = 2, pady=2)
         
         self.tools.pack(side = TOP, fill = X)
         #self.tools.create_window(0,0,window = rectangle_button, anchor = NW)
@@ -158,6 +165,18 @@ class MFrame(ttk.Frame):
             
         if event.keysym == 'a':
             print([k[1] for k in self.drawings])
+            
+    def save_experiment(self):
+        f = asksaveasfile(mode='w', defaultextension=".json")
+        if f is None: # ask save as file dialog has been closed
+            return
+        D = dict()
+        for i in range(len(self.drawings)):
+            D[i] = self.drawings[i][1]
+        json_object = json.dumps(D, indent=4)
+        f.write(json_object)
+        f.close()
+        
 
 def main():
     frame = MFrame(root)
