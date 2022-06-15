@@ -21,7 +21,6 @@ class MFrame(ttk.Frame):
         
         self.master.title(title)
         
-        
         #List of different shapes followed by the index of the selected shape
         self.shapes = [['circle', 'rectangle'],0]
         self.shapes_ind = {self.shapes[0][k]:k for k in range(len(self.shapes[0]))}
@@ -33,6 +32,21 @@ class MFrame(ttk.Frame):
         
         #List of all the shapes drawed on screen.
         self.drawings = []
+        
+        #file name of the experiment (used in quick save)
+        self.file_name = None
+        
+        #Menu part
+        self.menuBar = Menu(root)
+        
+        self.fileMenu = Menu(self.menuBar)
+        self.fileMenu.add_command(label = "Open")
+        self.fileMenu.add_command(label = "Save", command = self.save_experiment)
+        self.fileMenu.add_command(label = "Save as", command = self.save_experiment)
+        self.fileMenu.add_command(label = "Exit")
+        self.menuBar.add_cascade(label = "File", menu = self.fileMenu)
+        
+        root.config(menu = self.menuBar)
         
         #Tools bar part
         self.tools  = Frame(self, bd = 1, relief = RAISED)
@@ -55,7 +69,7 @@ class MFrame(ttk.Frame):
         rectangle_button = Button(self.tools, image = self.photo_rect, relief = FLAT, command = self.set_rectangle_shape)
         circle_button    = Button(self.tools, image = self.photo_circ, relief = FLAT, command = self.set_circle_shape)
         color_button     = Button(self.tools, image = self.photo_color, relief = FLAT, command = self.new_color)
-        save_button      = Button(self.tools, image = self.photo_save,  relief = FLAT, command = self.save_experiment)
+        save_button      = Button(self.tools, image = self.photo_save,  relief = FLAT, command = self.quick_save)
         
         circle_button   .pack(side=LEFT, padx = 2, pady=2)
         rectangle_button.pack(side=LEFT, padx = 2, pady=2)  
@@ -78,6 +92,8 @@ class MFrame(ttk.Frame):
         root.bind('<Key>', self.key_pressed)
         root.bind('<Control-Key-z>', self.undo)
         root.bind('<Control-Key-Z>', self.undo)
+        root.bind('<Control-Key-s>', self.quick_save)
+        root.bind('<Control-Key-S>', self.quick_save)
         
         self.pack(side=TOP, fill = X)
         
@@ -167,16 +183,35 @@ class MFrame(ttk.Frame):
             print([k[1] for k in self.drawings])
             
     def save_experiment(self):
+        print("Opening save file dialog...")
         f = asksaveasfile(mode='w', defaultextension=".json")
         if f is None: # ask save as file dialog has been closed
+            print("Abandon : save file dialog closed early")
             return
+        print("Saving file as "+f.name+" ...")
         D = dict()
         for i in range(len(self.drawings)):
             D[i] = self.drawings[i][1]
         json_object = json.dumps(D, indent=4)
         f.write(json_object)
         f.close()
+        self.file_name = f.name
+        print("File saved !")
+        return
         
+    def quick_save(self, event=None):
+        if self.file_name == None:
+            return self.save_experiment()
+        print("Saving as "+self.file_name+" ...")
+        f = open(self.file_name, 'w')
+        D = dict()
+        for i in range(len(self.drawings)):
+            D[i] = self.drawings[i][1]
+        json_object = json.dumps(D, indent=4)
+        f.write(json_object)
+        f.close()
+        print("File saved !")
+        return
 
 def main():
     frame = MFrame(root)
