@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import colorchooser
-from tkinter.filedialog import asksaveasfile
+from tkinter import filedialog
 
 from PIL import Image, ImageTk
 import math
@@ -40,7 +40,7 @@ class MFrame(ttk.Frame):
         self.menuBar = Menu(root)
         
         self.fileMenu = Menu(self.menuBar)
-        self.fileMenu.add_command(label = "Open")
+        self.fileMenu.add_command(label = "Open", command = self.open_file)
         self.fileMenu.add_command(label = "Save", command = self.save_experiment)
         self.fileMenu.add_command(label = "Save as", command = self.save_experiment)
         self.fileMenu.add_command(label = "Exit", command = self.quitApp)
@@ -94,6 +94,8 @@ class MFrame(ttk.Frame):
         root.bind('<Control-Key-Z>', self.undo)
         root.bind('<Control-Key-s>', self.quick_save)
         root.bind('<Control-Key-S>', self.quick_save)
+        root.bind('<Control-Key-o>', self.open_file)
+        root.bind('<Control-Key-O>', self.open_file)
         
         self.pack(side=TOP, fill = X)
     
@@ -101,11 +103,23 @@ class MFrame(ttk.Frame):
         #to do: "Do you want to save the work ?"
         root.destroy()
         
-    def draw_circle(self, x, y, r):
-        return self.canvas.create_oval(x - r, y - r, x + r, y + r, outline=self.outline, fill=self.fill, width=self.width)
+    def draw_circle(self, x, y, r, outline = None, fill = None, width = None):
+        if outline == None:
+            outline = self.outline
+        if fill == None:
+            fill = self.fill
+        if width == None:
+            width = self.width
+        return self.canvas.create_oval(x - r, y - r, x + r, y + r, outline=outline, fill=fill, width=width)
     
-    def draw_rectangle(self, x0, y0, x1, y1):
-        return self.canvas.create_rectangle(x0, y0, x1, y1, outline=self.outline, fill=self.fill, width=self.width)
+    def draw_rectangle(self, x0, y0, x1, y1, outline = None, fill = None, width = None):
+        if outline == None:
+            outline = self.outline
+        if fill == None:
+            fill = self.fill
+        if width == None:
+            width = self.width
+        return self.canvas.create_rectangle(x0, y0, x1, y1, outline=outline, fill=fill, width=width)
     
     def undo(self, event):
         #delete the last item on the drawing list (shortcut CTRL-Z)
@@ -146,14 +160,25 @@ class MFrame(ttk.Frame):
         
     def released(self, event):
         #called when the user release left mouse button
-        self.drawings.append((self.current_drawing,{'shape':self.get_current_shape(),\
-                                                    'x0':self.x0,\
-                                                    'y0':self.y0,\
-                                                    'x1':self.x1,\
-                                                    'x2':self.x1,\
-                                                    'border_color':self.outline,\
-                                                    'fill_color':self.fill,\
-                                                    'width':self.width}))
+        if self.current_drawing == None:
+            return
+        if self.get_current_shape() == 'rectangle':
+            self.drawings.append((self.current_drawing,{'shape':self.get_current_shape(),\
+                                                        'x0':self.x0,\
+                                                        'y0':self.y0,\
+                                                        'x1':self.x1,\
+                                                        'y1':self.y1,\
+                                                        'border_color':self.outline,\
+                                                        'fill_color':self.fill,\
+                                                        'width':self.width}))
+        if self.get_current_shape() == 'circle':
+            self.drawings.append((self.current_drawing,{'shape':self.get_current_shape(),\
+                                                        'x':self.x0,\
+                                                        'y':self.y0,\
+                                                        'r':self.sensibility * math.sqrt( (self.x1 - self.x0)**2 + (self.y1 - self.y0)**2 ),
+                                                        'border_color':self.outline,\
+                                                        'fill_color':self.fill,\
+                                                        'width':self.width}))
         self.current_drawing = None
         
     def next_shape(self):
@@ -188,7 +213,7 @@ class MFrame(ttk.Frame):
             
     def save_experiment(self):
         print("Opening save file dialog...")
-        f = asksaveasfile(mode='w', defaultextension=".json")
+        f = filedialog.asksaveasfile(mode='w', defaultextension=".json")
         if f is None: # ask save as file dialog has been closed
             print("Abandon : save file dialog closed early")
             return
@@ -215,6 +240,59 @@ class MFrame(ttk.Frame):
         f.write(json_object)
         f.close()
         print("File saved !")
+        return
+        
+    def open_file(self, event=None):
+        print("Opening open file dialog...")
+        f_name = filedialog.askopenfilename(
+            title = "Open a file",
+            filetypes = (('json files', '*.json'), ('All files', '*.*')))
+        if f_name == '': # ask open file dialog has been closed
+            print("Abandon : open file dialog closed early")
+            return
+        f = open(f_name, 'r')
+        data = json.load(f)
+        print(data)
+        for id, fig in data.items():
+            if fig['shape'] == 'rectangle':
+                self.drawings.append((
+                    #Draw element + adding to self.drawings 
+                    self.draw_rectangle(
+                        fig['x0'], 
+                        fig['y0'], 
+                        fig['x1'],
+                        fig['y1'], 
+                        outline = fig['border_color'], 
+                        fill = fig['fill_color'], 
+                        width = fig['width']),
+                        
+                    {'shape' : fig['shape'],
+                    'x0': fig['x0'], 
+                    'y0':fig['y0'], 
+                    'x1':fig['x1'],
+                    'y1':fig['y1'], 
+                    'border_color' : fig['border_color'], 
+                    'fill_color' : fig['fill_color'], 
+                    'width' : fig['width']}))
+            if fig['shape'] == 'circle':
+                self.drawings.append((
+                    #Draw element + adding to self.drawings 
+                    self.draw_circle(
+                    fig['x'], 
+                    fig['y'], 
+                    fig['r'], 
+                    outline = fig['border_color'], 
+                    fill = fig['fill_color'], 
+                    width = fig['width']),
+                    
+                    {'shape' : fig['shape'],
+                    'x': fig['x'], 
+                    'y':fig['y'], 
+                    'r':fig['r'],
+                    'border_color' : fig['border_color'], 
+                    'fill_color' : fig['fill_color'], 
+                    'width' : fig['width']}))
+        f.close()
         return
 
 def main():
