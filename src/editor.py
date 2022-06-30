@@ -212,6 +212,7 @@ class MFrame(ttk.Frame):
             print([k[1] for k in self.drawings])
             
     def save_experiment(self):
+        #Ask a file name and path to save experiment in a json file
         print("Opening save file dialog...")
         f = filedialog.asksaveasfile(mode='w', defaultextension=".json")
         if f is None: # ask save as file dialog has been closed
@@ -229,6 +230,7 @@ class MFrame(ttk.Frame):
         return
         
     def quick_save(self, event=None):
+        #Save directly if a file_name is already specified
         if self.file_name == None:
             return self.save_experiment()
         print("Saving as "+self.file_name+" ...")
@@ -242,7 +244,14 @@ class MFrame(ttk.Frame):
         print("File saved !")
         return
         
+    def clear_all(self):
+        while self.drawings != []:
+            drawing = self.drawings.pop()
+            self.canvas.delete(drawing[0])
+        self.current_drawing = None
+        
     def open_file(self, event=None):
+        #clear actual drawings and open a file
         print("Opening open file dialog...")
         f_name = filedialog.askopenfilename(
             title = "Open a file",
@@ -253,6 +262,7 @@ class MFrame(ttk.Frame):
         f = open(f_name, 'r')
         data = json.load(f)
         print(data)
+        self.clear_all()
         for id, fig in data.items():
             if fig['shape'] == 'rectangle':
                 self.drawings.append((

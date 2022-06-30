@@ -1,0 +1,61 @@
+{
+    "0": {
+        "shape": "circle",
+        "x": 158,
+        "y": 163,
+        "r": 157.4372891026773,
+        "border_color": "#000",
+        "fill_color": "#fff",
+        "width": 2
+    },
+    "1": {
+        "shape": "rectangle",
+        "x0": 490,
+        "y0": 284,
+        "x1": 732,
+        "y1": 541,
+        "border_color": "#000",
+        "fill_color": "#fff",
+        "width": 2
+    },
+    "2": {
+        "shape": "rectangle",
+        "x0": 378,
+        "y0": 121,
+        "x1": 578,
+        "y1": 216,
+        "border_color": "#000",
+        "fill_color": "#ff00ff",
+        "width": 2
+    },
+    "3": {
+        "shape": "rectangle",
+        "x0": 976,
+        "y0": 130,
+        "x1": 1276,
+        "y1": 353,
+        "border_color": "#000",
+        "fill_color": "#ff00ff",
+        "width": 2
+    },
+    "4": {
+        "shape": "rectangle",
+        "x0": 439,
+        "y0": 384,
+        "x1": 493,
+        "y1": 639,
+        "border_color": "#000",
+        "fill_color": "#ff00ff",
+        "width": 2
+    },
+    "5": {
+        "shape": "rectangle",
+        "x0": 849,
+        "y0": 340,
+        "x1": 1096,
+        "y1": 543,
+        "border_color": "#000",
+        "fill_color": "#ff00ff",
+        "width": 2
+    }
+}
