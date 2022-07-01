@@ -13,8 +13,11 @@ import colors as Colors
 import pickle
 
 class CircleRandomExp(Experiment):
-    def __init__(self, width, height, exp_name, exp_id, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30):
-        super().__init__(None, exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+    '''One target at a time on screen.
+       When clicking on a target, a new one appear on a constant distance from the previous one.
+    '''
+    def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
         self.target_radius = target_radius
         self.target_color  = target_color
         self.distance = distance
@@ -55,6 +58,125 @@ class CircleRandomExp(Experiment):
         game.listTarget = [target]
         self.targets = [target]
         
+class twoTargetsExp(Experiment):
+    '''Only two constant targets on screen
+       Use a rad given in parameters to set the line where the two targets will be placed
+       Use a distance in pixels to separate the two targets
+    ''' 
+    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.WHITE):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+        self.data['number_of_targets'] = 2
+        self.data['distance of the two targets'] = distance
+        self.data['radian of axe'] = rad
+        #target 1
+        x1 = int(width/2 - (distance/2) * math.cos(rad))
+        y1 = int(height/2 - (distance/2) * math.sin(rad))
+        self.targets.append(Cible((x1,y1), target_radius, target_color, isTarget = True))
+        #target 2
+        x2 = int(width/2 + (distance/2) * math.cos(rad))
+        y2 = int(height/2 + (distance/2) * math.sin(rad))
+        self.targets.append(Cible((x2,y2), target_radius, target_color, isTarget = False))
+        self.actual_target = self.targets[0]
+        
+    def swap_target(self):
+        if self.targets[0] is self.actual_target :
+            self.targets[0].isTarget = False
+            self.targets[1].isTarget = True
+            self.actual_target = self.targets[1]
+        else:
+            self.targets[0].isTarget = True
+            self.targets[1].isTarget = False
+            self.actual_target = self.targets[0]
+    
+    def begin(self, game):         
+        '''Start the experience
+        WARNING : we can pause the experience so we can exit this method at any time
+        We must use trial variable to know where we are on the experiment
+        
+        Overide for custom assignRandomTarget
+        '''
+        
+        if self.targets == None or self.targets == []:
+            raise Exception("Experiment has no target initialized")
+        
+        self.data['cursor_x_sensibility'] = self.dx_sens
+        self.data['cursor_y_sensibility'] = self.dy_sens
+        
+        game.running = True
+        
+        game.listTarget = targets = self.targets
+        game.addListenerDrawable(self.targets)
+        
+        game.cursor_position = []
+        
+        #Save the cursor settings (sensibility)
+        dx_cursor, dy_cursor = game.cursor.getSensibility()
+        #Set the cursor sensibility to the experiment sensibility settings
+        game.cursor.set_x_sensibility(self.dx_sens)
+        game.cursor.set_y_sensibility(self.dy_sens)
+        
+        self.startOfTrial = time.time()
+        self.previous_time = self.startOfTrial
+        
+        while (game.running and self.trial_id < self.maxTrials):
+            
+            pygame.mouse.set_pos = (game.width/2, game.height/2)
+            
+            game.refreshScreen(True)
+
+            ev = pygame.event.get()
+            for event in ev:
+            
+                L = game.listen(event)
+                
+                if event.type == pygame.QUIT:
+                    game.quitApp()
+                    return 0
+                    
+                #collect mouse position
+                if event.type == pygame.USEREVENT:
+                    #Tracking mouse position
+                    game.cursor_position.append((game.cursor.x, game.cursor.y))
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        #Reset the cursor sensibility back to previous settings
+                        game.cursor.set_x_sensibility(dx_cursor)
+                        game.cursor.set_y_sensibility(dy_cursor)
+                        pygame.mouse.set_visible(True)
+                        game.running = False
+                        game.removeListenerDrawable(targets)
+                        game.menu("pause")
+                        return
+                if event.type == pygame.MOUSEMOTION:
+                    game.cursorMove(event.rel)
+        
+                if ("cible",True) in L:#On a cliqué sur une cible
+                    self.swap_target()
+                
+                    self.correct_clic(game)
+                    
+                    self.iterateData(game)
+                
+                    self.trial_id += 1
+                
+                    game.score += 1
+                        
+                    #Saving the tracking of mouse
+                    game.cursor_position_list.append(game.cursor_position)
+                    game.cursor_position = []
+                
+                elif ("not cible",False) in L: #On n'a pas cliqué sur la bonne cible
+                    game.score += -1
+                    
+        #End of the experiment
+        #Reset the cursor sensibility back to previous settings
+        game.cursor.set_x_sensibility(dx_cursor)
+        game.cursor.set_y_sensibility(dy_cursor)
+        game.running = False
+        game.removeListenerDrawable(targets)
+        game.menu("endExperiment", data = self.data)
+    
 def saveExperiment(exp, filename = ''):
     if not isinstance(exp, Experiment):
         raise Exception("exp must be an experiment")

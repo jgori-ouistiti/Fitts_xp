@@ -138,6 +138,7 @@ class Experiment :
                     game.cursorMove(event.rel)
         
                 if ("cible",True) in L:#On a cliqué sur une cible
+                    game.assignRandomTarget()
                 
                     self.correct_clic(game)
                     

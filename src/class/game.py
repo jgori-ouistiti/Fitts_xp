@@ -235,7 +235,10 @@ class Game :
     def assignRandomTarget(self, printTarget = True):
         '''Assign every active targets to False on pick one randomly to assign it to the actual target'''
         #Set one target the main target to hit
+        if len(self.listTarget) <= 1:
+            return
         new_target_id = random.randint(0,self.nb_target - 1)
+
         target = None
         i = 0
         for obj in self.listTarget:

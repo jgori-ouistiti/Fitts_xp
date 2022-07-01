@@ -14,6 +14,7 @@ from makeExperiments import *
 import webExtractor as webEx
 import colors as Colors
 import pygame
+import math
 
 URLS = {"moodle":"https://moodle-sciences.upmc.fr/moodle-2021/",\
         #"wikipedia":"https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal",\
@@ -46,12 +47,25 @@ def main():
                 experiments = readModel(model_filename, maxTrials = 10)
             else:
                 experiments = generateModel(URLS, WIDTH, HEIGHT, filename = model_filename, maxTrials = 10)
+        elif '--circle' in sys.argv:
+            experiments = [CircleRandomExp(WIDTH, HEIGHT, 
+                'Circle Random with r = 30, distance = 300', 
+                0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30)]
+        elif '--lineH' in sys.argv:
+            experiments = [twoTargetsExp(WIDTH, HEIGHT,
+                'Two Targets with r = 30, distance = 500, rad = 0',
+                0,500)]
+            saveExperiment(experiments[0], 'experiments\HorizontalTwoTargets_R30_D500.pkl')
+        elif '--lineV' in sys.argv:
+            experiments = [twoTargetsExp(WIDTH, HEIGHT,
+                'Two Targets with r = 30, distance = 500, rad = PI/2',
+                math.pi/2,500)]
+            saveExperiment(experiments[0], 'experiments\VerticalTwoTargets_R30_D500.pkl')
         else:
-            #default = circle random experiment
-            #experiments = [CircleRandomExp(WIDTH, HEIGHT, 
-                # 'Circle Random with r = 30, distance = 300', 
-                # 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30)]
-            experiments = [loadExperiment('experiments\CircleRandom_R20_D300.pkl')]
+            #default : loading the file CircleRandom_R20_D300.pkl
+            experiments = [loadExperiment('experiments\CircleRandom_R20_D300.pkl')
+                          ,loadExperiment('experiments\HorizontalTwoTargets_R30_D500.pkl')
+                          ,loadExperiment('experiments\VerticalTwoTargets_R30_D500.pkl')]
             # saveExperiment(experiments[0], 'CircleRandom_R20_D300.pkl')
     
     else:
