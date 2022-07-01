@@ -50,7 +50,7 @@ def main():
         elif '--circle' in sys.argv:
             experiments = [CircleRandomExp(WIDTH, HEIGHT, 
                 'Circle Random with r = 30, distance = 300', 
-                0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30)]
+                0, maxTrials = 20, target_radius = 30, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30)]
         elif '--lineH' in sys.argv:
             experiments = [twoTargetsExp(WIDTH, HEIGHT,
                 'Two Targets with r = 30, distance = 500, rad = 0',
