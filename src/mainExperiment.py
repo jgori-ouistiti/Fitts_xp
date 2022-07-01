@@ -1,5 +1,6 @@
 import sys
 import os.path
+from os import walk
 sys.path.append('./tools')
 sys.path.append('./class')
 from drawable import *
@@ -47,26 +48,33 @@ def main():
                 experiments = readModel(model_filename, maxTrials = 10)
             else:
                 experiments = generateModel(URLS, WIDTH, HEIGHT, filename = model_filename, maxTrials = 10)
+                
+        #-------Using a specific parameter for an experience will save on previous file corresponding to the experiment name-------
         elif '--circle' in sys.argv:
             experiments = [CircleRandomExp(WIDTH, HEIGHT, 
                 'Circle Random with r = 30, distance = 300', 
                 0, maxTrials = 20, target_radius = 30, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30)]
+            saveExperiment(experiments[0], 'experiments\CircleRandom_R20_D300.pkl')
         elif '--lineH' in sys.argv:
             experiments = [twoTargetsExp(WIDTH, HEIGHT,
                 'Two Targets with r = 30, distance = 500, rad = 0',
-                0,500)]
+                0,500, target_radius = 30)]
             saveExperiment(experiments[0], 'experiments\HorizontalTwoTargets_R30_D500.pkl')
         elif '--lineV' in sys.argv:
             experiments = [twoTargetsExp(WIDTH, HEIGHT,
                 'Two Targets with r = 30, distance = 500, rad = PI/2',
-                math.pi/2,500)]
+                math.pi/2,500, target_radius = 30)]
             saveExperiment(experiments[0], 'experiments\VerticalTwoTargets_R30_D500.pkl')
+        #--------------------------------------------------------------------------------------------------------------------------
+        #DEFAULT LOAD ALL THE EXPERIMENTS IN FOLDER '\experiment'
         else:
-            #default : loading the file CircleRandom_R20_D300.pkl
-            experiments = [loadExperiment('experiments\CircleRandom_R20_D300.pkl')
-                          ,loadExperiment('experiments\HorizontalTwoTargets_R30_D500.pkl')
-                          ,loadExperiment('experiments\VerticalTwoTargets_R30_D500.pkl')]
-            # saveExperiment(experiments[0], 'CircleRandom_R20_D300.pkl')
+            filenames = next(walk("experiments/"), (None, None, []))[2]  # [] if no file
+            print(filenames)
+            experiments = []
+            for file in filenames:
+                if file[-4:] == '.pkl':
+                    experiments.append(loadExperiment('experiments/'+file))
+            
     
     else:
         for i in range(len(sys.argv)):

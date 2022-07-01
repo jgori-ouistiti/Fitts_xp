@@ -63,7 +63,7 @@ class twoTargetsExp(Experiment):
        Use a rad given in parameters to set the line where the two targets will be placed
        Use a distance in pixels to separate the two targets
     ''' 
-    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.WHITE):
+    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY):
         super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
         self.data['number_of_targets'] = 2
         self.data['distance of the two targets'] = distance
@@ -78,15 +78,17 @@ class twoTargetsExp(Experiment):
         self.targets.append(Cible((x2,y2), target_radius, target_color, isTarget = False))
         self.actual_target = self.targets[0]
         
-    def swap_target(self):
+    def swap_target(self, game):
         if self.targets[0] is self.actual_target :
             self.targets[0].isTarget = False
             self.targets[1].isTarget = True
             self.actual_target = self.targets[1]
+            game.active_target = self.targets[1]
         else:
             self.targets[0].isTarget = True
             self.targets[1].isTarget = False
             self.actual_target = self.targets[0]
+            game.active_target = self.targets[0]
     
     def begin(self, game):         
         '''Start the experience
@@ -117,6 +119,8 @@ class twoTargetsExp(Experiment):
         
         self.startOfTrial = time.time()
         self.previous_time = self.startOfTrial
+        
+        game.active_target = self.targets[0]
         
         while (game.running and self.trial_id < self.maxTrials):
             
@@ -152,7 +156,7 @@ class twoTargetsExp(Experiment):
                     game.cursorMove(event.rel)
         
                 if ("cible",True) in L:#On a cliqué sur une cible
-                    self.swap_target()
+                    self.swap_target(game)
                 
                     self.correct_clic(game)
                     
