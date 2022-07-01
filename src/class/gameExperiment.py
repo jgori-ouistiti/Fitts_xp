@@ -9,7 +9,7 @@ import json
 
 class GameExperiment(Game):
     
-    def __init__(self, width, height, experiments, listTimerPause=[], cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor3.png'):
+    def __init__(self, width, height, experiments, listTimerPause=[], cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor1.png'):
         super().__init__(width, height, bg_color)
         
         self.infiniteTime = True

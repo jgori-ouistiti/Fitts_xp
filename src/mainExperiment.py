@@ -10,6 +10,7 @@ from healthBar import *
 from experiment import *
 from generateModel import *
 from sensitiveCursor import *
+from makeExperiments import *
 import webExtractor as webEx
 import colors as Colors
 import pygame
@@ -40,10 +41,18 @@ def main():
     experiments = None
     
     if not '--url' in sys.argv:
-        if os.path.isfile(model_filename):
-            experiments = readModel(model_filename, maxTrials = 10)
+        if '--model' in sys.argv:
+            if os.path.isfile(model_filename):
+                experiments = readModel(model_filename, maxTrials = 10)
+            else:
+                experiments = generateModel(URLS, WIDTH, HEIGHT, filename = model_filename, maxTrials = 10)
         else:
-            experiments = generateModel(URLS, WIDTH, HEIGHT, filename = model_filename, maxTrials = 10)
+            #default = circle random experiment
+            #experiments = [CircleRandomExp(WIDTH, HEIGHT, 
+                # 'Circle Random with r = 30, distance = 300', 
+                # 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30)]
+            experiments = [loadExperiment('experiments\CircleRandom_R20_D300.pkl')]
+            # saveExperiment(experiments[0], 'CircleRandom_R20_D300.pkl')
     
     else:
         for i in range(len(sys.argv)):
@@ -64,7 +73,7 @@ def main():
     #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     
     #Change the sensibility for the first experiment (TEST)
-    experiments[0].set_x_sensibility(-1)
+    #experiments[0].set_x_sensibility(-1)
     
     game = GameExperiment(WIDTH, HEIGHT, experiments)
     

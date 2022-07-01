@@ -14,12 +14,18 @@ class Experiment :
         self.data = dict() #contains all user's data ,for this one experiment, about mouse tracking, time, etc...
         self.data['exp_name'] = exp_name
         self.data['exp_id']   = exp_id
-        self.data['number_of_targets'] = len(targets)
+        if targets == None:
+            self.data['number_of_targets'] = 0
+        else:
+            self.data['number_of_targets'] = len(targets)
         self.data['trials'] = dict()
         
         self.maxTrials = maxTrials
         
-        self.startOfTrial = 0
+        tmp = time.time()
+        
+        self.startOfTrial = tmp
+        self.previous_time = tmp
         
         if self.maxTrials < 0:
             raise Exception("maxTrials must be positive")
@@ -27,8 +33,9 @@ class Experiment :
         self.trial_id    = 0
         
         #Cursor sensitibility for the experiment
-        self.dx_sens = 1
-        self.dy_sens = 1
+        self.dx_sens = dx_sens
+        self.dy_sens = dy_sens
+        
         
     def set_x_sensibility(self, dx_sens):
         self.dx_sens = dx_sens
@@ -38,8 +45,11 @@ class Experiment :
         
     def iterateData(self, game):
         '''do one iteration each click and add mouth tracks and time to self.trials'''
+        actual_time = time.time()
         
-        trialTime = time.time() - self.startOfTrial
+        trialTime = actual_time - self.startOfTrial
+        timeFromPrev = actual_time - self.previous_time
+        self.previous_time = actual_time
         target = game.active_target
         cursor_tracks = game.cursor_position
         
@@ -53,9 +63,16 @@ class Experiment :
         else:
             self.data['trials'][self.trial_id]['target_type'] = 'circle'
             self.data['trials'][self.trial_id]['radius']      = target.r
-        self.data['trials'][self.trial_id]['time'] = trialTime
+        self.data['trials'][self.trial_id]['time from start'] = trialTime
+        self.data['trials'][self.trial_id]['time from previous clic'] = timeFromPrev
         self.data['trials'][self.trial_id]['mouse_tracks'] = cursor_tracks
         
+    def assignRandomTarget(self, game):
+        game.assignRandomTarget()
+        
+    def correct_clic(self, game):
+        #Nothing here, used for child of Experiment
+        return
 
     def begin(self, game):         
         '''Start the experience
@@ -74,7 +91,7 @@ class Experiment :
         game.listTarget = targets = self.targets
         game.addListenerDrawable(self.targets)
         
-        game.assignRandomTarget()
+        self.assignRandomTarget(game)
         
         game.cursor_position = []
         
@@ -85,6 +102,7 @@ class Experiment :
         game.cursor.set_y_sensibility(self.dy_sens)
         
         self.startOfTrial = time.time()
+        self.previous_time = self.startOfTrial
         
         while (game.running and self.trial_id < self.maxTrials):
             
@@ -120,6 +138,8 @@ class Experiment :
                     game.cursorMove(event.rel)
         
                 if ("cible",True) in L:#On a cliqué sur une cible
+                
+                    self.correct_clic(game)
                     
                     self.iterateData(game)
                 
