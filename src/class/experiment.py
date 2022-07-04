@@ -130,12 +130,12 @@ class Experiment :
                         game.cursor.set_x_sensibility(dx_cursor)
                         game.cursor.set_y_sensibility(dy_cursor)
                         pygame.mouse.set_visible(True)
-                        game.running = False
                         game.removeListenerDrawable(targets)
-                        game.menu("pause")
-                        return
+                        if game.menu("pause") == -1: #quitting app because user closed game during pause menu
+                            return -1
+                        game.addListenerDrawable(self.targets)
                 if event.type == pygame.MOUSEMOTION:
-                    game.cursorMove(event.rel)
+                    game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
                     game.assignRandomTarget()

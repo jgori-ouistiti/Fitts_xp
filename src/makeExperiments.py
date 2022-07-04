@@ -12,6 +12,7 @@ from experiment import *
 import colors as Colors
 import pickle
 
+#-------------------------RANDOM TARGETS WITH SAME DISTANCE EVERY HIT CLASS
 class CircleRandomExp(Experiment):
     '''One target at a time on screen.
        When clicking on a target, a new one appear on a constant distance from the previous one.
@@ -58,7 +59,9 @@ class CircleRandomExp(Experiment):
         game.listTarget = [target]
         self.targets = [target]
         
-class twoTargetsExp(Experiment):
+
+#-------------------------TWO TARGETS EXPERIMENT CLASS  
+class TwoTargetsExp(Experiment):
     '''Only two constant targets on screen
        Use a rad given in parameters to set the line where the two targets will be placed
        Use a distance in pixels to separate the two targets
@@ -148,12 +151,12 @@ class twoTargetsExp(Experiment):
                         game.cursor.set_x_sensibility(dx_cursor)
                         game.cursor.set_y_sensibility(dy_cursor)
                         pygame.mouse.set_visible(True)
-                        game.running = False
                         game.removeListenerDrawable(targets)
-                        game.menu("pause")
-                        return
+                        if game.menu("pause") == -1: #quitting app because user closed game during pause menu
+                            return -1
+                        game.addListenerDrawable(self.targets)
                 if event.type == pygame.MOUSEMOTION:
-                    game.cursorMove(event.rel)
+                    game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
                     self.swap_target(game)
@@ -180,7 +183,142 @@ class twoTargetsExp(Experiment):
         game.running = False
         game.removeListenerDrawable(targets)
         game.menu("endExperiment", data = self.data)
+
+#-------------------------CIRCLE EXPERIMENT CLASS
+class CircleExp(Experiment):
+    '''Targets are displayed on an invisible circle centered in the middle of the screen.
+    The target's order is specified and not random.
+    Every time a target is hit, the next one is at the most opposite of the circle.'''
     
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+        self.data['number_of_targets'] = nb_target
+        self.data['radius of the circle'] = rad_circle
+        
+        #Generation of the targets on a list. Next target is the next one in the list
+        self.targets = []
+        if way_H :
+            delta_theta = math.pi / nb_target
+        else: 
+            delta_theta = - (math.pi / nb_target)
+        theta = 0
+        for i in range(nb_target):
+            x,y = (0,0)
+            if i%2 == 0:
+                x = int(width/2  + rad_circle*math.cos(theta))
+                y = int(height/2 + rad_circle*math.sin(theta))
+            else:
+                x = int(width/2  + rad_circle*math.cos(math.pi + theta ))
+                y = int(height/2 + rad_circle*math.sin(math.pi + theta ))
+            if i == 0:
+                self.targets.append(Cible((x,y), target_radius, target_color, isTarget = True))
+            else:
+                self.targets.append(Cible((x,y), target_radius, target_color, isTarget = False))
+            theta += delta_theta
+        self.actual_target = (self.targets[0],0) #target object + id of the object in the list
+        
+    def swap_target(self, game):
+        self.actual_target[0].isTarget = False
+        if self.actual_target[1] + 1 == len(self.targets):
+            self.actual_target = (self.targets[0], 0)
+        else:
+            index = self.actual_target[1] + 1
+            self.actual_target = (self.targets[index], index)
+        self.actual_target[0].isTarget = True
+        game.active_target = self.actual_target[0]
+    
+    def begin(self, game):         
+        '''Start the experience
+        WARNING : we can pause the experience so we can exit this method at any time
+        We must use trial variable to know where we are on the experiment
+        
+        Overide for custom assignRandomTarget
+        '''
+        
+        if self.targets == None or self.targets == []:
+            raise Exception("Experiment has no target initialized")
+        
+        self.data['cursor_x_sensibility'] = self.dx_sens
+        self.data['cursor_y_sensibility'] = self.dy_sens
+        
+        game.running = True
+        
+        game.listTarget = targets = self.targets
+        game.addListenerDrawable(self.targets)
+        
+        game.cursor_position = []
+        
+        #Save the cursor settings (sensibility)
+        dx_cursor, dy_cursor = game.cursor.getSensibility()
+        #Set the cursor sensibility to the experiment sensibility settings
+        game.cursor.set_x_sensibility(self.dx_sens)
+        game.cursor.set_y_sensibility(self.dy_sens)
+        
+        self.startOfTrial = time.time()
+        self.previous_time = self.startOfTrial
+        
+        game.active_target = self.targets[0]
+        
+        while (game.running and self.trial_id < self.maxTrials):
+            
+            pygame.mouse.set_pos = (game.width/2, game.height/2)
+            
+            game.refreshScreen(True)
+
+            ev = pygame.event.get()
+            for event in ev:
+            
+                L = game.listen(event)
+                
+                if event.type == pygame.QUIT:
+                    game.quitApp()
+                    return 0
+                    
+                #collect mouse position
+                if event.type == pygame.USEREVENT:
+                    #Tracking mouse position
+                    game.cursor_position.append((game.cursor.x, game.cursor.y))
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        #Reset the cursor sensibility back to previous settings
+                        game.cursor.set_x_sensibility(dx_cursor)
+                        game.cursor.set_y_sensibility(dy_cursor)
+                        pygame.mouse.set_visible(True)
+                        game.removeListenerDrawable(targets)
+                        if game.menu("pause") == -1: #quitting app because user closed game during pause menu
+                            print("QUITTING GAME")
+                            return -1
+                        game.addListenerDrawable(self.targets)
+                if event.type == pygame.MOUSEMOTION:
+                    game.cursorMove()
+        
+                if ("cible",True) in L:#On a cliqué sur une cible
+                    self.swap_target(game)
+                
+                    self.correct_clic(game)
+                    
+                    self.iterateData(game)
+                
+                    self.trial_id += 1
+                
+                    game.score += 1
+                        
+                    #Saving the tracking of mouse
+                    game.cursor_position_list.append(game.cursor_position)
+                    game.cursor_position = []
+                
+                elif ("not cible",False) in L: #On n'a pas cliqué sur la bonne cible
+                    game.score += -1
+                    
+        #End of the experiment
+        #Reset the cursor sensibility back to previous settings
+        game.cursor.set_x_sensibility(dx_cursor)
+        game.cursor.set_y_sensibility(dy_cursor)
+        game.running = False
+        game.removeListenerDrawable(targets)
+        game.menu("endExperiment", data = self.data)
+        
 def saveExperiment(exp, filename = ''):
     if not isinstance(exp, Experiment):
         raise Exception("exp must be an experiment")

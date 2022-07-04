@@ -50,21 +50,36 @@ def main():
                 experiments = generateModel(URLS, WIDTH, HEIGHT, filename = model_filename, maxTrials = 10)
                 
         #-------Using a specific parameter for an experience will save on previous file corresponding to the experiment name-------
-        elif '--circle' in sys.argv:
+        elif '--random' in sys.argv:
             experiments = [CircleRandomExp(WIDTH, HEIGHT, 
                 'Circle Random with r = 30, distance = 300', 
                 0, maxTrials = 20, target_radius = 30, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30)]
-            saveExperiment(experiments[0], 'experiments\CircleRandom_R20_D300.pkl')
+            saveExperiment(experiments[0], 'experiments\Random_R20_D300.pkl')
+            
         elif '--lineH' in sys.argv:
-            experiments = [twoTargetsExp(WIDTH, HEIGHT,
+            experiments = [TwoTargetsExp(WIDTH, HEIGHT,
                 'Two Targets with r = 30, distance = 500, rad = 0',
                 0,500, target_radius = 30)]
             saveExperiment(experiments[0], 'experiments\HorizontalTwoTargets_R30_D500.pkl')
+            
         elif '--lineV' in sys.argv:
-            experiments = [twoTargetsExp(WIDTH, HEIGHT,
+            experiments = [TwoTargetsExp(WIDTH, HEIGHT,
                 'Two Targets with r = 30, distance = 500, rad = PI/2',
                 math.pi/2,500, target_radius = 30)]
             saveExperiment(experiments[0], 'experiments\VerticalTwoTargets_R30_D500.pkl')
+            
+        elif '--circleH' in sys.argv:
+            experiments = [CircleExp(WIDTH, HEIGHT,
+                'Two Targets with r = 30, distance = 500, nb_of_target = 25',
+                25,200, target_radius = 30, maxTrials = 26, way_H = True)]
+            saveExperiment(experiments[0], 'experiments\Circle_R30_D200_N25_H.pkl')
+            
+        elif '--circleAH' in sys.argv:
+            experiments = [CircleExp(WIDTH, HEIGHT,
+                'Two Targets with r = 30, distance = 500, nb_of_target = 25',
+                25,200, target_radius = 30, maxTrials = 26, way_H = False)]
+            saveExperiment(experiments[0], 'experiments\Circle_R30_D200_N25_AH.pkl')
+            
         #--------------------------------------------------------------------------------------------------------------------------
         #DEFAULT LOAD ALL THE EXPERIMENTS IN FOLDER '\experiment'
         else:
