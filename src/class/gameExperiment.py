@@ -9,7 +9,7 @@ import json
 
 class GameExperiment(Game):
     
-    def __init__(self, width, height, experiments, listTimerPause=[], cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor1.png', title='TEST CIBLES'):
+    def __init__(self, width, height, experiments, listTimerPause=dict(), cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor1.png', title='TEST CIBLES'):
         super().__init__(width, height, bg_color, title=title)
         
         self.infiniteTime = True
@@ -197,34 +197,31 @@ class GameExperiment(Game):
     def checkPause(self):
         '''This screen is shown between 2 experiments
                 It makes a pause for the user with timer '''
+                
+        print("ACTIVE EXPERIMENT : ",self.activeExperiment,"\nLIST TIMER PAUSE :",self.listTimerPause,'\n')
 
-        for (id, timerPause) in self.listTimerPause :
-            if (self.activeExperiment-1 == id):
-                self.running = True
-                timer = 0
-                pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
-                while (self.running and timer <= timerPause*100):
-                    self.refreshScreen(False)
-                    restTime = (timerPause*1000 - timer)
-                    if restTime < 10:
-                        break
-                    if self.language == 'en':
-                        self.write_box(" Pause time ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
-                        self.write_box(" Begin in " + str(restTime)[1] + " seconds", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
-                    elif self.language == 'fr':
-                        self.write_box(" Jeu temporairement en pause ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
-                        self.write_box(" Le jeu reprend dans " + str(restTime)[1] + " secondes", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
-                    pygame.display.update()
-                    ev = pygame.event.get()
-                    for event in ev:
-                        if event.type == pygame.QUIT:
-                            self.quitApp()
-                        if event.type == pygame.MOUSEMOTION:
-                            self.cursorMove()
-                        if event.type == pygame.USEREVENT: 
-                            timer += 10
-                pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive
-                break;
+        if self.activeExperiment in self.listTimerPause.keys() :
+            self.running = True
+            timer = self.listTimerPause[self.activeExperiment]
+            pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
+            while (self.running and timer >= 0):
+                self.refreshScreen(False)
+                if self.language == 'en':
+                    self.write_box(" Pause time ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
+                    self.write_box(" Continuing in " + "{:.1f}".format(timer) + " seconds", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
+                elif self.language == 'fr':
+                    self.write_box(" Expérience temporairement en pause ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
+                    self.write_box(" L'expérience reprend dans " + "{:.1f}".format(timer)+ " secondes", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
+                pygame.display.update()
+                ev = pygame.event.get()
+                for event in ev:
+                    if event.type == pygame.QUIT:
+                        self.quitApp()
+                    if event.type == pygame.MOUSEMOTION:
+                        self.cursorMove()
+                    if event.type == pygame.USEREVENT: 
+                        timer -= 0.01
+        pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive    
 
     def endExperimentScreen(self):
         '''This screen is shown between 2 experiments
