@@ -12,10 +12,10 @@ import colors as Colors
 import textInputBox 
 
 class Game :
-    def __init__(self, width, height, bg_color = Colors.WHITE):
+    def __init__(self, width, height, bg_color = Colors.WHITE, title = 'TEST_CIBLES'):
         self.font = pygame.font.SysFont("aerial", 60)
         self.screen    = pygame.display.set_mode((width, height))
-        pygame.display.set_caption("TEST CIBLES")
+        pygame.display.set_caption(title)
         self.width     = width
         self.height    = height
         self.listener  = dict() #Key = Listener object, value = boolean (True if listening, False if not listening) 
@@ -235,7 +235,10 @@ class Game :
     def assignRandomTarget(self, printTarget = True):
         '''Assign every active targets to False on pick one randomly to assign it to the actual target'''
         #Set one target the main target to hit
+        if len(self.listTarget) <= 1:
+            return
         new_target_id = random.randint(0,self.nb_target - 1)
+
         target = None
         i = 0
         for obj in self.listTarget:

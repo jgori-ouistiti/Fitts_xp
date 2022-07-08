@@ -1,0 +1,31 @@
+{
+    "0": {
+        "shape": "circle",
+        "x": 719,
+        "y": 177,
+        "r": 52.7114788257738,
+        "border_color": "#000",
+        "fill_color": "#fff",
+        "width": 2
+    },
+    "1": {
+        "shape": "rectangle",
+        "x0": 159,
+        "y0": 246,
+        "x1": 230,
+        "y1": 457,
+        "border_color": "#000",
+        "fill_color": "#fff",
+        "width": 2
+    },
+    "2": {
+        "shape": "rectangle",
+        "x0": 297,
+        "y0": 254,
+        "x1": 357,
+        "y1": 357,
+        "border_color": "#000",
+        "fill_color": "#0000a0",
+        "width": 2
+    }
+}

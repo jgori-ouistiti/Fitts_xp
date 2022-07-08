@@ -64,7 +64,7 @@ class Cible(Drawable, Listener):
                 tmp = self.isTarget
                 if (self.isTarget) :
                     self.isTarget = False
-                    game.assignRandomTarget()
+                    #game.assignRandomTarget()
                     return ("cible", tmp)
                 else:
                     return("not cible", tmp)
@@ -74,7 +74,7 @@ class Cible(Drawable, Listener):
                     tmp = self.isTarget
                     if (self.isTarget) :
                         self.isTarget = False
-                        game.assignRandomTarget()
+                        # game.assignRandomTarget()
                         return ("cible", tmp)
                     else:
                         return("not cible", tmp)
