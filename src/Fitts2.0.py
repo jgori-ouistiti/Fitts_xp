@@ -12,6 +12,7 @@ from experiment import *
 from generateModel import *
 from sensitiveCursor import *
 from makeExperiments import *
+from readFileExperiment import *
 import webExtractor as webEx
 import colors as Colors
 import pygame
@@ -41,8 +42,9 @@ def main():
     
     model_filename = 'tools/models.pkl'
     experiments = None
+    game = None
     
-    if not '--url' in sys.argv:
+    if not '--file' in sys.argv and not '--url' in sys.argv:
         if '--model' in sys.argv:
             if os.path.isfile(model_filename):
                 experiments = readModel(model_filename, maxTrials = 10)
@@ -91,13 +93,21 @@ def main():
                     experiments.append(loadExperiment('experiments/'+file))
             
     
-    else:
+    elif '--url' in sys.argv:
         for i in range(len(sys.argv)):
             if sys.argv[i] == '--url':
+                if i+1 >= len(sys.argv):
+                    raise Exception("Error : no web URL specified")
                 URL = sys.argv[i+1]
                 experiments = [Experiment(\
                     webEx.getTargetsFromUrl(URL, WIDTH, HEIGHT, displayInfo = True), "url", 0, maxTrials = 5)]
                 break
+    elif '--file' in sys.argv:
+        for i in range(len(sys.argv)):
+            if sys.argv[i] == '--file':
+                if i+1 >= len(sys.argv):
+                    raise Exception("Error : no file name specified")
+                game = readFileExperiment('experiments/'+sys.argv[i+1], WIDTH, HEIGHT)
                 
     #Add experiments
             
@@ -111,8 +121,8 @@ def main():
     
     #Change the sensibility for the first experiment (TEST)
     #experiments[0].set_x_sensibility(-1)
-    
-    game = GameExperiment(WIDTH, HEIGHT, experiments, title='Fitts 2.O')
+    if game == None:
+        game = GameExperiment(WIDTH, HEIGHT, experiments, title='Fitts 2.O')
     
     
     running = True
