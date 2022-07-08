@@ -308,8 +308,12 @@ class GameExperiment(Game):
     def pauseMenu(self, current_mode):
         '''Pause menu'''
         self.refreshScreen()
-        self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
-        self.write_box("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
+        if self.language == 'en':
+            self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
+            self.write_box("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
+        elif self.language =='fr':
+            self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
+            self.write_box("Appuyez sur ESPACE pour continuer", Colors.BLACK, (self.width/2, self.height/2 + 30))
         self.running = True
         
         pygame.mouse.set_visible(True)
