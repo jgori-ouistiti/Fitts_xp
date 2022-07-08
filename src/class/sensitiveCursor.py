@@ -9,6 +9,11 @@ class SensitiveCursor(Cursor):
         self.dy_sens = dy_sens
         
     def move(self, dx, dy):
+        # print('--DEBUG--')
+        # print('self.x :',self.x)
+        # print('dx :',dx)
+        # print('self.dx_sens :',self.dx_sens)
+        # print('self.WIDTH :',self.WIDTH)
         if self.x + (dx * self.dx_sens) > 0 and self.x + (dx * self.dx_sens) < self.WIDTH:
             self.x += (dx * self.dx_sens)
         if self.y + (dy * self.dy_sens) > 0 and self.y + (dy * self.dy_sens) < self.HEIGHT:

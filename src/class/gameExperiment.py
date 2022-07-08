@@ -40,7 +40,7 @@ class GameExperiment(Game):
         if menu_title == "play":
         
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
-            self.play(mode="", listTarget=self.listTarget)
+            return self.play(mode="", listTarget=self.listTarget)
         
         elif menu_title == 'chooseLanguage':
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
@@ -51,12 +51,17 @@ class GameExperiment(Game):
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.hideAllDrawable()
             self.hideAllListener()
-            self.pauseMenu(current_mode)
+            res = self.pauseMenu(current_mode)
+            self.showAllDrawable()
+            self.showAllListener()
+            pygame.time.set_timer(pygame.USEREVENT, 10)
+            return res
         elif menu_title == "chooseMode":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.hideAllDrawable()
             self.hideAllListener()
             self.chooseMode()
+            return
         elif menu_title == "endExperiment":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.dumpExperiment(data)
@@ -66,12 +71,14 @@ class GameExperiment(Game):
                 self.hideAllDrawable()
                 self.hideAllListener()
                 self.endOfExperiment()
+                return
             else:
                 #There is still some experiments
                 self.hideAllDrawable()
                 self.hideAllListener()
                 self.checkPause()
                 self.endExperimentScreen()
+                return
 
             
         else:
@@ -82,7 +89,7 @@ class GameExperiment(Game):
         
         Each experiments calls menu("endExperiment") at the end
         No need to quit app here because endOfExperiment is called at the final end in menu() by the last experiment'''
-        (self.experiments[self.activeExperiment]).begin(self)
+        return (self.experiments[self.activeExperiment]).begin(self)
         
     def chooseLanguage(self):
         '''This menu is the first menu that the user sees
@@ -125,7 +132,7 @@ class GameExperiment(Game):
                 if event.type == pygame.QUIT:
                     self.quitApp()
                 if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove(event.rel)
+                    self.cursorMove()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
@@ -178,7 +185,7 @@ class GameExperiment(Game):
                 if event.type == pygame.QUIT:
                     self.quitApp()
                 if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove(event.rel)
+                    self.cursorMove()
                 if ("button",1) in L:
                     self.removeListenerDrawable([button1])
                     self.score = 0
@@ -213,7 +220,7 @@ class GameExperiment(Game):
                         if event.type == pygame.QUIT:
                             self.quitApp()
                         if event.type == pygame.MOUSEMOTION:
-                            self.cursorMove(event.rel)
+                            self.cursorMove()
                         if event.type == pygame.USEREVENT: 
                             timer += 10
                 pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive
@@ -244,7 +251,7 @@ class GameExperiment(Game):
                         self.running = False
                         self.menu("play","pause")
                 if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove(event.rel)
+                    self.cursorMove()
                         
     def endOfExperiment(self):
         '''This screen is shown at the final end'''
@@ -284,7 +291,7 @@ class GameExperiment(Game):
                         self.experiments_data['user_review'] = self.avis
                         self.running = False
                 if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove(event.rel)
+                    self.cursorMove()
             pygame.display.flip()
 
         self.quitApp()
@@ -319,23 +326,24 @@ class GameExperiment(Game):
         pygame.mouse.set_visible(True)
         pygame.event.set_grab(False)
         
-        while(self.running):
+        while(True):
             pygame.display.update()
             ev = pygame.event.get()
             for event in ev:
                 if event.type == pygame.QUIT:
                         self.quitApp()
+                        return -1
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         pygame.mouse.set_visible(False)
                         pygame.event.set_grab(True)
-                        self.running = False
                         self.showAllDrawable()
                         self.showAllListener()
-                        self.menu(current_mode,"pause")
+                        return
             
-    def cursorMove(self, pos):
-        self.cursor.move(pos[0], pos[1])  
+    def cursorMove(self):
+        pos = pygame.mouse.get_rel()
+        self.cursor.move(pos[0], pos[1])
         
     def draw(self):
         '''always draw the cursor at the end'''
