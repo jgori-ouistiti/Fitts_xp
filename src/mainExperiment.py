@@ -97,12 +97,12 @@ def main():
     #Change the sensibility for the first experiment (TEST)
     #experiments[0].set_x_sensibility(-1)
     
-    game = GameExperiment(WIDTH, HEIGHT, experiments)
+    game = GameExperiment(WIDTH, HEIGHT, experiments, title='Fitts 2.O')
     
     
     running = True
  
-    game.menu("chooseMode")
+    game.menu("chooseLanguage")
 
 if __name__ == "__main__":
     main()

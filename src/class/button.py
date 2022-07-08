@@ -4,7 +4,7 @@ import gameExperiment as gE
 import pygame
 
 class Button(Drawable, Listener):
-    def __init__(self, pos, mode, width, height, color, selectedColor, text = "", textColor = (0,0,0) ):
+    def __init__(self, pos, mode, width, height, color, selectedColor, text = "", image = None, textColor = (0,0,0) ):
     
         self.checkPosType(pos)
         self.pos = pos
@@ -19,6 +19,7 @@ class Button(Drawable, Listener):
         
         if not isinstance(height, int):
             raise Exception("height must be of type int")
+            
         self.height = height
         
         self.checkColorType(color)
@@ -32,6 +33,12 @@ class Button(Drawable, Listener):
         self.font = pygame.font.SysFont('Corbel',35)
         self.text = text
         self.text_render = self.font.render(text , True , textColor)
+        
+        #Image
+        self.imagePath = image
+        if image != None:
+            self.buttonImage = pygame.image.load(image)
+            self.buttonImage = pygame.transform.scale(self.buttonImage, (width, height))
         
     def setFont(self, font):
         self.font = font
@@ -88,20 +95,24 @@ class Button(Drawable, Listener):
         else:
             tmp_selected = True
         #Est-ce que la couleur doit changer ?
-        if self.isSelected != tmp_selected : 
-            self.isSelected = tmp_selected
-            if self.isSelected:
-                self.active_color = self.selectedColor
-            else:
-                self.active_color = self.color
-         
-        text_x = x + int(self.width/2)
-        text_y = y + int(self.height/2)
+        if self.imagePath == None:
+            if self.isSelected != tmp_selected : 
+                self.isSelected = tmp_selected
+                if self.isSelected:
+                    self.active_color = self.selectedColor
+                else:
+                    self.active_color = self.color
+             
+            text_x = x + int(self.width/2)
+            text_y = y + int(self.height/2)
+            
+            text_rect = self.text_render.get_rect(center=(text_x, text_y))
+            
+            pygame.draw.rect(game.screen,self.active_color ,[x, y ,self.width ,self.height])
+            game.screen.blit(self.text_render, text_rect)
+        else:
+            game.screen.blit(self.buttonImage, (x, y))
         
-        text_rect = self.text_render.get_rect(center=(text_x, text_y))
-        
-        pygame.draw.rect(game.screen,self.active_color ,[x, y ,self.width ,self.height])
-        game.screen.blit(self.text_render, text_rect)
             
     def action(self, game, event):
         if not isinstance(game, gE.GameExperiment): 

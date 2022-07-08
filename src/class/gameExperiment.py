@@ -9,8 +9,8 @@ import json
 
 class GameExperiment(Game):
     
-    def __init__(self, width, height, experiments, listTimerPause=[], cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor1.png'):
-        super().__init__(width, height, bg_color)
+    def __init__(self, width, height, experiments, listTimerPause=[], cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor1.png', title='TEST CIBLES'):
+        super().__init__(width, height, bg_color, title=title)
         
         self.infiniteTime = True
         self.listTimerPause = listTimerPause
@@ -18,6 +18,7 @@ class GameExperiment(Game):
         self.experiments_data = dict() #User's data collected after ends of each experiments
         self.experiments_data['user_id'] = random.randint(0,1000000)
         self.experiments_data['experiments'] = dict()
+        self.language = 'en' #default = en, can be changed with chooseLanguage() screen
         if cursor == None:
             self.cursor = SensitiveCursor(width, height, cursorImage = cursorImage) 
         else:
@@ -40,7 +41,12 @@ class GameExperiment(Game):
         
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
             self.play(mode="", listTarget=self.listTarget)
-            
+        
+        elif menu_title == 'chooseLanguage':
+            pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
+            self.hideAllDrawable()
+            self.hideAllListener()
+            self.chooseLanguage()
         elif menu_title == "pause":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.hideAllDrawable()
@@ -77,20 +83,84 @@ class GameExperiment(Game):
         Each experiments calls menu("endExperiment") at the end
         No need to quit app here because endOfExperiment is called at the final end in menu() by the last experiment'''
         (self.experiments[self.activeExperiment]).begin(self)
+        
+    def chooseLanguage(self):
+        '''This menu is the first menu that the user sees
+        This menu will display all languages available (french and english)
+        After the language is selected, the chooseMode screen is displayed'''
+        
+        space_between_flags  = 100
+        
+        flags = [] #Putting flags in an array list to add more languages in the future
+        buttons = []
+        
+        #ENGLISH
+        flags.append(('en', 'images/flag_en.png'))
+        #FRENCH
+        flags.append(('fr', 'images/flag_fr.png'))
+        
+        flag_y = int(self.height/2 - (self.height/(len(flags)+1)))
+        height_flag = int(self.height - 2*flag_y)
+        width_flag = int( (self.width / len(flags)) - (space_between_flags*2)) 
+        
+        for i in range(len(flags)):
+            flag_x = int(i * self.width/2 + space_between_flags) 
+            buttons.append(Button((flag_x, flag_y), i, width_flag, height_flag, (0,0,0), (0,0,0), image=flags[i][1]))
+            
+        self.addListenerDrawable(buttons)
+        self.refreshScreen()
+        
+        self.running = True
+        
+        pygame.mouse.set_visible(False)
+        pygame.event.set_grab(True)
+        
+        while(self.running):
+            self.refreshScreen(False)
+            pygame.display.update()
+            ev = pygame.event.get()
+            for event in ev:
+                L = self.listen(event)
+                #self.listenMode(event)
+                if event.type == pygame.QUIT:
+                    self.quitApp()
+                if event.type == pygame.MOUSEMOTION:
+                    self.cursorMove(event.rel)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                if len(L) >= 1:
+                    self.language = flags[L[0][1]][0]
+                    self.removeListenerDrawable(buttons)
+                    self.running = False
+                    self.showAllDrawable()
+                    self.showAllListener()
+                    return self.menu("chooseMode","main")
+        
+        
 
     def chooseMode(self):
         '''MAIN MENU
-        This menu is the first menu that the user sees
+        This menu is the second menu that the user sees
         In GameExperience, we use only one button to start the experiment'''
-        button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "BEGIN")
+        button1 = None
+        if self.language == 'en':
+            button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "BEGIN")
+        elif self.language =='fr':
+            button1 = Button((int(self.width/2 - 170),int(self.height/2 + 30)), 1, 340, 60 , (200, 50, 50), RED, "COMMENCER")
         self.addListenerDrawable([button1])
         self.refreshScreen()
-        
-        text =  "Welcome to our experiment.\n\n"+\
-                "You will encounter multiple experiments. You will have to click as fast as possible "+\
-                "on the red targets.\n\n"+\
-                "Thank you for your participation, click on BEGIN to start."
-        
+        text = ''
+        if self.language == 'en':
+            text =  "Welcome to our experiment.\n\n"+\
+                    "You will encounter multiple experiments. You will have to click as fast as possible "+\
+                    "on the red targets.\n\n"+\
+                    "Thank you for your participation, click on BEGIN to start."
+        elif self.language =='fr':
+            text =  "Bienvenue dans cette expérience.\n\n"+\
+                    "Vous allez avoir plusieurs petites expériences. Il vous faudra cliquer le plus vite possible "+\
+                    "sur les cibles rouges.\n\n"+\
+                    "Merci de votre participation, appuyez sur COMMENCER pour démarrer."
         self.write_screen(text, Colors.BLACK, (self.width/2 - 360, self.height/2 - 500), maxSize=(720, 300))
         self.running = True
         
@@ -131,8 +201,12 @@ class GameExperiment(Game):
                     restTime = (timerPause*1000 - timer)
                     if restTime < 10:
                         break
-                    self.write_box(" Pause time ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
-                    self.write_box(" Begin in " + str(restTime)[1] + " secondes", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
+                    if self.language == 'en':
+                        self.write_box(" Pause time ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
+                        self.write_box(" Begin in " + str(restTime)[1] + " seconds", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
+                    elif self.language == 'fr':
+                        self.write_box(" Jeu temporairement en pause ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
+                        self.write_box(" Le jeu reprend dans " + str(restTime)[1] + " secondes", Colors.BLACK, (self.width / 2, self.height / 2 + 30))
                     pygame.display.update()
                     ev = pygame.event.get()
                     for event in ev:
@@ -154,8 +228,12 @@ class GameExperiment(Game):
         while(self.running):
             self.refreshScreen(False)
             #self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
-            self.write_box(" Ready ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
-            self.write_box("Press SPACE to begin next experiment", Colors.BLACK, (self.width/2, self.height/2 + 30))
+            if self.language == 'en':
+                self.write_box(" Ready ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
+                self.write_box("Press SPACE to continue.", Colors.BLACK, (self.width/2, self.height/2 + 30))
+            elif self.language == 'fr':
+                self.write_box(" Prêt ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
+                self.write_box("Appuyez sur ESPACE pour continuer.", Colors.BLACK, (self.width/2, self.height/2 + 30))
             pygame.display.update()
             ev = pygame.event.get()
             for event in ev:
@@ -176,10 +254,14 @@ class GameExperiment(Game):
         self.running = True
         while(self.running):
             self.refreshScreen(False)
-            self.write_box("END OF THE EXPERIMENT", Colors.BLACK, (self.width/2, self.height/2 - 60))
-            self.write_box("Thanks for helping us participating at this experiment !", Colors.BLACK, (self.width/2, self.height/2))
-            self.write_box("You can now close this window or press ESCAPE.", Colors.BLACK, (self.width/2, self.height/2 + 60))
-            
+            if self.language == 'en':
+                self.write_box("END OF THE EXPERIMENT", Colors.BLACK, (self.width/2, self.height/2 - 60))
+                self.write_box("Thanks for helping us participating at this experiment !", Colors.BLACK, (self.width/2, self.height/2))
+                self.write_box("You can now close this window or press ESCAPE.", Colors.BLACK, (self.width/2, self.height/2 + 60))
+            elif self.language == 'fr':
+                self.write_box("FIN DE L'EXPÉRIENCE", Colors.BLACK, (self.width/2, self.height/2 - 60))
+                self.write_box("Merci d'avoir participé !", Colors.BLACK, (self.width/2, self.height/2))
+                self.write_box("Vous pouvez maintenant fermer cette fenêtre en appuyant sur ECHAP.", Colors.BLACK, (self.width/2, self.height/2 + 60))
             ev = pygame.event.get()
             
             group.update(self, ev, "Let us a comment")
