@@ -19,12 +19,26 @@ class CircleRandomExp(Experiment):
     '''
     def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30):
         super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+        
+        #init target_info
+        self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
+        #Radius
         if isinstance(target_radius, list):
-            self.target_radius  = {"isList" : True, "radius":target_radius,"index":0}#Boolean = is it a list ? (True), target_radius = list of radius, 0 = index of the radius of next target
-            if len(self.target_radius["radius"]) <= 1:
-                raise Exception("Error: Radius for targets is set as a list but there isn't 2 or more elements in the list. If you want to use one generic value, use just an int an not a list.")
+            self.target_info["isRadiusList"]=True #Boolean = is it a list ? (True),
+            self.target_info["indexRadius"] = 0 #index of the radius of next target
+            if len(self.target_info["radius"]) <= 1:
+                raise Exception("Error: Radius for targets is set as a list but there isn't 2 or more elements in the list. "\
+                +"If you want to use one generic value, use just an int an not a list.")
+        #Distance
+        if isinstance(distance, list):
+            self.target_info["isDistanceList"]=True #Boolean = is it a list ? (True),
+            self.target_info["indexDistance"] = 0 #index of the radius of next target
+            if len(self.target_info["distance"]) <= 1:
+                raise Exception("Error: Distance for targets is set as a list but there isn't 2 or more elements in the list. "\
+                +"If you want to use one generic value, use just an int an not a list.")        
         else:
-            self.target_radius = {"isList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
+            self.target_info = {"isRadiusList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
+        #---------
         self.target_color  = target_color
         self.distance = distance
         self.buffer = buffer # add marges on the edges of the screen for targets
@@ -32,12 +46,14 @@ class CircleRandomExp(Experiment):
         self.height = height
         
         #Initializing first target
-        if self.target_radius["isList"]:
-            self.targets =  [Cible( (int(width/2),int(height/2)), self.target_radius["radius"][0], target_color, isTarget = True)]
+        if self.target_info["isRadiusList"]:
+            self.targets =  [Cible( (int(width/2),int(height/2)), self.target_info["radius"][0], target_color, isTarget = True)]
         else:  
-            self.targets =  [Cible( (int(width/2),int(height/2)), self.target_radius["radius"], target_color, isTarget = True)]
+            self.targets =  [Cible( (int(width/2),int(height/2)), self.target_info["radius"], target_color, isTarget = True)]
         self.data['number_of_targets at each time'] = 1
         self.data['distance of next target'] = distance
+        self.data["width"] = width
+        self.data["height"] = height
         
     def correct_clic(self, game):
         #Overide super method correct_clic. Called when clicking on the target
@@ -49,34 +65,50 @@ class CircleRandomExp(Experiment):
         
         #Creating a new target based on position of actual target
         theta = random.uniform(0,2*math.pi)
-        new_x = int(x + self.distance * math.cos(theta))
-        new_y = int(y + self.distance * math.sin(theta))
-        #Checking is new target will be outside of screen, and in a safe area (not in the edges)
-        if self.target_radius["isList"]:
-            marge = self.buffer + self.target_radius["radius"][self.target_radius["index"]]
+        if self.target_info["isDistanceList"]:
+            new_x = int(x + self.target_info["distance"][self.target_info["indexDistance"]] * math.cos(theta))
+            new_y = int(y + self.target_info["distance"][self.target_info["indexDistance"]] * math.sin(theta))
         else:
-            marge = self.buffer + self.target_radius["radius"]
+            new_x = int(x + self.distance * math.cos(theta))
+            new_y = int(y + self.distance * math.sin(theta))
+        #Checking is new target will be outside of screen, and in a safe area (not in the edges)
+        if self.target_info["isRadiusList"]:
+            marge = self.buffer + self.target_info["radius"][self.target_info["indexRadius"]]
+        else:
+            marge = self.buffer + self.target_info["radius"]
         cpt = 0
         while(new_x < marge or new_x > self.width - marge or new_y < marge or new_y > self.height - marge):
             theta += math.pi/5 #moving in a math.pi/5 degree angle
-            new_x = int(x + self.distance * math.cos(theta))
-            new_y = int(y + self.distance * math.sin(theta))
+            if self.target_info["isDistanceList"]:
+                new_x = int(x + self.target_info["distance"][self.target_info["indexDistance"]] * math.cos(theta))
+                new_y = int(y + self.target_info["distance"][self.target_info["indexDistance"]] * math.sin(theta))
+            else:
+                new_x = int(x + self.distance * math.cos(theta))
+                new_y = int(y + self.distance * math.sin(theta))
             cpt += 1
             if cpt > 20:
                 raise Exception("Error , could not place the next target as it's always out of the screen. Check width, height and distance.")
+                
         #Assigning next target
         radius = None
         
         #Incrementing index of radius list
-        if self.target_radius["isList"]:
-            self.target_radius["index"] += 1
-            if self.target_radius["index"] == len(self.target_radius["radius"]): #looping index back to zero
-                self.target_radius["index"] = 0
+        if self.target_info["isRadiusList"]:
+            self.target_info["indexRadius"] += 1
+            if self.target_info["indexRadius"] == len(self.target_info["radius"]): #looping index back to zero
+                self.target_info["indexRadius"] = 0
         
-        if self.target_radius["isList"]:
-            radius = self.target_radius["radius"][self.target_radius["index"]]
+        #using new variable to get the actual next radius 
+        if self.target_info["isRadiusList"]:
+            radius = self.target_info["radius"][self.target_info["indexRadius"]]
         else:
-            radius = self.target_radius["radius"]
+            radius = self.target_info["radius"]
+            
+        #Incrementing index of distance list
+        if self.target_info["isDistanceList"]:
+            self.target_info["indexDistance"] += 1
+            if self.target_info["indexDistance"] == len(self.target_info["distance"]): #looping index back to zero
+                self.target_info["indexDistance"] = 0
             
         target = Cible((new_x, new_y), radius, self.target_color, isTarget = True)
         
@@ -99,55 +131,93 @@ class TwoTargetsExp(Experiment):
     ''' 
     def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY):
         super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+        
+        #init target_info
+        self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
+        #Radius
         if isinstance(target_radius, list):
-            self.target_radius  = {"isList" : True, "radius":target_radius,"index":2}#Boolean = is it a list ? (True), target_radius = list of radius, 0 = index of the radius of next target
-            if len(self.target_radius["radius"]) <= 1:
-                raise Exception("Error: Radius for targets is set as a list but there isn't 2 or more elements in the list. If you want to use one generic value, use just an int an not a list.")
+            self.target_info["isRadiusList"]=True #Boolean = is it a list ? (True),
+            self.target_info["indexRadius"] = 0 #index of the radius of next target
+            if len(self.target_info["radius"]) <= 1:
+                raise Exception("Error: Radius for targets is set as a list but there isn't 2 or more elements in the list. "\
+                +"If you want to use one generic value, use just an int an not a list.")
+        #Distance
+        if isinstance(distance, list):
+            self.target_info["isDistanceList"]=True #Boolean = is it a list ? (True),
+            self.target_info["indexDistance"] = 0 #index of the radius of next target
+            if len(self.target_info["distance"]) <= 1:
+                raise Exception("Error: Distance for targets is set as a list but there isn't 2 or more elements in the list. "\
+                +"If you want to use one generic value, use just an int an not a list.")        
         else:
-            self.target_radius = {"isList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
+            self.target_info = {"isRadiusList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
+        #---------f.target_info = {"isRadiusList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
         
         self.data['number_of_targets'] = 2
         self.data['distance of the two targets'] = distance
         self.data['radian of axe'] = rad
-        #target 1
-        x1 = int(width/2 - (distance/2) * math.cos(rad))
-        y1 = int(height/2 - (distance/2) * math.sin(rad))
-        #target 2
-        x2 = int(width/2 + (distance/2) * math.cos(rad))
-        y2 = int(height/2 + (distance/2) * math.sin(rad))
+        self.data["width"] = width
+        self.data["height"] = height
+        
+        #Initializing targets
+        if self.target_info["isDistanceList"]:
+            #target 1
+            x1 = int(width/2 - (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.cos(rad))
+            y1 = int(height/2 - (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.sin(rad))
+            #target 2
+            x2 = int(width/2 + (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.cos(rad))
+            y2 = int(height/2 + (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.sin(rad))
+        else :
+            #target 1
+            x1 = int(width/2 - (distance/2) * math.cos(rad))
+            y1 = int(height/2 - (distance/2) * math.sin(rad))
+            #target 2
+            x2 = int(width/2 + (distance/2) * math.cos(rad))
+            y2 = int(height/2 + (distance/2) * math.sin(rad))
         self.targets = []
-        if self.target_radius["isList"]:
+        if self.target_info["isRadiusList"]:
             #creating targets with target_radius["radius"] as a list of radius
-            self.targets.append(Cible((x1,y1), self.target_radius["radius"][0], target_color, isTarget = True))
-            self.targets.append(Cible((x2,y2), self.target_radius["radius"][1], target_color, isTarget = False))
+            self.targets.append(Cible((x1,y1), self.target_info["radius"][0], target_color, isTarget = True))
+            self.targets.append(Cible((x2,y2), self.target_info["radius"][1], target_color, isTarget = False))
         else:
             #creating targets with target_radius[1] as one generic radius
-            print("TARGET RADIUS : ",self.target_radius["radius"])
-            self.targets.append(Cible((x1,y1), self.target_radius["radius"], target_color, isTarget = True))
-            self.targets.append(Cible((x2,y2), self.target_radius["radius"], target_color, isTarget = False))
+            print("TARGET RADIUS : ",self.target_info["radius"])
+            self.targets.append(Cible((x1,y1), self.target_info["radius"], target_color, isTarget = True))
+            self.targets.append(Cible((x2,y2), self.target_info["radius"], target_color, isTarget = False))
             
         self.actual_target = self.targets[0]
         
     def swap_target(self, game):
+        if self.target_info["isDistanceList"]:
+            #Incrementing index of distance list
+            self.target_info["indexDistance"] += 1
+            if self.target_info["indexDistance"] == len(self.target_info["distance"]): #looping index back to zero
+                self.target_info["indexDistance"] = 0
+            #target 1
+            self.targets[0].x = int(self.data["width"]/2 - (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.cos(self.data["radian of axe"]))
+            self.targets[0].y = int(self.data["height"]/2 - (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.sin(self.data["radian of axe"]))
+            #target 2
+            self.targets[1].x = int(self.data["width"]/2 + (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.cos(self.data["radian of axe"]))
+            self.targets[1].y = int(self.data["height"]/2 + (self.target_info["distance"][self.target_info["indexDistance"]]/2) * math.sin(self.data["radian of axe"]))
+            
         if self.targets[0] is self.actual_target :
             self.targets[0].isTarget = False
-            if self.target_radius["isList"]:
-                self.targets[0].r = self.target_radius["radius"][self.target_radius["index"]]
+            if self.target_info["isRadiusList"]:
+                self.targets[0].r = self.target_info["radius"][self.target_info["indexRadius"]]
             self.targets[1].isTarget = True
             self.actual_target = self.targets[1]
             game.active_target = self.targets[1]
         else:
             self.targets[0].isTarget = True
             self.targets[1].isTarget = False
-            if self.target_radius["isList"]:
-                self.targets[1].r = self.target_radius["radius"][self.target_radius["index"]]
+            if self.target_info["isRadiusList"]:
+                self.targets[1].r = self.target_info["radius"][self.target_info["indexRadius"]]
             self.actual_target = self.targets[0]
             game.active_target = self.targets[0]
         #Incrementing index of radius list
-        if self.target_radius["isList"]:
-            self.target_radius["index"] += 1
-            if self.target_radius["index"] == len(self.target_radius["radius"]): #looping index back to zero
-                self.target_radius["index"] = 0
+        if self.target_info["isRadiusList"]:
+            self.target_info["indexRadius"] += 1
+            if self.target_info["indexRadius"] == len(self.target_info["radius"]): #looping index back to zero
+                self.target_info["indexRadius"] = 0
     def begin(self, game):         
         '''Start the experience
         WARNING : we can pause the experience so we can exit this method at any time
@@ -250,6 +320,8 @@ class CircleExp(Experiment):
         super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
+        self.data["width"] = width
+        self.data["height"] = height
         
         #Generation of the targets on a list. Next target is the next one in the list
         self.targets = []

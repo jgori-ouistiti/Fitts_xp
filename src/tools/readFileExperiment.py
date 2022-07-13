@@ -88,7 +88,14 @@ def readFileExperiment(filename, width, height, title = None):
                     list_experiences.append(Experiment(targets, disposition, exp_id, nbMouv))
                     
             elif type_experience == 'random':
-                distance = int(parameters[2])
+                #Distance
+                if parameters[2][0] == '[':
+                    tmp = parameters[2].strip('[]')
+                    tmp = tmp.split(',')
+                    distance = list(map(lambda x : int(x), tmp))
+                else:
+                    distance = int(parameters[3])
+                #Radius
                 if parameters[3][0] == '[':
                     print("ON A UNE LISTE")
                     tmp = parameters[3].strip('[]')
@@ -104,7 +111,14 @@ def readFileExperiment(filename, width, height, title = None):
                 list_experiences.append(experiment)
                 
             elif type_experience == 'lineV':
-                distance = int(parameters[2])
+                #Distance
+                if parameters[2][0] == '[':
+                    tmp = parameters[2].strip('[]')
+                    tmp = tmp.split(',')
+                    distance = list(map(lambda x : int(x), tmp))
+                else:
+                    distance = int(parameters[3])
+                #Radius
                 if parameters[3][0] == '[':
                     tmp = parameters[3].strip('[]')
                     tmp = tmp.split(',')
@@ -118,7 +132,14 @@ def readFileExperiment(filename, width, height, title = None):
                 list_experiences.append(experiment)
                 
             elif type_experience == 'lineH':
-                distance = int(parameters[2])
+                #Distance
+                if parameters[2][0] == '[':
+                    tmp = parameters[2].strip('[]')
+                    tmp = tmp.split(',')
+                    distance = list(map(lambda x : int(x), tmp))
+                else:
+                    distance = int(parameters[3])
+                #Radius
                 if parameters[3][0] == '[':
                     tmp = parameters[3].strip('[]')
                     tmp = tmp.split(',')
@@ -132,7 +153,14 @@ def readFileExperiment(filename, width, height, title = None):
                 list_experiences.append(experiment)
             
             elif type_experience == 'line':
-                distance = int(parameters[2])
+                #Distance
+                if parameters[2][0] == '[':
+                    tmp = parameters[2].strip('[]')
+                    tmp = tmp.split(',')
+                    distance = list(map(lambda x : int(x), tmp))
+                else:
+                    distance = int(parameters[3])
+                #Radius
                 if parameters[3][0] == '[':
                     tmp = parameters[3].strip('[]')
                     tmp = tmp.split(',')
@@ -148,12 +176,7 @@ def readFileExperiment(filename, width, height, title = None):
             
             elif type_experience == 'circleH':
                 distance = int(parameters[2])
-                if parameters[3][0] == '[':
-                    tmp = parameters[3].strip('[]')
-                    tmp = tmp.split(',')
-                    radius = list(map(lambda x : int(x), tmp))
-                else:
-                    radius = int(parameters[3])
+                radius = int(parameters[3])
                 nbCible = int(parameters[4])
                 if nbCible %2 == 0: 
                     nbCible += 1
