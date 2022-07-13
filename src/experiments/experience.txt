@@ -22,18 +22,12 @@
 
 
 ;Start of experiment
-experience1 url https://www.jeu.fr/ 5
-experience2 lineV 300 30 10
-pause : 10
-experience3 random 500 50 20
+;experience1 url https://www.jeu.fr/ 5
+exp_random_avec_list random 500 [5,50,100,150,200,250] 20
+;ligne_vertical_D300 lineV 300 [5,50,100,150,200,250] 15
+pause : 5 
+ligne_horizontal_D300 lineH 300 [5,50,100,150,200,250] 15
 pause : 5
-experience4 circle 300 20 25 AH
-
-;experience2 cible densite (50,50) 3 40 0.25 20 3
-;experience3 cible cercle cercle 250 25 30 3
-;pause : 10
-;experience4 cible densite (50,50) 3 40 0.25 20 2
-;experience5 url https://www.google.fr/ 3
-;experience6 url https://fr.wikipedia.org/wiki/Wikipédia:Accueil_principal 5
-;experience7 cible cercle cercle 100 20 5 (50,50) 3
-;experience8 cible densite (50,50) 3 40 0.25 20 4
+exp_aleatoire_D500 random 500 [50,50,50,5,50,50,50,5,100,20,20,20] 20
+;pause : 5
+;exp_en_cercle_D300 circle 300 20 25 AH

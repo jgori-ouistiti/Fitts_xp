@@ -91,7 +91,7 @@ class Experiment :
         self.data['cursor_x_sensibility'] = self.dx_sens
         self.data['cursor_y_sensibility'] = self.dy_sens
         
-        game.running = True
+        running = True
         
         game.listTarget = targets = self.targets
         game.addListenerDrawable(self.targets)
@@ -109,7 +109,7 @@ class Experiment :
         self.startOfTrial = time.time()
         self.previous_time = self.startOfTrial
         
-        while (game.running and self.trial_id < self.maxTrials):
+        while (running and self.trial_id < self.maxTrials):
             
             pygame.mouse.set_pos = (game.width/2, game.height/2)
             
@@ -122,8 +122,8 @@ class Experiment :
                 
                 if event.type == pygame.QUIT:
                     self.last_call(game)
-                    game.quitApp()
-                    return 0
+                    game.menu("quit", data = self.data)
+                    return game.quitApp()
                     
                 #collect mouse position
                 if event.type == pygame.USEREVENT:
@@ -138,7 +138,9 @@ class Experiment :
                         pygame.mouse.set_visible(True)
                         game.removeListenerDrawable(targets)
                         if game.menu("pause") == -1: #quitting app because user closed game during pause menu
-                            return -1
+                            print("QUITTING APP")
+                            game.menu("quit", data = self.data)
+                            return game.quitApp()
                         game.addListenerDrawable(self.targets)
                 if event.type == pygame.MOUSEMOTION:
                     game.cursorMove()
@@ -165,7 +167,6 @@ class Experiment :
         #Reset the cursor sensibility back to previous settings
         game.cursor.set_x_sensibility(dx_cursor)
         game.cursor.set_y_sensibility(dy_cursor)
-        game.running = False
         game.removeListenerDrawable(targets)
         self.last_call(game)
         game.menu("endExperiment", data = self.data)

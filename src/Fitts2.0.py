@@ -127,7 +127,8 @@ def main():
     
     running = True
  
-    game.menu("chooseLanguage")
+    game.start()
+    
 
 if __name__ == "__main__":
     main()

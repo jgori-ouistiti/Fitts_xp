@@ -89,7 +89,14 @@ def readFileExperiment(filename, width, height, title = None):
                     
             elif type_experience == 'random':
                 distance = int(parameters[2])
-                radius = int(parameters[3])
+                if parameters[3][0] == '[':
+                    print("ON A UNE LISTE")
+                    tmp = parameters[3].strip('[]')
+                    tmp = tmp.split(',')
+                    radius = list(map(lambda x : int(x), tmp))
+                else:
+                    radius = int(parameters[3])
+                print("RADIUS UTILISÉ :", radius)
                 nb_mouvement = int(parameters[4])
                 experiment = CircleRandomExp(width, height, 
                         'Circle Random with r = '+str(radius)+', distance = '+str(distance), 
@@ -98,7 +105,12 @@ def readFileExperiment(filename, width, height, title = None):
                 
             elif type_experience == 'lineV':
                 distance = int(parameters[2])
-                radius = int(parameters[3])
+                if parameters[3][0] == '[':
+                    tmp = parameters[3].strip('[]')
+                    tmp = tmp.split(',')
+                    radius = list(map(lambda x : int(x), tmp))
+                else:
+                    radius = int(parameters[3])
                 nb_mouvement = int(parameters[4])
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = PI/2',
@@ -107,7 +119,12 @@ def readFileExperiment(filename, width, height, title = None):
                 
             elif type_experience == 'lineH':
                 distance = int(parameters[2])
-                radius = int(parameters[3])
+                if parameters[3][0] == '[':
+                    tmp = parameters[3].strip('[]')
+                    tmp = tmp.split(',')
+                    radius = list(map(lambda x : int(x), tmp))
+                else:
+                    radius = int(parameters[3])
                 nb_mouvement = int(parameters[4])
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = 0',
@@ -116,7 +133,12 @@ def readFileExperiment(filename, width, height, title = None):
             
             elif type_experience == 'line':
                 distance = int(parameters[2])
-                radius = int(parameters[3])
+                if parameters[3][0] == '[':
+                    tmp = parameters[3].strip('[]')
+                    tmp = tmp.split(',')
+                    radius = list(map(lambda x : int(x), tmp))
+                else:
+                    radius = int(parameters[3])
                 nb_mouvement = int(parameters[4])
                 angle = int(parameters[5])
                 experiment = TwoTargetsExp(width, height,
@@ -126,7 +148,12 @@ def readFileExperiment(filename, width, height, title = None):
             
             elif type_experience == 'circleH':
                 distance = int(parameters[2])
-                radius = int(parameters[3])
+                if parameters[3][0] == '[':
+                    tmp = parameters[3].strip('[]')
+                    tmp = tmp.split(',')
+                    radius = list(map(lambda x : int(x), tmp))
+                else:
+                    radius = int(parameters[3])
                 nbCible = int(parameters[4])
                 if nbCible %2 == 0: 
                     nbCible += 1

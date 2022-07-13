@@ -47,6 +47,7 @@ class GameExperiment(Game):
             self.hideAllDrawable()
             self.hideAllListener()
             self.chooseLanguage()
+            return
         elif menu_title == "pause":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
             self.hideAllDrawable()
@@ -79,6 +80,10 @@ class GameExperiment(Game):
                 self.checkPause()
                 self.endExperimentScreen()
                 return
+        elif menu_title == "quit":
+            if data != None:
+                self.dumpExperiment(data)
+            return self.quitApp()
 
             
         else:
@@ -117,12 +122,14 @@ class GameExperiment(Game):
         self.addListenerDrawable(buttons)
         self.refreshScreen()
         
-        self.running = True
+        choosingLanguage = True
         
         pygame.mouse.set_visible(False)
         pygame.event.set_grab(True)
         
-        while(self.running):
+        
+        
+        while(choosingLanguage):
             self.refreshScreen(False)
             pygame.display.update()
             ev = pygame.event.get()
@@ -136,13 +143,15 @@ class GameExperiment(Game):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
+                        return
                 if len(L) >= 1:
                     self.language = flags[L[0][1]][0]
                     self.removeListenerDrawable(buttons)
-                    self.running = False
                     self.showAllDrawable()
                     self.showAllListener()
-                    return self.menu("chooseMode","main")
+                    choosingLanguage = False
+                    
+        print("Language :",self.language)
         
         
 
@@ -150,6 +159,9 @@ class GameExperiment(Game):
         '''MAIN MENU
         This menu is the second menu that the user sees
         In GameExperience, we use only one button to start the experiment'''
+        
+        print("CHOOSE MODE")
+        
         button1 = None
         if self.language == 'en':
             button1 = Button((int(self.width/2 - 150),int(self.height/2 + 30)), 1, 300, 60 , (200, 50, 50), RED, "BEGIN")
@@ -169,12 +181,12 @@ class GameExperiment(Game):
                     "sur les cibles rouges.\n\n"+\
                     "Merci de votre participation, appuyez sur COMMENCER pour démarrer."
         self.write_screen(text, Colors.BLACK, (self.width/2 - 360, self.height/2 - 500), maxSize=(720, 300))
-        self.running = True
+        running = True
         
         pygame.mouse.set_visible(False)
         pygame.event.set_grab(True)
         
-        while(self.running):
+        while(running):
             self.refreshScreen(False)
             self.write_screen(text, Colors.BLACK, (self.width/2 - 360, self.height/2 - 500), maxSize=(720, 300))
             pygame.display.update()
@@ -186,10 +198,14 @@ class GameExperiment(Game):
                     self.quitApp()
                 if event.type == pygame.MOUSEMOTION:
                     self.cursorMove()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                        return
                 if ("button",1) in L:
                     self.removeListenerDrawable([button1])
                     self.score = 0
-                    self.running = False
+                    running = False
                     self.showAllDrawable()
                     self.showAllListener()
                     self.menu("play","main")
@@ -201,10 +217,10 @@ class GameExperiment(Game):
         print("ACTIVE EXPERIMENT : ",self.activeExperiment,"\nLIST TIMER PAUSE :",self.listTimerPause,'\n')
 
         if self.activeExperiment in self.listTimerPause.keys() :
-            self.running = True
+            running = True
             timer = self.listTimerPause[self.activeExperiment]
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
-            while (self.running and timer >= 0):
+            while (running and timer >= 0):
                 self.refreshScreen(False)
                 if self.language == 'en':
                     self.write_box(" Pause time ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
@@ -216,11 +232,14 @@ class GameExperiment(Game):
                 ev = pygame.event.get()
                 for event in ev:
                     if event.type == pygame.QUIT:
-                        self.quitApp()
+                        return self.quitApp()
                     if event.type == pygame.MOUSEMOTION:
                         self.cursorMove()
                     if event.type == pygame.USEREVENT: 
                         timer -= 0.01
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE:
+                            running = False
         pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive    
 
     def endExperimentScreen(self):
@@ -228,8 +247,9 @@ class GameExperiment(Game):
         It makes a pause for the user'''
         self.refreshScreen()
         
-        self.running = True
-        while(self.running):
+        running = True
+        
+        while(running):
             self.refreshScreen(False)
             #self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
             if self.language == 'en':
@@ -242,11 +262,11 @@ class GameExperiment(Game):
             ev = pygame.event.get()
             for event in ev:
                 if event.type == pygame.QUIT:
-                    self.quitApp()
+                    return self.quitApp()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        self.running = False
-                        self.menu("play","pause")
+                        running = False
+                        return
                 if event.type == pygame.MOUSEMOTION:
                     self.cursorMove()
                         
@@ -255,8 +275,8 @@ class GameExperiment(Game):
         self.refreshScreen()
         
         group = pygame.sprite.Group(self.inputBoxAvis) 
-        self.running = True
-        while(self.running):
+        running = True
+        while(running):
             self.refreshScreen(False)
             if self.language == 'en':
                 self.write_box("END OF THE EXPERIMENT", Colors.BLACK, (self.width/2, self.height/2 - 60))
@@ -278,20 +298,23 @@ class GameExperiment(Game):
             for event in ev:
                 if event.type == pygame.QUIT:
                     self.running = False
+                    return self.quitApp()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
+                        return self.quitApp()
                 if event.type == pygame.MOUSEBUTTONDOWN:    
                     if (self.inputBoxAvis.button_ok.isInside((self.cursor.x, self.cursor.y))):
                         self.avis = self.inputBoxAvis.text #recupere avis
                         print("AVIS :", self.avis)
                         self.experiments_data['user_review'] = self.avis
                         self.running = False
+                        return self.quitApp()
                 if event.type == pygame.MOUSEMOTION:
                     self.cursorMove()
             pygame.display.flip()
 
-        self.quitApp()
+        return self.quitApp()
         
     def dumpExperiment(self,data):
         '''Dump one iteration in variable self.experiment
@@ -308,6 +331,7 @@ class GameExperiment(Game):
         '''Save user's data before quitting'''
         self.save_data_in_file("../users_data/user_"+str(self.experiments_data['user_id'])+".json")
         self.running = False
+        return -1
         
     def pauseMenu(self, current_mode):
         '''Pause menu'''
@@ -318,7 +342,6 @@ class GameExperiment(Game):
         elif self.language =='fr':
             self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
             self.write_box("Appuyez sur ESPACE pour continuer", Colors.BLACK, (self.width/2, self.height/2 + 30))
-        self.running = True
         
         pygame.mouse.set_visible(True)
         pygame.event.set_grab(False)
@@ -328,8 +351,8 @@ class GameExperiment(Game):
             ev = pygame.event.get()
             for event in ev:
                 if event.type == pygame.QUIT:
-                        self.quitApp()
-                        return -1
+                        self.running = False
+                        return self.quitApp()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         pygame.mouse.set_visible(False)
@@ -348,3 +371,11 @@ class GameExperiment(Game):
             if v == True:
                 d.draw(self)
         self.cursor.draw(self)
+
+    def start(self):
+        self.running = True
+        self.menu("chooseLanguage")
+        if self.running:
+            self.menu("chooseMode")
+        while(self.running):
+            self.menu("play")
