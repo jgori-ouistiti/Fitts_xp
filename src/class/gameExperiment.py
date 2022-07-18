@@ -144,7 +144,9 @@ class GameExperiment(Game):
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         return
-                if len(L) >= 1:
+                if len(L) >= 1 and len(L[0]) == 2:
+                    print("L :", L)
+                    print("flags :",flags)
                     self.language = flags[L[0][1]][0]
                     self.removeListenerDrawable(buttons)
                     self.showAllDrawable()
