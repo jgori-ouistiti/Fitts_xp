@@ -19,11 +19,12 @@ class GameExperiment(Game):
         self.experiments_data['user_id'] = random.randint(0,1000000)
         self.experiments_data['experiments'] = dict()
         self.language = 'en' #default = en, can be changed with chooseLanguage() screen
-        if cursor == None:
-            self.cursor = SensitiveCursor(width, height, cursorImage = cursorImage) 
-        else:
-            self.cursor = cursor 
-        self.addListenerDrawable(self.cursor)
+        self.cursor = cursor
+        #if cursor == None:
+        #    self.cursor = SensitiveCursor(width, height, cursorImage = cursorImage) 
+        #else:
+        #    self.cursor = cursor 
+        #self.addListenerDrawable(self.cursor)
         
         if hasattr(experiments, '__len__'):
             for experiment in experiments:
@@ -124,8 +125,12 @@ class GameExperiment(Game):
         
         choosingLanguage = True
         
-        pygame.mouse.set_visible(False)
-        pygame.event.set_grab(True)
+        if self.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
+        else:
+            pygame.mouse.set_visible(True)
+            pygame.event.set_grab(False)
         
         
         
@@ -137,7 +142,7 @@ class GameExperiment(Game):
                 L = self.listen(event)
                 #self.listenMode(event)
                 if event.type == pygame.QUIT:
-                    self.quitApp()
+                    return self.quitApp()
                 if event.type == pygame.MOUSEMOTION:
                     self.cursorMove()
                 if event.type == pygame.KEYDOWN:
@@ -185,8 +190,12 @@ class GameExperiment(Game):
         self.write_screen(text, Colors.BLACK, (self.width/2 - 360, self.height/2 - 500), maxSize=(720, 300))
         running = True
         
-        pygame.mouse.set_visible(False)
-        pygame.event.set_grab(True)
+        if self.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
+        else:
+            pygame.mouse.set_visible(True)
+            pygame.event.set_grab(False)
         
         while(running):
             self.refreshScreen(False)
@@ -197,7 +206,7 @@ class GameExperiment(Game):
                 L = self.listen(event)
                 #self.listenMode(event)
                 if event.type == pygame.QUIT:
-                    self.quitApp()
+                    return self.quitApp()
                 if event.type == pygame.MOUSEMOTION:
                     self.cursorMove()
                 if event.type == pygame.KEYDOWN:
@@ -249,6 +258,13 @@ class GameExperiment(Game):
         It makes a pause for the user'''
         self.refreshScreen()
         
+        if self.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
+        else:
+            pygame.mouse.set_visible(True)
+            pygame.event.set_grab(False)
+        
         running = True
         
         while(running):
@@ -275,6 +291,13 @@ class GameExperiment(Game):
     def endOfExperiment(self):
         '''This screen is shown at the final end'''
         self.refreshScreen()
+        
+        if self.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
+        else:
+            pygame.mouse.set_visible(True)
+            pygame.event.set_grab(False)
         
         group = pygame.sprite.Group(self.inputBoxAvis) 
         running = True
@@ -306,7 +329,7 @@ class GameExperiment(Game):
                         self.running = False
                         return self.quitApp()
                 if event.type == pygame.MOUSEBUTTONDOWN:    
-                    if (self.inputBoxAvis.button_ok.isInside((self.cursor.x, self.cursor.y))):
+                    if (self.inputBoxAvis.button_ok.isInside(self.getCursorPos())):
                         self.avis = self.inputBoxAvis.text #recupere avis
                         print("AVIS :", self.avis)
                         self.experiments_data['user_review'] = self.avis
@@ -340,10 +363,10 @@ class GameExperiment(Game):
         self.refreshScreen()
         if self.language == 'en':
             self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
-            self.write_box("Press ESCAPE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
+            self.write_box("Press ESCAPE or SPACE to continue", Colors.BLACK, (self.width/2, self.height/2 + 30))
         elif self.language =='fr':
             self.write_box("PAUSE", Colors.BLACK, (self.width/2, self.height/2 - 30))
-            self.write_box("Appuyez sur ESPACE pour continuer", Colors.BLACK, (self.width/2, self.height/2 + 30))
+            self.write_box("Appuyez sur ECHAP ou ESPACE pour continuer", Colors.BLACK, (self.width/2, self.height/2 + 30))
         
         pygame.mouse.set_visible(True)
         pygame.event.set_grab(False)
@@ -356,23 +379,35 @@ class GameExperiment(Game):
                         self.running = False
                         return self.quitApp()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        pygame.mouse.set_visible(False)
-                        pygame.event.set_grab(True)
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_SPACE:
+                        if self.cursor != None:
+                            pygame.mouse.set_visible(False)
+                            pygame.event.set_grab(True)
+                        else:
+                            pygame.mouse.set_visible(True)
+                            pygame.event.set_grab(False)
                         self.showAllDrawable()
                         self.showAllListener()
                         return
             
     def cursorMove(self):
-        pos = pygame.mouse.get_rel()
-        self.cursor.move(pos[0], pos[1])
+        if self.cursor != None:
+            pos = pygame.mouse.get_rel()
+            self.cursor.move(pos[0], pos[1])
         
     def draw(self):
         '''always draw the cursor at the end'''
         for d, v in self.drawables.items():
             if v == True:
                 d.draw(self)
-        self.cursor.draw(self)
+        if self.cursor != None:
+            self.cursor.draw(self)
+        
+    def getCursorPos(self):
+        if self.cursor == None:
+            return pygame.mouse.get_pos()
+        else:
+            return (self.cursor.x, self.cursor.y)
 
     def start(self):
         self.running = True

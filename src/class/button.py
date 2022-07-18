@@ -121,7 +121,7 @@ class Button(Drawable, Listener):
                     return "button", self.mode   
         else: 
             if event.type == pygame.MOUSEBUTTONDOWN:    
-                if (self.isInside((game.cursor.x, game.cursor.y))):
+                if (self.isInside(game.getCursorPos())):
                     return "button", self.mode 
           
         

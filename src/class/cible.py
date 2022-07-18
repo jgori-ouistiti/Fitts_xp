@@ -70,7 +70,7 @@ class Cible(Drawable, Listener):
                     return("not cible", tmp)
         else:
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.isInside((game.cursor.x, game.cursor.y)):
+                if self.isInside((game.getCursorPos())):
                     tmp = self.isTarget
                     if (self.isTarget) :
                         self.isTarget = False

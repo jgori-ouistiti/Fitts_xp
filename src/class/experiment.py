@@ -8,7 +8,8 @@ import random
 import time
 
 class Experiment :
-    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1):
+    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1, cursor = None):
+        print("Creating experiment \""+ exp_name+ "\" with cursor =",cursor)
         self.targets  = targets
         
         self.data = dict() #contains all user's data ,for this one experiment, about mouse tracking, time, etc...
@@ -33,9 +34,10 @@ class Experiment :
         self.trial_id    = 0
         
         #Cursor sensitibility for the experiment
+        self.cursor = cursor
+        
         self.dx_sens = dx_sens
         self.dy_sens = dy_sens
-        
         
     def set_x_sensibility(self, dx_sens):
         self.dx_sens = dx_sens
@@ -85,6 +87,13 @@ class Experiment :
         We must use trial variable to know where we are on the experiment
         '''
         
+        cursor_save = game.cursor
+        game.cursor = self.cursor
+        
+        if game.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
+        
         if self.targets == None or self.targets == []:
             raise Exception("Experiment has no target initialized")
         
@@ -100,12 +109,6 @@ class Experiment :
         
         game.cursor_position = []
         
-        #Save the cursor settings (sensibility)
-        dx_cursor, dy_cursor = game.cursor.getSensibility()
-        #Set the cursor sensibility to the experiment sensibility settings
-        game.cursor.set_x_sensibility(self.dx_sens)
-        game.cursor.set_y_sensibility(self.dy_sens)
-        
         self.startOfTrial = time.time()
         self.previous_time = self.startOfTrial
         
@@ -114,6 +117,8 @@ class Experiment :
             pygame.mouse.set_pos = (game.width/2, game.height/2)
             
             game.refreshScreen(True)
+            if self.cursor != None:
+                self.cursor.draw(game)
 
             ev = pygame.event.get()
             for event in ev:
@@ -122,19 +127,18 @@ class Experiment :
                 
                 if event.type == pygame.QUIT:
                     self.last_call(game)
+                    game.cursor = cursor_save
                     game.menu("quit", data = self.data)
                     return game.quitApp()
                     
                 #collect mouse position
                 if event.type == pygame.USEREVENT:
                     #Tracking mouse position
-                    game.cursor_position.append((game.cursor.x, game.cursor.y))
+                    game.cursor_position.append(game.getCursorPos())
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         #Reset the cursor sensibility back to previous settings
-                        game.cursor.set_x_sensibility(dx_cursor)
-                        game.cursor.set_y_sensibility(dy_cursor)
                         pygame.mouse.set_visible(True)
                         game.removeListenerDrawable(targets)
                         if game.menu("pause") == -1: #quitting app because user closed game during pause menu
@@ -165,10 +169,9 @@ class Experiment :
                     
         #End of the experiment
         #Reset the cursor sensibility back to previous settings
-        game.cursor.set_x_sensibility(dx_cursor)
-        game.cursor.set_y_sensibility(dy_cursor)
         game.removeListenerDrawable(targets)
         self.last_call(game)
+        game.cursor = cursor_save
         game.menu("endExperiment", data = self.data)
         
 

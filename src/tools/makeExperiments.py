@@ -17,8 +17,8 @@ class CircleRandomExp(Experiment):
     '''One target at a time on screen.
        When clicking on a target, a new one appear on a constant distance from the previous one.
     '''
-    def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+    def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = None):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
         
         #init target_info
         self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
@@ -36,8 +36,6 @@ class CircleRandomExp(Experiment):
             if len(self.target_info["distance"]) <= 1:
                 raise Exception("Error: Distance for targets is set as a list but there isn't 2 or more elements in the list. "\
                 +"If you want to use one generic value, use just an int an not a list.")        
-        else:
-            self.target_info = {"isRadiusList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
         #---------
         self.target_color  = target_color
         self.distance = distance
@@ -129,27 +127,25 @@ class TwoTargetsExp(Experiment):
        Use a rad given in parameters to set the line where the two targets will be placed
        Use a distance in pixels to separate the two targets
     ''' 
-    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
         
         #init target_info
         self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
         #Radius
         if isinstance(target_radius, list):
             self.target_info["isRadiusList"]=True #Boolean = is it a list ? (True),
-            self.target_info["indexRadius"] = 0 #index of the radius of next target
+            self.target_info["indexRadius"] = 1 #index of the radius of next target
             if len(self.target_info["radius"]) <= 1:
                 raise Exception("Error: Radius for targets is set as a list but there isn't 2 or more elements in the list. "\
                 +"If you want to use one generic value, use just an int an not a list.")
         #Distance
         if isinstance(distance, list):
             self.target_info["isDistanceList"]=True #Boolean = is it a list ? (True),
-            self.target_info["indexDistance"] = 0 #index of the radius of next target
+            self.target_info["indexDistance"] = 1 #index of the radius of next target
             if len(self.target_info["distance"]) <= 1:
                 raise Exception("Error: Distance for targets is set as a list but there isn't 2 or more elements in the list. "\
                 +"If you want to use one generic value, use just an int an not a list.")        
-        else:
-            self.target_info = {"isRadiusList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
         #---------f.target_info = {"isRadiusList" : False, "radius":target_radius} #Boolean = is it a list ? (False), target_radius = int, no index because target_radius isn't a list
         
         self.data['number_of_targets'] = 2
@@ -180,13 +176,19 @@ class TwoTargetsExp(Experiment):
             self.targets.append(Cible((x2,y2), self.target_info["radius"][1], target_color, isTarget = False))
         else:
             #creating targets with target_radius[1] as one generic radius
-            print("TARGET RADIUS : ",self.target_info["radius"])
             self.targets.append(Cible((x1,y1), self.target_info["radius"], target_color, isTarget = True))
             self.targets.append(Cible((x2,y2), self.target_info["radius"], target_color, isTarget = False))
             
         self.actual_target = self.targets[0]
         
     def swap_target(self, game):
+    
+        #Incrementing index of radius list
+        if self.target_info["isRadiusList"]:
+            self.target_info["indexRadius"] += 1
+            if self.target_info["indexRadius"] == len(self.target_info["radius"]): #looping index back to zero
+                self.target_info["indexRadius"] = 0
+                
         if self.target_info["isDistanceList"]:
             #Incrementing index of distance list
             self.target_info["indexDistance"] += 1
@@ -213,11 +215,8 @@ class TwoTargetsExp(Experiment):
                 self.targets[1].r = self.target_info["radius"][self.target_info["indexRadius"]]
             self.actual_target = self.targets[0]
             game.active_target = self.targets[0]
-        #Incrementing index of radius list
-        if self.target_info["isRadiusList"]:
-            self.target_info["indexRadius"] += 1
-            if self.target_info["indexRadius"] == len(self.target_info["radius"]): #looping index back to zero
-                self.target_info["indexRadius"] = 0
+            
+        
     def begin(self, game):         
         '''Start the experience
         WARNING : we can pause the experience so we can exit this method at any time
@@ -234,16 +233,16 @@ class TwoTargetsExp(Experiment):
         
         running = True
         
+        cursor_save = game.cursor
+        game.cursor = self.cursor
+        if game.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
+        
         game.listTarget = targets = self.targets
         game.addListenerDrawable(self.targets)
         
         game.cursor_position = []
-        
-        #Save the cursor settings (sensibility)
-        dx_cursor, dy_cursor = game.cursor.getSensibility()
-        #Set the cursor sensibility to the experiment sensibility settings
-        game.cursor.set_x_sensibility(self.dx_sens)
-        game.cursor.set_y_sensibility(self.dy_sens)
         
         self.startOfTrial = time.time()
         self.previous_time = self.startOfTrial
@@ -255,6 +254,8 @@ class TwoTargetsExp(Experiment):
             pygame.mouse.set_pos = (game.width/2, game.height/2)
             
             game.refreshScreen(True)
+            if self.cursor != None:
+                self.cursor.draw(game)
 
             ev = pygame.event.get()
             for event in ev:
@@ -268,13 +269,10 @@ class TwoTargetsExp(Experiment):
                 #collect mouse position
                 if event.type == pygame.USEREVENT:
                     #Tracking mouse position
-                    game.cursor_position.append((game.cursor.x, game.cursor.y))
+                    game.cursor_position.append(game.getCursorPos())
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        #Reset the cursor sensibility back to previous settings
-                        game.cursor.set_x_sensibility(dx_cursor)
-                        game.cursor.set_y_sensibility(dy_cursor)
                         pygame.mouse.set_visible(True)
                         game.removeListenerDrawable(targets)
                         if game.menu("pause") == -1: #quitting app because user closed game during pause menu
@@ -305,9 +303,9 @@ class TwoTargetsExp(Experiment):
                     
         #End of the experiment
         #Reset the cursor sensibility back to previous settings
-        game.cursor.set_x_sensibility(dx_cursor)
-        game.cursor.set_y_sensibility(dy_cursor)
+        game.cursor = cursor_save
         game.removeListenerDrawable(targets)
+        
         game.menu("endExperiment", data = self.data)
 
 #-------------------------CIRCLE EXPERIMENT CLASS
@@ -316,8 +314,8 @@ class CircleExp(Experiment):
     The target's order is specified and not random.
     Every time a target is hit, the next one is at the most opposite of the circle.'''
     
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
         self.data["width"] = width
@@ -374,13 +372,13 @@ class CircleExp(Experiment):
         game.listTarget = targets = self.targets
         game.addListenerDrawable(self.targets)
         
-        game.cursor_position = []
+        cursor_save = game.cursor
+        game.cursor = self.cursor
+        if game.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
         
-        #Save the cursor settings (sensibility)
-        dx_cursor, dy_cursor = game.cursor.getSensibility()
-        #Set the cursor sensibility to the experiment sensibility settings
-        game.cursor.set_x_sensibility(self.dx_sens)
-        game.cursor.set_y_sensibility(self.dy_sens)
+        game.cursor_position = []
         
         self.startOfTrial = time.time()
         self.previous_time = self.startOfTrial
@@ -392,6 +390,8 @@ class CircleExp(Experiment):
             pygame.mouse.set_pos = (game.width/2, game.height/2)
             
             game.refreshScreen(True)
+            if self.cursor != None:
+                self.cursor.draw(game)
 
             ev = pygame.event.get()
             for event in ev:
@@ -400,18 +400,16 @@ class CircleExp(Experiment):
                 
                 if event.type == pygame.QUIT:
                     game.menu("quit", data = self.data)
+                    game.cursor = cursor_save
                     return game.quitApp()
                     
                 #collect mouse position
                 if event.type == pygame.USEREVENT:
                     #Tracking mouse position
-                    game.cursor_position.append((game.cursor.x, game.cursor.y))
+                    game.cursor_position.append(game.getCursorPos())
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        #Reset the cursor sensibility back to previous settings
-                        game.cursor.set_x_sensibility(dx_cursor)
-                        game.cursor.set_y_sensibility(dy_cursor)
                         pygame.mouse.set_visible(True)
                         game.removeListenerDrawable(targets)
                         if game.menu("pause") == -1: #quitting app because user closed game during pause menu
@@ -442,14 +440,13 @@ class CircleExp(Experiment):
                     
         #End of the experiment
         #Reset the cursor sensibility back to previous settings
-        game.cursor.set_x_sensibility(dx_cursor)
-        game.cursor.set_y_sensibility(dy_cursor)
+        game.cursor = cursor_save
         game.removeListenerDrawable(targets)
         game.menu("endExperiment", data = self.data)
         
 class DistractorExp(Experiment):
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens)
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
         
