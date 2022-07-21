@@ -171,9 +171,9 @@ class GameExperiment(Game):
         
         button1 = None
         if self.language == 'en':
-            button1 = Button((int(self.width/2 - 150),int(self.height - 150)), 1, 300, 60 , (200, 50, 50), RED, "BEGIN")
+            button1 = Button((int(self.width/2 + 160),int(self.height/2 - 30)), 1, 300, 60 , (200, 50, 50), RED, "BEGIN")
         elif self.language =='fr':
-            button1 = Button((int(self.width/2 - 170),int(self.height - 150)), 1, 340, 60 , (200, 50, 50), RED, "COMMENCER")
+            button1 = Button((int(self.width/2 + 150),int(self.height/2 - 30)), 1, 340, 60 , (200, 50, 50), RED, "COMMENCER")
         self.addListenerDrawable([button1])
         self.refreshScreen()
         text = ''
@@ -187,7 +187,7 @@ class GameExperiment(Game):
                     "Vous allez avoir plusieurs petites expériences. Il vous faudra cliquer le plus vite possible "+\
                     "sur les cibles rouges.\n\n"+\
                     "Merci de votre participation, appuyez sur COMMENCER pour démarrer."
-        self.write_screen(text, Colors.BLACK, (self.width/2 - 360, 100), maxSize=(720, 300))
+        self.write_screen(text, Colors.BLACK, (self.width/8, self.height/2 - self.height/4), maxSize=(720, 300))
         running = True
         
         if self.cursor != None:
@@ -199,7 +199,7 @@ class GameExperiment(Game):
         
         while(running):
             self.refreshScreen(False)
-            self.write_screen(text, Colors.BLACK, (self.width/2 - 360, 100), maxSize=(720, 300))
+            self.write_screen(text, Colors.BLACK, (self.width/8, self.height/2 - self.height/4), maxSize=(720, 300))
             pygame.display.update()
             ev = pygame.event.get()
             for event in ev:
