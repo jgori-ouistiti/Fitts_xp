@@ -4,6 +4,7 @@ import sys
 sys.path.append('../class')
 from experiment import *
 import webExtractor as webEx
+import random
 from gameExperiment import *
 from makeExperiments import *
 
@@ -14,6 +15,7 @@ def readFileExperiment(filename, width, height, title = None):
         title = "Experiment file : "+filename
 
     list_experiences = []
+    list_random_experiences = []
     listTimePause = dict()
     nbExperience = 0
 
@@ -24,6 +26,8 @@ def readFileExperiment(filename, width, height, title = None):
     
     cursor = SensitiveCursor(width, height, cursorImage = 'class/cursor/cursor1.png') 
     cursor_used = cursor
+    
+    isRandom = False #If set to True, all next experiments will appear in a random order until set to False or end of file
 
     noPause = False #If set to False : make a pause between two experiments
 
@@ -46,6 +50,16 @@ def readFileExperiment(filename, width, height, title = None):
                 noPause = True
             elif 'false' in elements[1].lower():
                 noPause = False
+                
+        elif line.startswith("random"):
+            elements = line.split(" ")
+            if 'true' in elements[1].lower():
+                isRandom = True
+            elif 'false' in elements[1].lower():
+                random.shuffle(list_random_experiences)
+                list_experiences += list_random_experiences
+                list_random_experiences = []
+                isRandom = False
 
         elif (line[0] == ';') or line[0] == '\n': #comment line
             continue 
@@ -62,7 +76,10 @@ def readFileExperiment(filename, width, height, title = None):
                 exp_name = parameters[2]
                 targets = webEx.getTargetsFromUrl(exp_name, width, height, color=Colors.BLACK, displayInfo=True)
                 nbMouv = int(parameters[3].strip("\n"))
-                list_experiences.append(Experiment(targets, exp_name, exp_id, nbMouv, cursor = cursor_used, noPause = noPause))
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(Experiment(targets, exp_name, exp_id, nbMouv, cursor = cursor_used, noPause = noPause))
 
             elif type_experience == 'cible':
                 disposition = parameters[2]  # diposition c'est soit "cercle" soit "densite"
@@ -86,7 +103,10 @@ def readFileExperiment(filename, width, height, title = None):
                         targets = make_circle_target_list(pos, rayon_D, nbCible, Colors.GREEN, rayon_cercle)
 
                         nbMouv = int(parameters[i].strip("\n"))
-                        list_experiences.append(Experiment(targets, type_cible, exp_id, nbMouv, noPause = noPause))
+                        if isRandom:
+                            list_random_experiences.append(experiment)
+                        else:
+                            list_experiences.append(Experiment(targets, type_cible, exp_id, nbMouv, noPause = noPause))
                     # elif type_cible=="rect":
 
                 ## Disposition est en densite
@@ -104,7 +124,10 @@ def readFileExperiment(filename, width, height, title = None):
                     jmax = int(parameters[7])
                     targets = make_2D_distractor_target_list(dimensions, center, ID, A, p, Colors.BLACK, jmax)
                     nbMouv = int(parameters[8].strip("\n"))
-                    list_experiences.append(Experiment(targets, disposition, exp_id, nbMouv, cursor = cursor_used, noPause = noPause))
+                    if isRandom:
+                        list_random_experiences.append(experiment)
+                    else:
+                        list_experiences.append(Experiment(targets, disposition, exp_id, nbMouv, cursor = cursor_used, noPause = noPause))
                     
             elif type_experience == 'random':
                 #Distance
@@ -125,7 +148,10 @@ def readFileExperiment(filename, width, height, title = None):
                 experiment = CircleRandomExp(width, height, 
                         'Circle Random with r = '+str(radius)+', distance = '+str(distance), 
                         exp_id = exp_id, maxTrials = nb_mouvement, target_radius = radius, distance = distance, dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = cursor_used, noPause = noPause)
-                list_experiences.append(experiment)
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(experiment)
                 
             elif type_experience == 'lineV':
                 #Distance
@@ -146,7 +172,10 @@ def readFileExperiment(filename, width, height, title = None):
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = PI/2',
                         math.pi/2,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
-                list_experiences.append(experiment)
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(experiment)
                 
             elif type_experience == 'lineH':
                 #Distance
@@ -167,7 +196,10 @@ def readFileExperiment(filename, width, height, title = None):
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = 0',
                         0,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
-                list_experiences.append(experiment)
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(experiment)
             
             elif type_experience == 'line':
                 #Distance
@@ -189,7 +221,10 @@ def readFileExperiment(filename, width, height, title = None):
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = '+str(angle),
                         angle,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
-                list_experiences.append(experiment)
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(experiment)
             
             elif type_experience == 'circleH':
                 distance = int(parameters[2])
@@ -200,7 +235,10 @@ def readFileExperiment(filename, width, height, title = None):
                 experiment = CircleExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
                         nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = True, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
-                list_experiences.append(experiment)
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(experiment)
             
             elif type_experience == 'circleAH':
                 distance = int(parameters[2])
@@ -211,7 +249,10 @@ def readFileExperiment(filename, width, height, title = None):
                 experiment = CircleExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
                         nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = False, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
-                list_experiences.append(experiment)
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(experiment)
                 
             elif type_experience == 'circle':
                 distance = int(parameters[2])
@@ -226,7 +267,13 @@ def readFileExperiment(filename, width, height, title = None):
                 experiment = CircleExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
                         nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = is_H, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
-                list_experiences.append(experiment)
+                if isRandom:
+                    list_random_experiences.append(experiment)
+                else:
+                    list_experiences.append(experiment)
             nbExperience += 1
     f.close()
+    if len(list_random_experiences) != 0:
+        random.shuffle(list_random_experiences)
+        list_experiences += list_random_experiences
     return GameExperiment(width, height, list_experiences, listTimePause, title = title)

@@ -32,6 +32,7 @@
 
 cursor os
 noPause True
+random True
 ligne_vertical_D300 lineV [50,80,110,130,160,190,220,250,280,310,340,370] 20 15
 ;pause : 5 
 
