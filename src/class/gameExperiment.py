@@ -37,7 +37,7 @@ class GameExperiment(Game):
             self.experiments = [experiments] # list of experiments objects
 
     ###--------------------------- Menu avec les differents fonctions (play, pause, etc) ---------------------------###       
-    def menu(self, menu_title, current_mode = 'play', data = None):
+    def menu(self, menu_title, current_mode = 'play', data = None, noPause = False):
         if menu_title == "play":
         
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
@@ -79,7 +79,7 @@ class GameExperiment(Game):
                 self.hideAllDrawable()
                 self.hideAllListener()
                 self.checkPause()
-                self.endExperimentScreen()
+                self.endExperimentScreen(noPause = noPause)
                 return
         elif menu_title == "quit":
             if data != None:
@@ -253,7 +253,7 @@ class GameExperiment(Game):
                             running = False
         pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive    
 
-    def endExperimentScreen(self):
+    def endExperimentScreen(self, noPause = False):
         '''This screen is shown between 2 experiments
         It makes a pause for the user'''
         self.refreshScreen()
@@ -267,7 +267,7 @@ class GameExperiment(Game):
         
         running = True
         
-        while(running):
+        while(running and not noPause):
             self.refreshScreen(False)
             #self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
             if self.language == 'en':

@@ -8,7 +8,7 @@ import random
 import time
 
 class Experiment :
-    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1, cursor = None):
+    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1, cursor = None, noPause = False):
         print("Creating experiment \""+ exp_name+ "\" with cursor =",cursor)
         self.targets  = targets
         
@@ -22,6 +22,7 @@ class Experiment :
         self.data['trials'] = dict()
         
         self.maxTrials = maxTrials
+        self.noPause = noPause #At the end of the experiment, skip the pause and directly begin next experiment if set to True
         
         tmp = time.time()
         
@@ -172,6 +173,6 @@ class Experiment :
         game.removeListenerDrawable(targets)
         self.last_call(game)
         game.cursor = cursor_save
-        game.menu("endExperiment", data = self.data)
+        game.menu("endExperiment", data = self.data, noPause = self.noPause)
         
 

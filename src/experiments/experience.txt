@@ -31,6 +31,7 @@
 ;exp_random_avec_list random [5,300,50,100,100,100,100,100,100,100,100,100] 20 20
 
 cursor os
+noPause True
 ligne_vertical_D300 lineV [50,80,110,130,160,190,220,250,280,310,340,370] 20 15
 ;pause : 5 
 

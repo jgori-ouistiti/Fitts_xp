@@ -17,8 +17,8 @@ class CircleRandomExp(Experiment):
     '''One target at a time on screen.
        When clicking on a target, a new one appear on a constant distance from the previous one.
     '''
-    def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = None):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
+    def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = None, noPause = False):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause)
         
         #init target_info
         self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
@@ -127,8 +127,8 @@ class TwoTargetsExp(Experiment):
        Use a rad given in parameters to set the line where the two targets will be placed
        Use a distance in pixels to separate the two targets
     ''' 
-    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
+    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause)
         
         #init target_info
         self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
@@ -306,7 +306,7 @@ class TwoTargetsExp(Experiment):
         game.cursor = cursor_save
         game.removeListenerDrawable(targets)
         
-        game.menu("endExperiment", data = self.data)
+        game.menu("endExperiment", data = self.data, noPause = self.noPause)
 
 #-------------------------CIRCLE EXPERIMENT CLASS
 class CircleExp(Experiment):
@@ -314,8 +314,8 @@ class CircleExp(Experiment):
     The target's order is specified and not random.
     Every time a target is hit, the next one is at the most opposite of the circle.'''
     
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
         self.data["width"] = width
@@ -442,10 +442,10 @@ class CircleExp(Experiment):
         #Reset the cursor sensibility back to previous settings
         game.cursor = cursor_save
         game.removeListenerDrawable(targets)
-        game.menu("endExperiment", data = self.data)
+        game.menu("endExperiment", data = self.data, noPause = self.noPause)
         
 class DistractorExp(Experiment):
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None):
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False):
         super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
