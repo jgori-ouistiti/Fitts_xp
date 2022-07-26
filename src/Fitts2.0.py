@@ -37,6 +37,7 @@ def main():
     
     #Get user's screen resolution
     infoObject = pygame.display.Info()
+    
     WIDTH = infoObject.current_w - 200
     HEIGHT = infoObject.current_h - 200
     

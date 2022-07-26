@@ -102,7 +102,10 @@ class GameExperiment(Game):
         
         Each experiments calls menu("endExperiment") at the end
         No need to quit app here because endOfExperiment is called at the final end in menu() by the last experiment'''
-        return (self.experiments[self.activeExperiment]).begin(self)
+        try:
+            return (self.experiments[self.activeExperiment]).begin(self)
+        except:
+            print("Error in experiment : "+self.experiments[self.activeExperiment].data['exp_name']+"\nError during experiment, cought a pygame parachute, skipping to next experiment.")
         
     def chooseLanguage(self):
         '''This menu is the first menu that the user sees
