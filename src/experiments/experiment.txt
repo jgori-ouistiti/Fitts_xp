@@ -3,7 +3,6 @@
 
 cursor os
 noPause True
-exp_aleatoire_1 random 500 10 20
 random True
 
 ligne_horizontal_1 lineH 1000 10 15
