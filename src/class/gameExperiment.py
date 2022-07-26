@@ -18,6 +18,7 @@ class GameExperiment(Game):
         self.experiments_data = dict() #User's data collected after ends of each experiments
         self.experiments_data['user_id'] = random.randint(0,1000000)
         self.experiments_data['experiments'] = dict()
+        self.experiments_data['input_device'] = 'mouse'
         self.language = 'en' #default = en, can be changed with chooseLanguage() screen
         self.cursor = cursor
         #if cursor == None:
@@ -48,6 +49,12 @@ class GameExperiment(Game):
             self.hideAllDrawable()
             self.hideAllListener()
             self.chooseLanguage()
+            return
+        elif menu_title == 'chooseDevice':
+            pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
+            self.hideAllDrawable()
+            self.hideAllListener()
+            self.chooseDevice()
             return
         elif menu_title == "pause":
             pygame.time.set_timer(pygame.USEREVENT, 0) #Desactive pygame.USEREVENT
@@ -100,7 +107,7 @@ class GameExperiment(Game):
     def chooseLanguage(self):
         '''This menu is the first menu that the user sees
         This menu will display all languages available (french and english)
-        After the language is selected, the chooseMode screen is displayed'''
+        After the language is selected, the chooseDevice screen is displayed'''
         
         space_between_flags  = 100
         
@@ -117,7 +124,7 @@ class GameExperiment(Game):
         width_flag = int( (self.width / len(flags)) - (space_between_flags*2)) 
         
         for i in range(len(flags)):
-            flag_x = int(i * self.width/2 + space_between_flags) 
+            flag_x = int(i * self.width/len(flags) + space_between_flags) 
             buttons.append(Button((flag_x, flag_y), i, width_flag, height_flag, (0,0,0), (0,0,0), image=flags[i][1]))
             
         self.addListenerDrawable(buttons)
@@ -160,11 +167,76 @@ class GameExperiment(Game):
                     
         print("Language :",self.language)
         
+    def chooseDevice(self):
+        '''This menu is the second menu that the user sees
+        This menu will display three type of device (mouse, trackpad and stylus)
+        After the device is selected, the chooseMode screen is displayed'''
+        
+        space_between_images  = 100
+        
+        devices = [] #Putting devices in an array list to add more languages in the future
+        buttons = []
+        
+        #MOUSE
+        devices.append(('mouse', 'images/device_mouse.png'))
+        #TRACKPAD
+        devices.append(('touchpad', 'images/device_touchpad.png'))
+        #STYLUS
+        devices.append(('stylus', 'images/device_stylus.png'))
+        
+        device_y = int(self.height/2 - (self.height/(len(devices)+1)))
+        height_device = int(self.height - 2*device_y)
+        width_device = int( (self.width / len(devices)) - (space_between_images*2)) 
+        
+        for i in range(len(devices)):
+            device_x = int(i * self.width/len(devices) + space_between_images) 
+            buttons.append(Button((device_x, device_y), i, width_device, height_device, (0,0,0), (0,0,0), image=devices[i][1]))
+            
+        self.addListenerDrawable(buttons)
+        self.refreshScreen()
+        
+        choosingDevice = True
+        
+        if self.cursor != None:
+            pygame.mouse.set_visible(False)
+            pygame.event.set_grab(True)
+        else:
+            pygame.mouse.set_visible(True)
+            pygame.event.set_grab(False)
+        
+        
+        
+        while(choosingDevice):
+            self.refreshScreen(False)
+            pygame.display.update()
+            ev = pygame.event.get()
+            for event in ev:
+                L = self.listen(event)
+                #self.listenMode(event)
+                if event.type == pygame.QUIT:
+                    return self.quitApp()
+                if event.type == pygame.MOUSEMOTION:
+                    self.cursorMove()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                        return
+                if len(L) >= 1 and len(L[0]) == 2:
+                    print("L :", L)
+                    print("devices :",devices)
+                    self.experiments_data['input_device'] = devices[L[0][1]][0]
+                    self.removeListenerDrawable(buttons)
+                    self.showAllDrawable()
+                    self.showAllListener()
+                    choosingDevice = False
+                    
+        print("Device :",self.experiments_data['input_device'])
+        
         
 
     def chooseMode(self):
         '''MAIN MENU
-        This menu is the second menu that the user sees
+        This menu is the third menu that the user sees
         In GameExperience, we use only one button to start the experiment'''
         
         print("CHOOSE MODE")
@@ -412,6 +484,8 @@ class GameExperiment(Game):
     def start(self):
         self.running = True
         self.menu("chooseLanguage")
+        if self.running:
+            self.menu("chooseDevice")
         if self.running:
             self.menu("chooseMode")
         while(self.running):
