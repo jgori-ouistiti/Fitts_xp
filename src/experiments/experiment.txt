@@ -46,7 +46,7 @@ exp_en_cercle_9 circle 600 10 25 H
 exp_en_cercle_10 circle 600 25 25 H
 exp_en_cercle_11 circle 1000 10 25 H
 exp_en_cercle_12 circle 1000 25 25 H
-pause : 30
+pause : 60
 exp_aleatoire_1 random 500 10 20
 exp_aleatoire_2 random 500 25 20
 exp_aleatoire_3 random 500 30 20
