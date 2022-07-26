@@ -53,6 +53,9 @@ class CircleRandomExp(Experiment):
         self.data["width"] = width
         self.data["height"] = height
         
+    def init_begin(self, game):
+        game.active_target = self.targets[0]
+        
     def correct_clic(self, game):
         #Overide super method correct_clic. Called when clicking on the target
         
@@ -284,11 +287,12 @@ class TwoTargetsExp(Experiment):
                     game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
-                    self.swap_target(game)
                 
                     self.correct_clic(game)
                     
                     self.iterateData(game)
+                    
+                    self.swap_target(game)
                 
                     self.trial_id += 1
                 
@@ -421,11 +425,12 @@ class CircleExp(Experiment):
                     game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
-                    self.swap_target(game)
+                
+                    self.iterateData(game)
                 
                     self.correct_clic(game)
                     
-                    self.iterateData(game)
+                    self.swap_target(game)
                 
                     self.trial_id += 1
                 

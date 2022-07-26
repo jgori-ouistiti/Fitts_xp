@@ -146,7 +146,7 @@ def readFileExperiment(filename, width, height, title = None):
                     radius = int(parameters[3])
                 nb_mouvement = int(parameters[4])
                 experiment = CircleRandomExp(width, height, 
-                        'Circle Random with r = '+str(radius)+', distance = '+str(distance), 
+                        'Random with r = '+str(radius)+', distance = '+str(distance), 
                         exp_id = exp_id, maxTrials = nb_mouvement, target_radius = radius, distance = distance, dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = cursor_used, noPause = noPause)
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -170,7 +170,7 @@ def readFileExperiment(filename, width, height, title = None):
                     radius = int(parameters[3])
                 nb_mouvement = int(parameters[4])
                 experiment = TwoTargetsExp(width, height,
-                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = PI/2',
+                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', rad = PI/2',
                         math.pi/2,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -194,7 +194,7 @@ def readFileExperiment(filename, width, height, title = None):
                     radius = int(parameters[3])
                 nb_mouvement = int(parameters[4])
                 experiment = TwoTargetsExp(width, height,
-                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = 0',
+                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', rad = 0',
                         0,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -219,7 +219,7 @@ def readFileExperiment(filename, width, height, title = None):
                 nb_mouvement = int(parameters[4])
                 angle = int(parameters[5])
                 experiment = TwoTargetsExp(width, height,
-                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+'rad = '+str(angle),
+                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', rad = '+str(angle),
                         angle,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -233,7 +233,7 @@ def readFileExperiment(filename, width, height, title = None):
                 if nbCible %2 == 0: 
                     nbCible += 1
                 experiment = CircleExp(width, height,
-                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
+                        'Circle experiment with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
                         nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = True, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -247,7 +247,7 @@ def readFileExperiment(filename, width, height, title = None):
                 if nbCible %2 == 0: 
                     nbCible += 1
                 experiment = CircleExp(width, height,
-                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
+                        'Circle experiment with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
                         nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = False, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -265,7 +265,7 @@ def readFileExperiment(filename, width, height, title = None):
                 if 'AH' in sens:
                     is_H = False
                 experiment = CircleExp(width, height,
-                        'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
+                        'Circle experiment with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
                         nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = is_H, exp_id = exp_id, cursor = cursor_used, noPause = noPause)
                 if isRandom:
                     list_random_experiences.append(experiment)

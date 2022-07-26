@@ -81,12 +81,19 @@ class Experiment :
         #Nothing here, used for child of Experiment
         #It is called when ending the experiment
         return
+        
+    def init_begin(self, game):
+        #Nothing here, used for child of Experiment
+        #It is called when ending the experiment
+        return
 
     def begin(self, game):         
         '''Start the experience
         WARNING : we can pause the experience so we can exit this method at any time
         We must use trial variable to know where we are on the experiment
         '''
+        
+        self.init_begin(game)
         
         cursor_save = game.cursor
         game.cursor = self.cursor
@@ -151,11 +158,12 @@ class Experiment :
                     game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
-                    game.assignRandomTarget()
+                
+                    self.iterateData(game)
                 
                     self.correct_clic(game)
                     
-                    self.iterateData(game)
+                    game.assignRandomTarget()
                 
                     self.trial_id += 1
                 
