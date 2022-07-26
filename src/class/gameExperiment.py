@@ -17,8 +17,10 @@ class GameExperiment(Game):
         self.activeExperiment = 0 #correspond exp_id or index of the active experiment in the experiments list
         self.experiments_data = dict() #User's data collected after ends of each experiments
         self.experiments_data['user_id'] = random.randint(0,1000000)
-        self.experiments_data['experiments'] = dict()
+        self.experiments_data['display_screen'] = [width,height]
         self.experiments_data['input_device'] = 'mouse'
+        self.experiments_data['experiments'] = dict()
+        
         self.language = 'en' #default = en, can be changed with chooseLanguage() screen
         self.cursor = cursor
         #if cursor == None:

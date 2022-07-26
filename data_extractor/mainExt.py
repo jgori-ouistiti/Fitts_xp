@@ -86,12 +86,16 @@ def plotData(data,xmin = 0, ymin = -1080, xmax = 1920, ymax = 0):
     plotTrajectory(trajectories, click = clicks, labels = labels, xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)
 
 def main():
-    data = readDirectory('../users_data/')
+    data = readDirectory('../users_data/saved/')
     for exp in data:
         try:
-            plotData(exp)
+            resolution = exp["display_screen"]
+            xmax = resolution[0]
+            ymin = -resolution[1]
+            print(xmax, ymin)
+            plotData(exp, xmin = 0, ymin = ymin, xmax = xmax, ymax = 0)
         except:
             print("Could not find one experiment for user_id :",exp['user_id'])
-    print("Trajectories for user_id :",data[0]["user_id"]," are :",getTrajectories(data[0]))
+    #print("Trajectories for user_id :",data[0]["user_id"]," are :",getTrajectories(data[0]))
 if __name__ =='__main__':
     main()
