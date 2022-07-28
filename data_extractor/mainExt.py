@@ -1,7 +1,25 @@
 from os import walk
 import sys
 import json
+import math
+import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+
+from PyQt5.QtWidgets import (
+                        QWidget,
+                        QApplication,
+                        QMainWindow,
+                        QVBoxLayout,
+                        QScrollArea,
+                    )
+
+from matplotlib.backends.backend_qt5agg import (
+                        FigureCanvasQTAgg as FigCanvas,
+                        NavigationToolbar2QT as NabToolbar,
+                    )
+
+matplotlib.use('Qt5Agg')
 
 def readJsonData(filename):
     f = open(filename,'r')
@@ -84,6 +102,91 @@ def plotData(data,xmin = 0, ymin = -1080, xmax = 1920, ymax = 0):
         labels.append("Trajectory for "+data['experiments'][id_]['exp_name'])
         labels.append("  Clicks   for   "+data['experiments'][id_]['exp_name'])
     plotTrajectory(trajectories, click = clicks, labels = labels, xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)
+
+def getDistancesByName(data):
+    RES = dict()
+    for exp in data:
+        for id_ in exp['experiments'].keys():
+            exp_name = exp['experiments'][id_]['exp_name']
+            if not exp_name in RES:
+                RES[exp_name] = dict()
+                RES[exp_name]['occurrence'] = 1
+                RES[exp_name]['distances'] = []
+            else:
+                RES[exp_name]['occurrence'] += 1
+            id_of_exp = RES[exp_name]['occurrence'] - 1
+            #Collecting data on movements, first click defined the starting point
+            source_pos = exp['experiments'][id_]['trials']['0']['pos_target']
+            for i in range(1, len(exp['experiments'][id_]['trials'])):
+                movement = exp['experiments'][id_]['trials'][str(i)]
+                distance = []
+                for tick in range(0,len(movement['mouse_tracks'])):
+                    cursor_pos = movement['mouse_tracks'][tick]
+                    distXY = list(map(lambda x1, x2 : abs(x1 - x2), source_pos, cursor_pos))
+                    distance.append(math.sqrt(math.pow(distXY[0],2) + math.pow(distXY[1],2) ))
+                source_pos = movement['pos_target']
+                RES[exp_name]['distances'].append(distance)
+    return RES
+    
+
+    
+def plotDistancesByName(data):
+
+    DIST = getDistancesByName(data)
+
+    # create a figure and some subplots
+    FIG, AXES = plt.subplots(ncols=1, nrows=len(DIST), figsize=(16,16*len(DIST)))
+
+
+    X = np.arange(0., 1.5, 0.01)
+    id_ = 0 
+    for exp_name in DIST:
+        for distances in DIST[exp_name]['distances']:
+            len_ = min(100,len(distances))
+            Y = distances[:len_]
+            last_y = Y[-1] #setting a constant function after 1 seconds
+            Y += [last_y]*(len(X)-len(Y))
+            AXES[id_].plot(X, Y)
+        AXES[id_].set_title(exp_name)
+        id_ += 1
+
+    class MyApp(QWidget):
+        def __init__(self, fig):
+            super().__init__()
+            self.title = 'VERTICAL, HORIZONTAL SCROLLABLE WINDOW : HERE!'
+            self.posXY = (700, 40)
+            self.windowSize = (1200, 800)
+            self.fig = fig
+            self.initUI()
+
+        def initUI(self):
+            QMainWindow().setCentralWidget(QWidget())
+
+            self.setLayout(QVBoxLayout())
+            self.layout().setContentsMargins(0, 0, 0, 0)
+            self.layout().setSpacing(0)
+
+            canvas = FigCanvas(self.fig)
+            canvas.draw()
+
+            scroll = QScrollArea(self)
+            scroll.setWidget(canvas)
+
+            nav = NabToolbar(canvas, self)
+            self.layout().addWidget(nav)
+            self.layout().addWidget(scroll)
+
+            self.show_basic()
+
+        def show_basic(self):
+            self.setWindowTitle(self.title)
+            self.setGeometry(*self.posXY, *self.windowSize)
+            self.show()
+    
+    app = QApplication(sys.argv)
+    window = MyApp(FIG)
+    sys.exit(app.exec_())
+        
 
 def main():
     data = readDirectory('../users_data/saved/')
