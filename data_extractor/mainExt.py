@@ -134,58 +134,21 @@ def plotDistancesByName(data):
 
     DIST = getDistancesByName(data)
 
-    # create a figure and some subplots
-    FIG, AXES = plt.subplots(ncols=1, nrows=len(DIST), figsize=(16,16*len(DIST)))
-
-
     X = np.arange(0., 1.5, 0.01)
-    id_ = 0 
+    cpt = 0
     for exp_name in DIST:
+        plt.figure()
+        plt.title(exp_name)
         for distances in DIST[exp_name]['distances']:
             len_ = min(100,len(distances))
             Y = distances[:len_]
             last_y = Y[-1] #setting a constant function after 1 seconds
             Y += [last_y]*(len(X)-len(Y))
-            AXES[id_].plot(X, Y)
-        AXES[id_].set_title(exp_name)
-        id_ += 1
-
-    class MyApp(QWidget):
-        def __init__(self, fig):
-            super().__init__()
-            self.title = 'VERTICAL, HORIZONTAL SCROLLABLE WINDOW : HERE!'
-            self.posXY = (700, 40)
-            self.windowSize = (1200, 800)
-            self.fig = fig
-            self.initUI()
-
-        def initUI(self):
-            QMainWindow().setCentralWidget(QWidget())
-
-            self.setLayout(QVBoxLayout())
-            self.layout().setContentsMargins(0, 0, 0, 0)
-            self.layout().setSpacing(0)
-
-            canvas = FigCanvas(self.fig)
-            canvas.draw()
-
-            scroll = QScrollArea(self)
-            scroll.setWidget(canvas)
-
-            nav = NabToolbar(canvas, self)
-            self.layout().addWidget(nav)
-            self.layout().addWidget(scroll)
-
-            self.show_basic()
-
-        def show_basic(self):
-            self.setWindowTitle(self.title)
-            self.setGeometry(*self.posXY, *self.windowSize)
-            self.show()
-    
-    app = QApplication(sys.argv)
-    window = MyApp(FIG)
-    sys.exit(app.exec_())
+            plt.plot(X, Y)
+        cpt = (cpt+1) % 5
+        if cpt == 0:
+            plt.show()
+    plt.show()
         
 
 def main():

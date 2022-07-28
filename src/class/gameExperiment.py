@@ -9,8 +9,8 @@ import json
 
 class GameExperiment(Game):
     
-    def __init__(self, width, height, experiments, listTimerPause=dict(), cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor1.png', title='TEST CIBLES'):
-        super().__init__(width, height, bg_color, title=title)
+    def __init__(self, width, height, experiments, listTimerPause=dict(), cursor = None, bg_color = Colors.WHITE, cursorImage = 'class/cursor/cursor1.png', title='TEST CIBLES', fullscreen = True):
+        super().__init__(width, height, bg_color, title=title, fullscreen = fullscreen)
         
         self.infiniteTime = True
         self.listTimerPause = listTimerPause

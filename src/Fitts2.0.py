@@ -38,9 +38,15 @@ def main():
     #Get user's screen resolution
     infoObject = pygame.display.Info()
     
-    WIDTH = infoObject.current_w - 200
-    HEIGHT = infoObject.current_h - 200
+    WIDTH = infoObject.current_w 
+    HEIGHT = infoObject.current_h
+    fullscreen = True
     
+    if '--windowed' in sys.argv:    
+        WIDTH = WIDTH - 200
+        HEIGHT = HEIGHT - 200
+        fullscreen = False
+        
     model_filename = 'tools/models.pkl'
     experiments = None
     game = None
@@ -108,7 +114,7 @@ def main():
             if sys.argv[i] == '--file':
                 if i+1 >= len(sys.argv):
                     raise Exception("Error : no file name specified")
-                game = readFileExperiment('experiments/'+sys.argv[i+1], WIDTH, HEIGHT)
+                game = readFileExperiment('experiments/'+sys.argv[i+1], WIDTH, HEIGHT, fullscreen = fullscreen)
                 
     #Add experiments
             
@@ -123,7 +129,7 @@ def main():
     #Change the sensibility for the first experiment (TEST)
     #experiments[0].set_x_sensibility(-1)
     if game == None:
-        game = GameExperiment(WIDTH, HEIGHT, experiments, title='Fitts 2.O')
+        game = GameExperiment(WIDTH, HEIGHT, experiments, title='Fitts 2.O', fullscreen = fullscreen)
     
     
     running = True

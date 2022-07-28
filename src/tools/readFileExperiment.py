@@ -8,7 +8,7 @@ import random
 from gameExperiment import *
 from makeExperiments import *
 
-def readFileExperiment(filename, width, height, title = None):
+def readFileExperiment(filename, width, height, title = None, fullscreen = True):
     f = open(filename, "r")
     
     if title == None:
@@ -276,4 +276,4 @@ def readFileExperiment(filename, width, height, title = None):
     if len(list_random_experiences) != 0:
         random.shuffle(list_random_experiences)
         list_experiences += list_random_experiences
-    return GameExperiment(width, height, list_experiences, listTimePause, title = title)
+    return GameExperiment(width, height, list_experiences, listTimePause, title = title, fullscreen = fullscreen)
