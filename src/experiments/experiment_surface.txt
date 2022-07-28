@@ -1,0 +1,62 @@
+
+;Start of experiment
+
+cursor os
+noPause True
+random True
+
+ligne_horizontal_1 lineH 1000 10 15
+ligne_horizontal_2 lineH 1000 25 15
+ligne_horizontal_3 lineH 1000 40 15
+ligne_horizontal_4 lineH 800 10 15
+ligne_horizontal_5 lineH 800 25 15
+ligne_horizontal_6 lineH 800 40 15
+pause : 60
+ligne_horizontal_7 lineH 600 10 15
+ligne_horizontal_8 lineH 600 25 15
+ligne_horizontal_9 lineH 600 40 15
+ligne_horizontal_10 lineH 400 10 15
+ligne_horizontal_11 lineH 400 25 15
+ligne_horizontal_12 lineH 400 40 15
+pause : 60
+ligne_vertical_1 lineV 800 10 15
+ligne_vertical_2 lineV 800 25 15
+ligne_vertical_3 lineV 800 40 15
+ligne_vertical_4 lineV 600 10 15
+ligne_vertical_5 lineV 600 25 15
+ligne_vertical_6 lineV 600 40 15
+pause : 60
+ligne_vertical_7 lineV 400 10 15
+ligne_vertical_8 lineV 400 25 15
+ligne_vertical_9 lineV 400 40 15
+ligne_vertical_10 lineV 200 10 15
+ligne_vertical_11 lineV 200 25 15
+ligne_vertical_12 lineV 200 40 15
+pause : 60 
+exp_en_cercle_1 circle 300 10 25 AH
+exp_en_cercle_2 circle 300 25 25 AH
+exp_en_cercle_3 circle 600 10 25 AH
+exp_en_cercle_4 circle 600 25 25 AH
+exp_en_cercle_5 circle 1000 10 25 AH
+exp_en_cercle_6 circle 1000 25 25 AH
+pause : 60
+exp_en_cercle_7 circle 300 10 25 H
+exp_en_cercle_8 circle 300 25 25 H
+exp_en_cercle_9 circle 600 10 25 H
+exp_en_cercle_10 circle 600 25 25 H
+exp_en_cercle_11 circle 1000 10 25 H
+exp_en_cercle_12 circle 1000 25 25 H
+pause : 60
+exp_aleatoire_1 random 500 10 20
+exp_aleatoire_2 random 500 25 20
+exp_aleatoire_3 random 500 30 20
+exp_aleatoire_4 random 700 10 20
+exp_aleatoire_5 random 700 25 20
+exp_aleatoire_6 random 700 30 20
+pause : 60
+exp_aleatoire_7 random 900 10 20
+exp_aleatoire_8 random 900 25 20
+exp_aleatoire_9 random 900 30 20
+exp_aleatoire_10 random 1000 10 20
+exp_aleatoire_11 random 1000 25 20
+exp_aleatoire_12 random 1000 30 20
