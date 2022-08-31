@@ -17,8 +17,8 @@ class CircleRandomExp(Experiment):
     '''One target at a time on screen.
        When clicking on a target, a new one appear on a constant distance from the previous one.
     '''
-    def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = None, noPause = False):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause)
+    def __init__(self, width, height, exp_name, exp_id = 0, maxTrials = 20, target_radius = 20, distance = 300,dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = None, noPause = False, default_cursor = True):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause, default_cursor = default_cursor)
         
         #init target_info
         self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
@@ -130,8 +130,8 @@ class TwoTargetsExp(Experiment):
        Use a rad given in parameters to set the line where the two targets will be placed
        Use a distance in pixels to separate the two targets
     ''' 
-    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause)
+    def __init__(self, width, height, exp_name, rad, distance, exp_id = 0, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False, default_cursor = True):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause, default_cursor = default_cursor)
         
         #init target_info
         self.target_info = {"radius" : target_radius, "distance": distance, "isRadiusList" : False, "isDistanceList": False}
@@ -236,8 +236,9 @@ class TwoTargetsExp(Experiment):
         
         running = True
         
-        cursor_save = game.cursor
-        game.cursor = self.cursor
+        if not self.default_cursor: 
+            cursor_save = game.cursor
+            game.cursor = self.cursor
         if game.cursor != None:
             pygame.mouse.set_visible(False)
             pygame.event.set_grab(True)
@@ -255,10 +256,10 @@ class TwoTargetsExp(Experiment):
         while (running and self.trial_id < self.maxTrials):
             
             pygame.mouse.set_pos = (game.width/2, game.height/2)
-            
+            game.cursorMove()
             game.refreshScreen(True)
-            if self.cursor != None:
-                self.cursor.draw(game)
+            if game.cursor != None:
+                game.cursor.draw(game)
 
             ev = pygame.event.get()
             for event in ev:
@@ -283,8 +284,6 @@ class TwoTargetsExp(Experiment):
                             game.menu("quit", data = self.data)
                             return game.quitApp()
                         game.addListenerDrawable(targets)
-                if event.type == pygame.MOUSEMOTION:
-                    game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
                 
@@ -307,7 +306,8 @@ class TwoTargetsExp(Experiment):
                     
         #End of the experiment
         #Reset the cursor sensibility back to previous settings
-        game.cursor = cursor_save
+        if not self.default_cursor: 
+            game.cursor = cursor_save
         game.removeListenerDrawable(targets)
         
         game.menu("endExperiment", data = self.data, noPause = self.noPause)
@@ -318,8 +318,8 @@ class CircleExp(Experiment):
     The target's order is specified and not random.
     Every time a target is hit, the next one is at the most opposite of the circle.'''
     
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause)
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False, default_cursor = True):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause, default_cursor = default_cursor)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
         self.data["width"] = width
@@ -376,8 +376,9 @@ class CircleExp(Experiment):
         game.listTarget = targets = self.targets
         game.addListenerDrawable(self.targets)
         
-        cursor_save = game.cursor
-        game.cursor = self.cursor
+        if not self.default_cursor: 
+            cursor_save = game.cursor
+            game.cursor = self.cursor
         if game.cursor != None:
             pygame.mouse.set_visible(False)
             pygame.event.set_grab(True)
@@ -392,10 +393,10 @@ class CircleExp(Experiment):
         while (running and self.trial_id < self.maxTrials):
             
             pygame.mouse.set_pos = (game.width/2, game.height/2)
-            
+            game.cursorMove()
             game.refreshScreen(True)
-            if self.cursor != None:
-                self.cursor.draw(game)
+            if game.cursor != None:
+                game.cursor.draw(game)
 
             ev = pygame.event.get()
             for event in ev:
@@ -404,7 +405,8 @@ class CircleExp(Experiment):
                 
                 if event.type == pygame.QUIT:
                     game.menu("quit", data = self.data)
-                    game.cursor = cursor_save
+                    if not self.default_cursor: 
+                        game.cursor = cursor_save
                     return game.quitApp()
                     
                 #collect mouse position
@@ -421,8 +423,6 @@ class CircleExp(Experiment):
                             game.menu("quit", data = self.data)
                             return game.quitApp()
                         game.addListenerDrawable(self.targets)
-                if event.type == pygame.MOUSEMOTION:
-                    game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
                 
@@ -445,13 +445,14 @@ class CircleExp(Experiment):
                     
         #End of the experiment
         #Reset the cursor sensibility back to previous settings
-        game.cursor = cursor_save
+        if not self.default_cursor: 
+            game.cursor = cursor_save
         game.removeListenerDrawable(targets)
         game.menu("endExperiment", data = self.data, noPause = self.noPause)
         
 class DistractorExp(Experiment):
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False):
-        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor)
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False, default_cursor = True):
+        super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, default_cursor = default_cursor)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
         

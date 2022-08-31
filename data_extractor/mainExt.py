@@ -5,6 +5,7 @@ import math
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import pvplib_main as pvp
 
 from PyQt5.QtWidgets import (
                         QWidget,
@@ -149,19 +150,37 @@ def plotDistancesByName(data):
         if cpt == 0:
             plt.show()
     plt.show()
-        
 
 def main():
     data = readDirectory('../users_data/saved/')
-    for exp in data:
-        try:
-            resolution = exp["display_screen"]
-            xmax = resolution[0]
-            ymin = -resolution[1]
-            print(xmax, ymin)
-            plotData(exp, xmin = 0, ymin = ymin, xmax = xmax, ymax = 0)
-        except:
-            print("Could not find one experiment for user_id :",exp['user_id'])
+    for user_data in data:
+        for experiments in user_data['experiments'].values():
+            for trials in experiments['trials'].values():
+                t_x, t_y = trials['pos_target']
+                X = np.array(list(map(lambda x : math.sqrt(math.pow(t_x - x[0],2) + math.pow(t_y - x[1],2)), trials['mouse_tracks'])))
+                stop = round(len(X)*0.01,2)
+                time = np.arange(0, round(stop,2), 0.01, dtype = float)
+                if time[-1] == stop:
+                    time = time[:-1]
+                container, TS = pvp.interp_filt(time, X)
+                for c in container:
+                    print(c)
+                    if len(time)>len(c):
+                        time = time[1:]
+                    print("LEN(C):", len(c))
+                    plt.plot(time[1:],c[1:])
+                    plt.show()
+                #movs = pvp.find_movs(None, X, X[int(len(X)/2)])
+                #print("movs : ",movs)
+    # for exp in data:
+        # try:
+            # resolution = exp["display_screen"]
+            # xmax = resolution[0]
+            # ymin = -resolution[1]
+            # print(xmax, ymin)
+            # plotData(exp, xmin = 0, ymin = ymin, xmax = xmax, ymax = 0)
+        # except:
+            # print("Could not find one experiment for user_id :",exp['user_id'])
     #print("Trajectories for user_id :",data[0]["user_id"]," are :",getTrajectories(data[0]))
 if __name__ =='__main__':
     main()

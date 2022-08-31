@@ -23,6 +23,9 @@ class GameExperiment(Game):
         
         self.language = 'en' #default = en, can be changed with chooseLanguage() screen
         self.cursor = cursor
+        self.joystick = None
+        self.x_dead_zone = 0.1 #10% of deadzone on X axis
+        self.y_dead_zone = 0.1 #10% of deadzone on Y axis
         #if cursor == None:
         #    self.cursor = SensitiveCursor(width, height, cursorImage = cursorImage) 
         #else:
@@ -150,6 +153,7 @@ class GameExperiment(Game):
         
         
         while(choosingLanguage):
+            self.cursorMove()
             self.refreshScreen(False)
             pygame.display.update()
             ev = pygame.event.get()
@@ -158,8 +162,6 @@ class GameExperiment(Game):
                 #self.listenMode(event)
                 if event.type == pygame.QUIT:
                     return self.quitApp()
-                if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
@@ -191,8 +193,10 @@ class GameExperiment(Game):
         devices.append(('touchpad', 'images/device_touchpad.png'))
         #STYLUS
         devices.append(('stylus', 'images/device_stylus.png'))
+        #CONTROLLER
+        devices.append(('controller', 'images/device_controller.png'))
         
-        device_y = int(self.height/2 - (self.height/(len(devices)+1)))
+        device_y = int(self.height/2 - (self.height/(len(devices)+2)))
         height_device = int(self.height - 2*device_y)
         width_device = int( (self.width / len(devices)) - (space_between_images*2)) 
         
@@ -215,6 +219,7 @@ class GameExperiment(Game):
         
         
         while(choosingDevice):
+            self.cursorMove()
             self.refreshScreen(False)
             pygame.display.update()
             ev = pygame.event.get()
@@ -223,8 +228,6 @@ class GameExperiment(Game):
                 #self.listenMode(event)
                 if event.type == pygame.QUIT:
                     return self.quitApp()
-                if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
@@ -278,6 +281,7 @@ class GameExperiment(Game):
             pygame.event.set_grab(False)
         
         while(running):
+            self.cursorMove()
             self.refreshScreen(False)
             self.write_screen(text, Colors.BLACK, (self.width/8, self.height/2 - self.height/4), maxSize=(720, 300))
             pygame.display.update()
@@ -287,8 +291,6 @@ class GameExperiment(Game):
                 #self.listenMode(event)
                 if event.type == pygame.QUIT:
                     return self.quitApp()
-                if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
@@ -312,6 +314,7 @@ class GameExperiment(Game):
             timer = self.listTimerPause[self.activeExperiment]
             pygame.time.set_timer(pygame.USEREVENT, 10) #Active pygame.USEREVENT toute les 10ms 
             while (running and timer >= 0):
+                self.cursorMove()
                 self.refreshScreen(False)
                 if self.language == 'en':
                     self.write_box(" Pause time ! ", Colors.BLACK, (self.width / 2, self.height / 2 - 30))
@@ -324,8 +327,6 @@ class GameExperiment(Game):
                 for event in ev:
                     if event.type == pygame.QUIT:
                         return self.quitApp()
-                    if event.type == pygame.MOUSEMOTION:
-                        self.cursorMove()
                     if event.type == pygame.USEREVENT: 
                         timer -= 0.01
                     if event.type == pygame.KEYDOWN:
@@ -336,6 +337,7 @@ class GameExperiment(Game):
     def endExperimentScreen(self, noPause = False):
         '''This screen is shown between 2 experiments
         It makes a pause for the user'''
+        self.cursorMove()
         self.refreshScreen()
         
         if self.cursor != None:
@@ -365,11 +367,10 @@ class GameExperiment(Game):
                     if event.key == pygame.K_SPACE:
                         running = False
                         return
-                if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove()
                         
     def endOfExperiment(self):
         '''This screen is shown at the final end'''
+        self.cursorMove()
         self.refreshScreen()
         
         if self.cursor != None:
@@ -408,15 +409,13 @@ class GameExperiment(Game):
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         return self.quitApp()
-                if event.type == pygame.MOUSEBUTTONDOWN:    
+                if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN:    
                     if (self.inputBoxAvis.button_ok.isInside(self.getCursorPos())):
                         self.avis = self.inputBoxAvis.text #recupere avis
                         print("AVIS :", self.avis)
                         self.experiments_data['user_review'] = self.avis
                         self.running = False
                         return self.quitApp()
-                if event.type == pygame.MOUSEMOTION:
-                    self.cursorMove()
             pygame.display.flip()
 
         return self.quitApp()
@@ -458,7 +457,7 @@ class GameExperiment(Game):
                 if event.type == pygame.QUIT:
                         self.running = False
                         return self.quitApp()
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN or event.type == pygame.JOYBUTTONDOWN:
                     if event.key == pygame.K_ESCAPE or event.key == pygame.K_SPACE:
                         if self.cursor != None:
                             pygame.mouse.set_visible(False)
@@ -472,8 +471,20 @@ class GameExperiment(Game):
             
     def cursorMove(self):
         if self.cursor != None:
-            pos = pygame.mouse.get_rel()
-            self.cursor.move(pos[0], pos[1])
+            if self.experiments_data['input_device'] == 'controller':
+                axis_X = self.joystick.get_axis(0)
+                axis_Y = self.joystick.get_axis(1)
+                if abs(axis_X) > self.x_dead_zone and abs(axis_Y) > self.y_dead_zone:
+                    self.cursor.move(axis_X, axis_Y)
+                elif abs(axis_X) > self.x_dead_zone:
+                    self.cursor.move(axis_X, 0)
+                elif abs(axis_Y) > self.x_dead_zone:
+                    self.cursor.move(0, axis_Y)
+                    
+                print("AXIS : ",axis_X,axis_Y)
+            else:
+                pos = pygame.mouse.get_rel()
+                self.cursor.move(pos[0], pos[1])
         
     def draw(self):
         '''always draw the cursor at the end'''
@@ -494,6 +505,16 @@ class GameExperiment(Game):
         self.menu("chooseLanguage")
         if self.running:
             self.menu("chooseDevice")
+        if self.experiments_data['input_device'] == 'controller':
+            width, height = self.experiments_data['display_screen']
+            self.cursor = SensitiveCursor(width, height, cursorImage = 'class/cursor/cursor1.png', dx_sens = 3, dy_sens = 3, sens_type = 'adaptive')
+            pygame.joystick.init()
+            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            if len(joysticks) == 0:
+                raise Exception("ERROR : NO JOYSTICK FOUND")
+            else:
+                self.joystick = joysticks[0]
+            print(joysticks)
         if self.running:
             self.menu("chooseMode")
         while(self.running):

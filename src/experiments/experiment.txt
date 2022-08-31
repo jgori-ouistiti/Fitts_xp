@@ -1,9 +1,9 @@
-
 ;Start of experiment
 
-cursor os
 noPause True
 random True
+
+cursor virtual
 
 ligne_horizontal_1 lineH 800 10 15
 ligne_horizontal_2 lineH 800 25 15

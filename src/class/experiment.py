@@ -8,7 +8,7 @@ import random
 import time
 
 class Experiment :
-    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1, cursor = None, noPause = False):
+    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1, cursor = None, noPause = False, default_cursor = True):
         print("Creating experiment \""+ exp_name+ "\" with cursor =",cursor)
         self.targets  = targets
         
@@ -36,6 +36,8 @@ class Experiment :
         
         #Cursor sensitibility for the experiment
         self.cursor = cursor
+        
+        self.default_cursor = default_cursor
         
         self.dx_sens = dx_sens
         self.dy_sens = dy_sens
@@ -95,8 +97,9 @@ class Experiment :
         
         self.init_begin(game)
         
-        cursor_save = game.cursor
-        game.cursor = self.cursor
+        if not self.default_cursor :
+            cursor_save = game.cursor
+            game.cursor = self.cursor
         
         if game.cursor != None:
             pygame.mouse.set_visible(False)
@@ -124,9 +127,10 @@ class Experiment :
             
             pygame.mouse.set_pos = (game.width/2, game.height/2)
             
+            game.cursorMove()
             game.refreshScreen(True)
-            if self.cursor != None:
-                self.cursor.draw(game)
+            if game.cursor != None:
+                game.cursor.draw(game)
 
             ev = pygame.event.get()
             for event in ev:
@@ -135,7 +139,8 @@ class Experiment :
                 
                 if event.type == pygame.QUIT:
                     self.last_call(game)
-                    game.cursor = cursor_save
+                    if not self.default_cursor :
+                        game.cursor = cursor_save
                     game.menu("quit", data = self.data)
                     return game.quitApp()
                     
@@ -154,8 +159,6 @@ class Experiment :
                             game.menu("quit", data = self.data)
                             return game.quitApp()
                         game.addListenerDrawable(self.targets)
-                if event.type == pygame.MOUSEMOTION:
-                    game.cursorMove()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
                 
@@ -180,7 +183,8 @@ class Experiment :
         #Reset the cursor sensibility back to previous settings
         game.removeListenerDrawable(targets)
         self.last_call(game)
-        game.cursor = cursor_save
+        if not self.default_cursor :
+            game.cursor = cursor_save
         game.menu("endExperiment", data = self.data, noPause = self.noPause)
         
 

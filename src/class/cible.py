@@ -59,7 +59,7 @@ class Cible(Drawable, Listener):
         
     def action(self, game, event):
          
-        if event.type == pygame.MOUSEBUTTONDOWN and not isinstance(game, gE.GameExperiment):
+        if (event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN) and not isinstance(game, gE.GameExperiment):
             if self.isInside(pygame.mouse.get_pos()):
                 tmp = self.isTarget
                 if (self.isTarget) :
@@ -69,7 +69,7 @@ class Cible(Drawable, Listener):
                 else:
                     return("not cible", tmp)
         else:
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN:
                 if self.isInside((game.getCursorPos())):
                     tmp = self.isTarget
                     if (self.isTarget) :
