@@ -251,11 +251,29 @@ class GameExperiment(Game):
         This menu is the third menu that the user sees
         In GameExperience, we use only one button to start the experiment'''
         
-        print("CHOOSE MODE")
-        
-        print("Device of experiment :",self.experiments[self.activeExperiment].input_device)
+        #Adding picture of next device used
+        buttons = None
         if self.experiments[self.activeExperiment].input_device != None:
+            buttons = []
             self.experiments_data['input_device'] = self.experiments[self.activeExperiment].input_device
+            device_name = self.experiments[self.activeExperiment].input_device
+            device = None
+            if device_name == 'mouse':
+                device = ('mouse', 'images/device_mouse.png')
+            if device_name == 'touchpad':
+                device = ('touchpad', 'images/device_touchpad.png')
+            if device_name == 'stylus':
+                device = ('stylus', 'images/device_stylus.png')
+            if device_name == 'controller':
+                device = ('controller', 'images/device_controller.png')
+            if device == None:
+                raise Exception("Device \""+device_name+"\"not recognized")
+            device_y = int(self.height/1.5)
+            height_device = int(self.height/10)
+            width_device = int(self.width/15)
+            buttons.append(Button((int(self.width/2), device_y), 0, width_device, height_device, (0,0,0), (0,0,0), image=device[1]))
+            self.addListenerDrawable(buttons)
+            
         if self.experiments[self.activeExperiment].input_device == 'controller':
             self.cursor = self.experiments[self.activeExperiment].cursor
             pygame.joystick.init()
@@ -265,6 +283,8 @@ class GameExperiment(Game):
                 raise Exception("ERROR : NO JOYSTICK FOUND")
             else:
                 self.joystick = joysticks[0]
+                
+        
         
         button1 = None
         if self.language == 'en':
@@ -321,9 +341,13 @@ class GameExperiment(Game):
                     return self.quitApp()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
+                        if buttons != None:
+                            self.removeListenerDrawable(buttons)
                         self.running = False
                         return
                 if ("button",1) in L:
+                    if buttons != None:
+                            self.removeListenerDrawable(buttons)
                     self.removeListenerDrawable([button1])
                     self.score = 0
                     running = False
@@ -366,8 +390,30 @@ class GameExperiment(Game):
         '''This screen is shown between 2 experiments
         It makes a pause for the user'''
         
+        #Adding picture of next device used
+        buttons = None
         if self.experiments[self.activeExperiment].input_device != None:
+            buttons = []
             self.experiments_data['input_device'] = self.experiments[self.activeExperiment].input_device
+            device_name = self.experiments[self.activeExperiment].input_device
+            device = None
+            if device_name == 'mouse':
+                device = ('mouse', 'images/device_mouse.png')
+            if device_name == 'touchpad':
+                device = ('touchpad', 'images/device_touchpad.png')
+            if device_name == 'stylus':
+                device = ('stylus', 'images/device_stylus.png')
+            if device_name == 'controller':
+                device = ('controller', 'images/device_controller.png')
+            if device == None:
+                raise Exception("Device \""+device_name+"\"not recognized")
+            #Setting coords for the image of the device
+            #It uses a button to display the image 
+            device_y = int(self.height/1.5)
+            height_device = int(self.height/10)
+            width_device = int(self.width/15)
+            buttons.append(Button((int(self.width/2), device_y), 0, width_device, height_device, (0,0,0), (0,0,0), image=device[1]))
+            self.addListenerDrawable(buttons)
             
         if self.experiments[self.activeExperiment].input_device == 'controller':
             self.cursor = self.experiments[self.activeExperiment].cursor
@@ -384,7 +430,7 @@ class GameExperiment(Game):
             self.cursor = None
             self.joy_is_init = False
         
-        self.cursorMove()
+        
         self.refreshScreen()
         
         if self.cursor != None:
@@ -397,6 +443,7 @@ class GameExperiment(Game):
         running = True
         
         while(running and not noPause):
+            self.cursorMove()
             self.refreshScreen(False)
             #self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
             if self.language == 'en':
@@ -418,9 +465,13 @@ class GameExperiment(Game):
                     return self.quitApp()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        if buttons != None:
+                            self.removeListenerDrawable(buttons)
                         running = False
                         return
                 if event.type == pygame.JOYBUTTONDOWN:
+                    if buttons != None:
+                        self.removeListenerDrawable(buttons)
                     running = False
                     return
                         
@@ -537,8 +588,6 @@ class GameExperiment(Game):
                     self.cursor.move(axis_X, 0)
                 elif abs(axis_Y) > self.x_dead_zone:
                     self.cursor.move(0, axis_Y)
-                    
-                print("AXIS : ",axis_X,axis_Y)
             else:
                 pos = pygame.mouse.get_rel()
                 self.cursor.move(pos[0], pos[1])

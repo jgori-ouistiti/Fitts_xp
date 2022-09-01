@@ -1,6 +1,6 @@
 device mouse
 pvp_exp0 random 800 3 20
-device controller
+device mouse
 pvp_exp1 random 1000 3 20
 device mouse
 pvp_exp2 random 200 3 20
