@@ -21,6 +21,7 @@ class GameExperiment(Game):
         self.experiments_data['input_device'] = 'mouse'
         self.experiments_data['experiments'] = dict()
         
+        self.joy_is_init = False #boolean used to know if pygame.joystick has been initiated or not
         self.language = 'en' #default = en, can be changed with chooseLanguage() screen
         self.cursor = cursor
         self.joystick = None
@@ -252,6 +253,19 @@ class GameExperiment(Game):
         
         print("CHOOSE MODE")
         
+        print("Device of experiment :",self.experiments[self.activeExperiment].input_device)
+        if self.experiments[self.activeExperiment].input_device != None:
+            self.experiments_data['input_device'] = self.experiments[self.activeExperiment].input_device
+        if self.experiments[self.activeExperiment].input_device == 'controller':
+            self.cursor = self.experiments[self.activeExperiment].cursor
+            pygame.joystick.init()
+            self.joy_is_init = True
+            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            if len(joysticks) == 0:
+                raise Exception("ERROR : NO JOYSTICK FOUND")
+            else:
+                self.joystick = joysticks[0]
+        
         button1 = None
         if self.language == 'en':
             button1 = Button((int(self.width/2 + 160),int(self.height/2 - 30)), 1, 300, 60 , (200, 50, 50), RED, "BEGIN")
@@ -261,12 +275,26 @@ class GameExperiment(Game):
         self.refreshScreen()
         text = ''
         if self.language == 'en':
-            text =  "Welcome to our experiment.\n\n"+\
+            if self.experiments[self.activeExperiment].input_device != None:
+                text =  "Welcome to our experiment.\n\n"+\
+                    "You will encounter multiple experiments. You will have to click as fast as possible "+\
+                    "on the red targets.\n\n"+\
+                    "WARNING : The first experiment require a "+self.experiments[self.activeExperiment].input_device+'\n\n'+\
+                    "Thank you for your participation, click on BEGIN to start."
+            else:
+                text =  "Welcome to our experiment.\n\n"+\
                     "You will encounter multiple experiments. You will have to click as fast as possible "+\
                     "on the red targets.\n\n"+\
                     "Thank you for your participation, click on BEGIN to start."
         elif self.language =='fr':
-            text =  "Bienvenue dans cette expérience.\n\n"+\
+            if self.experiments[self.activeExperiment].input_device != None:
+                text =  "Bienvenue dans cette expérience.\n\n"+\
+                    "Vous allez avoir plusieurs petites expériences. Il vous faudra cliquer le plus vite possible "+\
+                    "sur les cibles rouges.\n\n"+\
+                    "ATTENTION : La première expérience utilisera un(e) "+self.experiments[self.activeExperiment].input_device+'\n\n'\
+                    "Merci de votre participation, appuyez sur COMMENCER pour démarrer."
+            else:
+                text =  "Bienvenue dans cette expérience.\n\n"+\
                     "Vous allez avoir plusieurs petites expériences. Il vous faudra cliquer le plus vite possible "+\
                     "sur les cibles rouges.\n\n"+\
                     "Merci de votre participation, appuyez sur COMMENCER pour démarrer."
@@ -337,6 +365,25 @@ class GameExperiment(Game):
     def endExperimentScreen(self, noPause = False):
         '''This screen is shown between 2 experiments
         It makes a pause for the user'''
+        
+        if self.experiments[self.activeExperiment].input_device != None:
+            self.experiments_data['input_device'] = self.experiments[self.activeExperiment].input_device
+            
+        if self.experiments[self.activeExperiment].input_device == 'controller':
+            self.cursor = self.experiments[self.activeExperiment].cursor
+            pygame.joystick.init()
+            self.joy_is_init = True
+            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            if len(joysticks) == 0:
+                raise Exception("ERROR : NO JOYSTICK FOUND")
+            else:
+                self.joystick = joysticks[0]
+                
+        elif self.experiments_data['input_device'] != 'controller' and self.joy_is_init:
+            pygame.joystick.quit()
+            self.cursor = None
+            self.joy_is_init = False
+        
         self.cursorMove()
         self.refreshScreen()
         
@@ -353,11 +400,17 @@ class GameExperiment(Game):
             self.refreshScreen(False)
             #self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
             if self.language == 'en':
-                self.write_box(" Ready ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
-                self.write_box("Press SPACE to continue.", Colors.BLACK, (self.width/2, self.height/2 + 30))
+                if self.experiments[self.activeExperiment].input_device != None:
+                    self.write_box(" WARNING : Next experiment uses a"+self.experiments[self.activeExperiment].input_device, Colors.BLACK, (self.width/2, self.height/2 - 30))
+                else:
+                    self.write_box(" Ready ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
+                self.write_box("Press SPACE (or a key of the controller) to continue.", Colors.BLACK, (self.width/2, self.height/2 + 30))
             elif self.language == 'fr':
-                self.write_box(" Prêt ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
-                self.write_box("Appuyez sur ESPACE pour continuer.", Colors.BLACK, (self.width/2, self.height/2 + 30))
+                if self.experiments[self.activeExperiment].input_device != None:
+                    self.write_box(" ATTENTION : La prochaine expérience utilise un(e)"+self.experiments[self.activeExperiment].input_device, Colors.BLACK, (self.width/2, self.height/2 - 30))
+                else:
+                    self.write_box(" Prêt ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
+                self.write_box("Appuyez sur ESPACE (ou une touche de la manette) pour continuer.", Colors.BLACK, (self.width/2, self.height/2 + 30))
             pygame.display.update()
             ev = pygame.event.get()
             for event in ev:
@@ -367,6 +420,9 @@ class GameExperiment(Game):
                     if event.key == pygame.K_SPACE:
                         running = False
                         return
+                if event.type == pygame.JOYBUTTONDOWN:
+                    running = False
+                    return
                         
     def endOfExperiment(self):
         '''This screen is shown at the final end'''
@@ -471,6 +527,7 @@ class GameExperiment(Game):
             
     def cursorMove(self):
         if self.cursor != None:
+            # print("device :",self.experiments_data['input_device'])
             if self.experiments_data['input_device'] == 'controller':
                 axis_X = self.joystick.get_axis(0)
                 axis_Y = self.joystick.get_axis(1)
@@ -505,16 +562,16 @@ class GameExperiment(Game):
         self.menu("chooseLanguage")
         if self.running:
             self.menu("chooseDevice")
-        if self.experiments_data['input_device'] == 'controller':
-            width, height = self.experiments_data['display_screen']
-            self.cursor = SensitiveCursor(width, height, cursorImage = 'class/cursor/cursor1.png', dx_sens = 3, dy_sens = 3, sens_type = 'adaptive')
-            pygame.joystick.init()
-            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
-            if len(joysticks) == 0:
-                raise Exception("ERROR : NO JOYSTICK FOUND")
-            else:
-                self.joystick = joysticks[0]
-            print(joysticks)
+        # if self.experiments_data['input_device'] == 'controller':
+            # width, height = self.experiments_data['display_screen']
+            # self.cursor = SensitiveCursor(width, height, cursorImage = 'class/cursor/cursor1.png', dx_sens = 3, dy_sens = 3, sens_type = 'adaptive')
+            # pygame.joystick.init()
+            # joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            # if len(joysticks) == 0:
+                # raise Exception("ERROR : NO JOYSTICK FOUND")
+            # else:
+                # self.joystick = joysticks[0]
+            # print(joysticks)
         if self.running:
             self.menu("chooseMode")
         while(self.running):

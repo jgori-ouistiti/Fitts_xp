@@ -19,6 +19,9 @@ class SensitiveCursor(Cursor):
         # print('dx :',dx)
         # print('self.dx_sens :',self.dx_sens)
         # print('self.WIDTH :',self.WIDTH)
+        if self.sens_type == 'adaptive':
+            if abs(dx) > 1 or abs(dy) > 1:
+                return
         
         if dx > 0 :
             dx = self.adapt_function(dx) - self.dx0

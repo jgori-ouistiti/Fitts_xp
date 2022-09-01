@@ -8,13 +8,17 @@ import random
 import time
 
 class Experiment :
-    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1, cursor = None, noPause = False, default_cursor = True):
+    def __init__(self, targets, exp_name, exp_id, maxTrials = 20, dx_sens = 1, dy_sens = 1, cursor = None, noPause = False, default_cursor = True, input_device = None):
         print("Creating experiment \""+ exp_name+ "\" with cursor =",cursor)
         self.targets  = targets
         
         self.data = dict() #contains all user's data ,for this one experiment, about mouse tracking, time, etc...
         self.data['exp_name'] = exp_name
         self.data['exp_id']   = exp_id
+        self.input_device = input_device
+        
+        if input_device != None:
+            self.data['input_device'] = input_device
         if targets == None:
             self.data['number_of_targets'] = 0
         else:

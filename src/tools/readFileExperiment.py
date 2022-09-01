@@ -25,8 +25,10 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
     lines = lines[0:]
     
     default_cursor = True
-    cursor = SensitiveCursor(width, height, cursorImage = 'class/cursor/cursor1.png') 
+    cursor = SensitiveCursor(width, height, cursorImage = 'class/cursor/cursor1.png', dx_sens = 3, dy_sens = 3, sens_type = 'adaptive') 
     cursor_used = cursor
+    
+    device_used = None
     
     isRandom = False #If set to True, all next experiments will appear in a random order until set to False or end of file
 
@@ -49,6 +51,26 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
             elif 'default' in elements[1].lower():
                 default_cursor = True
                 cursor_used = None
+                
+        elif line.startswith("device"):
+            elements = line.split(" ")
+            if 'mouse' in elements[1].lower():
+                device_used = 'mouse'
+                default_cursor = True
+            elif 'controller' in elements[1].lower():
+                device_used = 'controller'
+                default_cursor = False
+                cursor_used = cursor
+                
+            elif 'touchpad' in elements[1].lower():
+                device_used = 'touchpad'
+                default_cursor = True
+            elif 'stylus' in elements[1].lower():
+                device_used = 'stylus'
+                default_cursor = True
+            elif 'default' in elements[1].lower():
+                device_used = None
+                default_cursor = True
         
         elif line.startswith("noPause"):
             elements = line.split(" ")
@@ -85,7 +107,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
-                    list_experiences.append(Experiment(targets, exp_name, exp_id, nbMouv, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor))
+                    list_experiences.append(Experiment(targets, exp_name, exp_id, nbMouv, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used))
 
             elif type_experience == 'cible':
                 disposition = parameters[2]  # diposition c'est soit "cercle" soit "densite"
@@ -133,7 +155,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                     if isRandom:
                         list_random_experiences.append(experiment)
                     else:
-                        list_experiences.append(Experiment(targets, disposition, exp_id, nbMouv, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor))
+                        list_experiences.append(Experiment(targets, disposition, exp_id, nbMouv, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used))
                     
             elif type_experience == 'random':
                 #Distance
@@ -153,7 +175,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                 nb_mouvement = int(parameters[4])
                 experiment = CircleRandomExp(width, height, 
                         'Random with r = '+str(radius)+', distance = '+str(distance), 
-                        exp_id = exp_id, maxTrials = nb_mouvement, target_radius = radius, distance = distance, dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor)
+                        exp_id = exp_id, maxTrials = nb_mouvement, target_radius = radius, distance = distance, dx_sens = 1, dy_sens = 1, target_color = Colors.RED, buffer = 30, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
@@ -177,7 +199,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                 nb_mouvement = int(parameters[4])
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', rad = PI/2',
-                        math.pi/2,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor)
+                        math.pi/2,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
@@ -201,7 +223,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                 nb_mouvement = int(parameters[4])
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', rad = 0',
-                        0,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor)
+                        0,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
@@ -226,7 +248,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                 angle = int(parameters[5])
                 experiment = TwoTargetsExp(width, height,
                         'Two Targets with r = '+str(radius)+', distance = '+str(distance)+', rad = '+str(angle),
-                        angle,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor)
+                        angle,distance, target_radius = radius, maxTrials = nb_mouvement, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
@@ -240,7 +262,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                     nbCible += 1
                 experiment = CircleExp(width, height,
                         'Circle experiment with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
-                        nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = True, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor)
+                        nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = True, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
@@ -254,7 +276,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                     nbCible += 1
                 experiment = CircleExp(width, height,
                         'Circle experiment with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
-                        nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = False, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor)
+                        nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = False, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
@@ -272,7 +294,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                     is_H = False
                 experiment = CircleExp(width, height,
                         'Circle experiment with r = '+str(radius)+', distance = '+str(distance)+', nb_of_target = '+str(nbCible),
-                        nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = is_H, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor)
+                        nbCible,distance, target_radius = radius, maxTrials = nbCible, way_H = is_H, exp_id = exp_id, cursor = cursor_used, noPause = noPause, default_cursor = default_cursor, input_device = device_used)
                 if isRandom:
                     list_random_experiences.append(experiment)
                 else:
