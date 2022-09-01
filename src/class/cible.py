@@ -4,6 +4,8 @@ from colors import *
 import gameExperiment as gE
 import pygame
 
+GREEN_CIRCLE_RADIUS = 30
+
 class Cible(Drawable, Listener):
     def __init__(self, pos , r, color, isTarget = False):
         if not isinstance(pos[0], int):
@@ -50,6 +52,7 @@ class Cible(Drawable, Listener):
         
     def draw(self, game):
         if self.isTarget :
+            pygame.draw.circle(game.screen, GREEN , (self.x,self.y), self.r + GREEN_CIRCLE_RADIUS)
             pygame.draw.circle(game.screen, RED , (self.x,self.y), self.r)
         else:
             pygame.draw.circle(game.screen, self.color, (self.x,self.y), self.r)

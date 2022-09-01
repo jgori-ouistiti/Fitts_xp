@@ -1,7 +1,7 @@
 import pickle as pkl
 
 FILE = 'complete_experiment_design.pickle'
-nb_of_movements = 20
+nb_of_movements = 21
 
 def makeExperiments(data):
     for P, exps in data.items():

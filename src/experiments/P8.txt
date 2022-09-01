@@ -1,72 +1,72 @@
 device controller
-fitts_exp0 circle 600 5 20 AH
+fitts_exp0 circle 600 5 21 AH
 device controller
-fitts_exp1 circle 1200 45 20 H
+fitts_exp1 circle 1200 45 21 H
 device controller
-fitts_exp2 circle 200 18 20 AH
+fitts_exp2 circle 200 18 21 AH
 device controller
-fitts_exp3 circle 1000 33 20 H
+fitts_exp3 circle 1000 33 21 H
 device controller
-fitts_exp4 circle 800 3 20 AH
+fitts_exp4 circle 800 3 21 AH
 device controller
-fitts_exp5 circle 400 9 20 H
+fitts_exp5 circle 400 9 21 H
 device mouse
-pvp_exp0 random 400 3 20
+pvp_exp0 random 400 3 21
 device mouse
-pvp_exp1 random 800 3 20
+pvp_exp1 random 800 3 21
 device mouse
-pvp_exp2 random 1000 3 20
+pvp_exp2 random 1000 3 21
 device mouse
-pvp_exp3 random 1200 3 20
+pvp_exp3 random 1200 3 21
 device mouse
-pvp_exp4 random 600 3 20
+pvp_exp4 random 600 3 21
 device mouse
-pvp_exp5 random 200 3 20
+pvp_exp5 random 200 3 21
 device touchpad
-fitts_exp6 circle 1200 45 20 AH
+fitts_exp6 circle 1200 45 21 AH
 device touchpad
-fitts_exp7 circle 400 9 20 H
+fitts_exp7 circle 400 9 21 H
 device touchpad
-fitts_exp8 circle 1000 33 20 AH
+fitts_exp8 circle 1000 33 21 AH
 device touchpad
-fitts_exp9 circle 600 5 20 H
+fitts_exp9 circle 600 5 21 H
 device touchpad
-fitts_exp10 circle 200 18 20 AH
+fitts_exp10 circle 200 18 21 AH
 device touchpad
-fitts_exp11 circle 800 3 20 H
+fitts_exp11 circle 800 3 21 H
 device touchpad
-pvp_exp6 random 600 3 20
+pvp_exp6 random 600 3 21
 device touchpad
-pvp_exp7 random 1000 3 20
+pvp_exp7 random 1000 3 21
 device touchpad
-pvp_exp8 random 800 3 20
+pvp_exp8 random 800 3 21
 device touchpad
-pvp_exp9 random 1200 3 20
+pvp_exp9 random 1200 3 21
 device touchpad
-pvp_exp10 random 400 3 20
+pvp_exp10 random 400 3 21
 device touchpad
-pvp_exp11 random 200 3 20
+pvp_exp11 random 200 3 21
 device mouse
-fitts_exp12 circle 200 18 20 AH
+fitts_exp12 circle 200 18 21 AH
 device mouse
-fitts_exp13 circle 800 3 20 H
+fitts_exp13 circle 800 3 21 H
 device mouse
-fitts_exp14 circle 1200 45 20 AH
+fitts_exp14 circle 1200 45 21 AH
 device mouse
-fitts_exp15 circle 600 5 20 H
+fitts_exp15 circle 600 5 21 H
 device mouse
-fitts_exp16 circle 1000 33 20 AH
+fitts_exp16 circle 1000 33 21 AH
 device mouse
-fitts_exp17 circle 400 9 20 H
+fitts_exp17 circle 400 9 21 H
 device controller
-pvp_exp12 random 600 3 20
+pvp_exp12 random 600 3 21
 device controller
-pvp_exp13 random 800 3 20
+pvp_exp13 random 800 3 21
 device controller
-pvp_exp14 random 400 3 20
+pvp_exp14 random 400 3 21
 device controller
-pvp_exp15 random 200 3 20
+pvp_exp15 random 200 3 21
 device controller
-pvp_exp16 random 1200 3 20
+pvp_exp16 random 1200 3 21
 device controller
-pvp_exp17 random 1000 3 20
+pvp_exp17 random 1000 3 21
