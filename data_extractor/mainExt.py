@@ -1,11 +1,15 @@
-from os import walk
 import sys
 import json
 import math
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import pvplib_main as pvp
+import os
+import re
+from pvplib.chi20_lib import *
+from pvplib.data_parser import *
+
+import argparse
 
 from PyQt5.QtWidgets import (
                         QWidget,
@@ -22,165 +26,161 @@ from matplotlib.backends.backend_qt5agg import (
 
 matplotlib.use('Qt5Agg')
 
-def readJsonData(filename):
-    f = open(filename,'r')
-    res = json.load(f)
-    f.close()
-    return res
-    
-def readDirectory(directory):
-    res = []
-    filenames = next(walk(directory), (None, None, []))[2]  # [] if no file
-    for file in filenames:
-        file = directory+file
-        if file[-5:] == '.json':
-            try:
-                res.append(readJsonData(file))
-            except Exception:
-                print('Could not read file \"'+file+'\"')
-    return res
-    
-def getTrajectories(data):
-    trajectories = []
-    clicks = []
-    if 'experiments' in data:
-        for exp_id in data['experiments']:
-            trajectory = []
-            click = []
-            trials = data['experiments'][exp_id]['trials']
-            for trial_id in trials.keys():
-                try:
-                    trajectory += trials[trial_id]['mouse_tracks']
-                    click.append(trials[trial_id]['mouse_tracks'][-1])
-                except KeyError:
-                    print("No mouse tracks for trial ID : "+trial_id)
-                    continue
-            clicks.append(click)
-            trajectories.append(trajectory)
-    elif 'trials' in data:
-        trials = data['trials']
-        for trial_id in trials.keys():
-            try:
-                trajectory = trials[trial_id]['mouse_tracks']
-                trajectories += trajectory
-                clicks.append(trials[trial_id]['mouse_tracks'][-1])
-            except KeyError:
-                print("No mouse tracks for trial ID : "+trial_id)
-                continue
-    return trajectories, clicks
-    
-def plotTrajectory(trajectories,click = None, labels = [], xmin = 0, ymin = -1080, xmax = 1920, ymax = 0):
-    isOneTrajectory = False
-    try :
-        tmp = len(trajectories[0][0])
-    except TypeError:
-        isOneTrajectory = True
-    except IndexError:
-        return
-    tmp = trajectories
-    if isOneTrajectory:
-        tmp = [tmp]
-    for i in range(len(tmp)):
-        X = list(map(lambda x: x[0], tmp[i]))
-        Y = list(map(lambda x: -x[1], tmp[i]))
-        plt.plot(X,Y)
-        if click != None and click[i] != None:
-            X_click = list(map(lambda x: x[0], click[i]))
-            Y_click = list(map(lambda x: -x[1], click[i]))
-            plt.scatter(X_click, Y_click)
-        
-    plt.title("Trajectory for experiment")
-    print("LEGENDS : ",labels)
-    plt.legend(labels)
-    plt.xlim(xmin, xmax)
-    plt.ylim(ymin,ymax)
-    plt.show()
-    
-def plotData(data,xmin = 0, ymin = -1080, xmax = 1920, ymax = 0):
-    trajectories, clicks = getTrajectories(data)
-    labels = []
-    for id_ in data['experiments'].keys():
-        labels.append("Trajectory for "+data['experiments'][id_]['exp_name'])
-        labels.append("  Clicks   for   "+data['experiments'][id_]['exp_name'])
-    plotTrajectory(trajectories, click = clicks, labels = labels, xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)
-
-def getDistancesByName(data):
-    RES = dict()
-    for exp in data:
-        for id_ in exp['experiments'].keys():
-            exp_name = exp['experiments'][id_]['exp_name']
-            if not exp_name in RES:
-                RES[exp_name] = dict()
-                RES[exp_name]['occurrence'] = 1
-                RES[exp_name]['distances'] = []
-            else:
-                RES[exp_name]['occurrence'] += 1
-            id_of_exp = RES[exp_name]['occurrence'] - 1
-            #Collecting data on movements, first click defined the starting point
-            source_pos = exp['experiments'][id_]['trials']['0']['pos_target']
-            for i in range(1, len(exp['experiments'][id_]['trials'])):
-                movement = exp['experiments'][id_]['trials'][str(i)]
-                distance = []
-                for tick in range(0,len(movement['mouse_tracks'])):
-                    cursor_pos = movement['mouse_tracks'][tick]
-                    distXY = list(map(lambda x1, x2 : abs(x1 - x2), source_pos, cursor_pos))
-                    distance.append(math.sqrt(math.pow(distXY[0],2) + math.pow(distXY[1],2) ))
-                source_pos = movement['pos_target']
-                RES[exp_name]['distances'].append(distance)
-    return RES
-    
-
-    
-def plotDistancesByName(data):
-
-    DIST = getDistancesByName(data)
-
-    X = np.arange(0., 1.5, 0.01)
-    cpt = 0
-    for exp_name in DIST:
-        plt.figure()
-        plt.title(exp_name)
-        for distances in DIST[exp_name]['distances']:
-            len_ = min(100,len(distances))
-            Y = distances[:len_]
-            last_y = Y[-1] #setting a constant function after 1 seconds
-            Y += [last_y]*(len(X)-len(Y))
-            plt.plot(X, Y)
-        cpt = (cpt+1) % 5
-        if cpt == 0:
-            plt.show()
-    plt.show()
-
 def main():
-    data = readDirectory('../users_data/saved/')
-    for user_data in data:
-        for experiments in user_data['experiments'].values():
-            for trials in experiments['trials'].values():
-                t_x, t_y = trials['pos_target']
-                X = np.array(list(map(lambda x : math.sqrt(math.pow(t_x - x[0],2) + math.pow(t_y - x[1],2)), trials['mouse_tracks'])))
-                stop = round(len(X)*0.01,2)
-                time = np.arange(0, round(stop,2), 0.01, dtype = float)
-                if time[-1] == stop:
-                    time = time[:-1]
-                container, TS = pvp.interp_filt(time, X)
-                for c in container:
-                    print(c)
-                    if len(time)>len(c):
-                        time = time[1:]
-                    print("LEN(C):", len(c))
-                    plt.plot(time[1:],c[1:])
-                    plt.show()
-                #movs = pvp.find_movs(None, X, X[int(len(X)/2)])
-                #print("movs : ",movs)
-    # for exp in data:
-        # try:
-            # resolution = exp["display_screen"]
-            # xmax = resolution[0]
-            # ymin = -resolution[1]
-            # print(xmax, ymin)
-            # plotData(exp, xmin = 0, ymin = ymin, xmax = xmax, ymax = 0)
-        # except:
-            # print("Could not find one experiment for user_id :",exp['user_id'])
-    #print("Trajectories for user_id :",data[0]["user_id"]," are :",getTrajectories(data[0]))
-if __name__ =='__main__':
-    main()
+    #plt.style.use(["latex"])
+
+    data_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/users_data/saved/"
+    datas = readDirectory(data_path)
+   
+    SHOW_ALL_FLAG = 0
+    SHOW_FLAG = 0
+    EXPORT_FLAG = 1
+    WRITE_FLAG = 1
+    
+    # pix to mm
+    #DISTANCE_CONVERSION_CONDITIONS = 9.5/1000
+    #DISTANCE_CONVERSION = 9.5/1000
+    DISTANCE_CONVERSION_CONDITIONS = 1
+    
+    W = [7.0, 9.0,13.0, 18.0, 33.0, 45.0, 62.0]
+    
+    def neg(x):
+        return [-u for u in x]
+
+    nb_data = len(datas)
+    ndata   = 1
+    
+    for data in datas:
+        print("\nOperating data : "+str(ndata)+'/'+str(nb_data)+' ...')
+        #plotTrajectory(getTrajectories(data)[0])
+        nb_files = len(data['experiments'])
+        nfile = 1
+        containers = []
+        cmpt = 0
+        conditions = []
+        exp_names = []
+        npart = data['user_id']
+        WIDTH_SCREEN, HEIGHT_SCREEN = data['display_screen']
+        
+        for experiment in data['experiments'].values():
+            exp_name = experiment['exp_name']
+            exp_names.append(exp_name + ' with '+experiment['input_device'])
+            exp_id = experiment['exp_id']
+            print("\nexperiment "+str(nfile)+'/'+str(nb_files))
+            print(exp_name)
+            
+            _W = None
+            _D = None
+            
+            for s in exp_name.split(','):
+                tmp = list(map(int, re.findall('\d+', s)))
+                if 'r =' in s:
+                    _W = tmp[0]
+                if 'distance' in s:
+                    _D = tmp[0]
+                   
+            if _W == None:
+                raise Exception("Failed to parse W in experiment :"+exp_name)
+            if _D == None:
+                raise Exception("Failed to parse D in experiment :"+exp_name)
+                    
+            ncond = W.index(_W) + 1
+            _ID = math.log(_D/_W + 1,2)
+            
+            print("conditions (D, ID, W)")
+            print(_D, _ID, _W)
+            print("ncond :",ncond)
+            conditions.append([_D, _ID, _W])
+            container = PVP_Project([npart, _D, _ID, _W])
+            
+            traj_x = []
+            traj_y = []
+            
+            for trial in experiment['trials'].values():
+                x = [v[0]*DISTANCE_CONVERSION_CONDITIONS for v in trial['mouse_tracks'][1:]] # We suppress the first movement because it is used to position the mouse
+                y = [v[1]*DISTANCE_CONVERSION_CONDITIONS for v in trial['mouse_tracks'][1:]]
+                #print('x:',x)
+                #print('y:',y)
+                t = np.arange(0, len(x)*0.01 + 0.01, 0.01)[:len(x)] # (... + 0.01, ...) and [:len(x)] used to prevent wrong size caused by numpy 
+                
+                tx, ty = [k * DISTANCE_CONVERSION_CONDITIONS for k in trial['pos_target']]
+                
+                container.add_2D_traj_raw_x(x, y, t,3,tx,ty)
+                #plt.plot(x,y)
+                #plt.show()
+                traj_x += x
+                traj_y += y
+            
+            #if 'Random' in exp_name:
+            #    plt.plot(traj_x, traj_y)
+            #    plt.show()
+                
+            
+            container.pvp_routine(3)
+            container._print_pvp_params()
+            print('removed {}'.format(container.removed))
+            fig = plt.figure()
+            ax1 = fig.add_subplot(231)
+            container.plot_traj_extend(ax1)
+            plt.tight_layout()
+
+            if SHOW_ALL_FLAG:
+                plt.legend()
+                plt.title(exp_name)
+                plt.show()
+                
+            container.plot_stdprofiles(ax1)
+
+            plt.tight_layout()
+
+
+            if SHOW_ALL_FLAG:
+                plt.show()
+            plt.close()
+            
+            containers.append(container)
+            nfile += 1
+            
+        if (EXPORT_FLAG):
+            export_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/data_extractor/"+str(npart)
+            if not os.path.exists(export_path):
+                os.makedirs(export_path)
+            for i, c in enumerate(containers):
+            
+                file_name = export_path+'/'+str(i)
+                
+                if os.path.exists(file_name+'.png'):
+                    file_name = export_path+'/'+str(i+20)
+                pvp_container = PVP_container(npart, [c])
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+                pvp_container.plot_all_pvps(ax,[''])
+                plt.title(exp_names[i])
+                plt.tight_layout()
+                plt.savefig(file_name)
+                plt.close()
+            
+        if (SHOW_FLAG) :
+            print("Plotting all pvps")
+            print("exp_id\tdevice\texp_name")
+            for i , name in enumerate(exp_names):
+                print(str(i)+'\t'+name)
+            pvp_container = PVP_container(npart, containers)
+            
+            fig = plt.figure()
+            ax1 = fig.add_subplot(111)
+            
+            pvp_container.plot_all_pvps(ax1,['exp_id' + str(i) for i in range(len(containers))])
+            plt.tight_layout()
+            plt.legend()
+            plt.title("PVPs for participant "+str(npart))
+        ndata += 1
+    if (SHOW_FLAG):
+        plt.show()
+    ######################################################################################
+
+        
+if __name__ == '__main__':
+    sys.exit(main())
+
+

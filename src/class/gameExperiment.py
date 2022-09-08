@@ -353,7 +353,7 @@ class GameExperiment(Game):
                     running = False
                     self.showAllDrawable()
                     self.showAllListener()
-                    self.menu("play","main")
+                    #self.menu("play","main")
 
     def checkPause(self):
         '''This screen is shown between 2 experiments
@@ -389,10 +389,11 @@ class GameExperiment(Game):
     def endExperimentScreen(self, noPause = False):
         '''This screen is shown between 2 experiments
         It makes a pause for the user'''
-        
+        print('A')
         #Adding picture of next device used
         buttons = None
         if self.experiments[self.activeExperiment].input_device != None:
+            print('B')
             buttons = []
             self.experiments_data['input_device'] = self.experiments[self.activeExperiment].input_device
             device_name = self.experiments[self.activeExperiment].input_device
@@ -407,6 +408,8 @@ class GameExperiment(Game):
                 device = ('controller', 'images/device_controller.png')
             if device == None:
                 raise Exception("Device \""+device_name+"\"not recognized")
+                
+            print('C')
             #Setting coords for the image of the device
             #It uses a button to display the image 
             device_y = int(self.height/1.5)
@@ -414,61 +417,77 @@ class GameExperiment(Game):
             width_device = int(self.width/15)
             buttons.append(Button((int(self.width/2), device_y), 0, width_device, height_device, (0,0,0), (0,0,0), image=device[1]))
             self.addListenerDrawable(buttons)
-            
+            print('D')
+        print('E')
         if self.experiments[self.activeExperiment].input_device == 'controller':
+            print('F')
             self.cursor = self.experiments[self.activeExperiment].cursor
             pygame.joystick.init()
             self.joy_is_init = True
             joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            print('G')
             if len(joysticks) == 0:
                 raise Exception("ERROR : NO JOYSTICK FOUND")
             else:
                 self.joystick = joysticks[0]
-                
+            print('H')
         elif self.experiments_data['input_device'] != 'controller' and self.joy_is_init:
+            print('J')
             pygame.joystick.quit()
             self.cursor = None
             self.joy_is_init = False
+            print('K')
         
         
         self.refreshScreen()
-        
+        print('L')
         if self.cursor != None:
+            print('M')
             pygame.mouse.set_visible(False)
             pygame.event.set_grab(True)
+            print('N')
         else:
             pygame.mouse.set_visible(True)
             pygame.event.set_grab(False)
         
+        print('O')
         running = True
-        
+        print('P')
         while(running and not noPause):
             self.cursorMove()
             self.refreshScreen(False)
+            print('Q')
             #self.write_box("End of experiment "+str((self.activeExperiment)) , Colors.BLACK, (self.width/2, self.height/2 - 30))
             if self.language == 'en':
+                print('R')
                 if self.experiments[self.activeExperiment].input_device != None:
                     self.write_box(" WARNING : Next experiment uses a"+self.experiments[self.activeExperiment].input_device, Colors.BLACK, (self.width/2, self.height/2 - 30))
                 else:
+                    print('S')
                     self.write_box(" Ready ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
                 self.write_box("Press SPACE (or a key of the controller) to continue.", Colors.BLACK, (self.width/2, self.height/2 + 30))
             elif self.language == 'fr':
+                print('T')
                 if self.experiments[self.activeExperiment].input_device != None:
                     self.write_box(" ATTENTION : La prochaine expérience utilise un(e)"+self.experiments[self.activeExperiment].input_device, Colors.BLACK, (self.width/2, self.height/2 - 30))
                 else:
                     self.write_box(" Prêt ? ", Colors.BLACK, (self.width/2, self.height/2 - 30))
                 self.write_box("Appuyez sur ESPACE (ou une touche de la manette) pour continuer.", Colors.BLACK, (self.width/2, self.height/2 + 30))
+            print('U')
             pygame.display.update()
             ev = pygame.event.get()
             for event in ev:
+                print('V')
                 if event.type == pygame.QUIT:
                     return self.quitApp()
+                print('W')
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if buttons != None:
                             self.removeListenerDrawable(buttons)
                         running = False
                         return
+                print('X')
                 if event.type == pygame.JOYBUTTONDOWN:
                     if buttons != None:
                         self.removeListenerDrawable(buttons)
@@ -542,6 +561,8 @@ class GameExperiment(Game):
         '''Save user's data before quitting'''
         self.save_data_in_file("../users_data/user_"+str(self.experiments_data['user_id'])+".json")
         self.running = False
+        pygame.display.quit()
+        pygame.quit()
         return -1
         
     def pauseMenu(self, current_mode):
@@ -594,9 +615,15 @@ class GameExperiment(Game):
         
     def draw(self):
         '''always draw the cursor at the end'''
+        target = None
         for d, v in self.drawables.items():
-            if v == True:
+            if isinstance(d, Cible) and d.isTarget and v == True:
+                target = d
+            elif v == True:
                 d.draw(self)
+        if target != None:
+            #Draw the target at the end to make it appear in front of other targets
+            target.draw(self)
         if self.cursor != None:
             self.cursor.draw(self)
         
@@ -623,5 +650,10 @@ class GameExperiment(Game):
             # print(joysticks)
         if self.running:
             self.menu("chooseMode")
+        print("On est dans la boucle")
         while(self.running):
-            self.menu("play")
+            try:
+                self.menu("play")
+            except:
+                print("CRASH ON EXPERIMENT N°",self.activeExperiment)
+                self.save_data_in_file("../users_data/user_"+str(self.experiments_data['user_id'])+".json")

@@ -318,13 +318,13 @@ class CircleExp(Experiment):
     The target's order is specified and not random.
     Every time a target is hit, the next one is at the most opposite of the circle.'''
     
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False, default_cursor = True, input_device = None):
+    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False, default_cursor = True, input_device = None, force_target_clic = False):
         super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause, default_cursor = default_cursor, input_device = input_device)
         self.data['number_of_targets'] = nb_target
         self.data['radius of the circle'] = rad_circle
         self.data["width"] = width
         self.data["height"] = height
-        
+        self.force_target_clic = force_target_clic
         #Generation of the targets on a list. Next target is the next one in the list
         self.targets = []
         if way_H :
@@ -356,7 +356,17 @@ class CircleExp(Experiment):
             self.actual_target = (self.targets[index], index)
         self.actual_target[0].isTarget = True
         game.active_target = self.actual_target[0]
+        
+    def correct_clic(self, game):
     
+        x_cursor , y_cursor = game.getCursorPos()
+        
+        xt, yt = game.active_target.x, game.active_target.y
+        
+        for target in self.targets:
+            target.x -= xt-x_cursor
+            target.y -= yt-y_cursor
+        
     def begin(self, game):         
         '''Start the experience
         WARNING : we can pause the experience so we can exit this method at any time
@@ -424,7 +434,7 @@ class CircleExp(Experiment):
                             return game.quitApp()
                         game.addListenerDrawable(self.targets)
         
-                if ("cible",True) in L:#On a cliqué sur une cible
+                if (("cible",True) in L) or ((event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN) and not self.force_target_clic):#On a cliqué sur une cible
                 
                     self.iterateData(game)
                 
