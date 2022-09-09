@@ -255,7 +255,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                     list_experiences.append(experiment)
             
             elif type_experience == 'circleH':
-                distance = int(int(parameters[2])/2)
+                distance = int(int(parameters[2]))
                 radius = int(parameters[3])
                 nbCible = int(parameters[4])
                 if nbCible %2 == 0: 
@@ -269,7 +269,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                     list_experiences.append(experiment)
             
             elif type_experience == 'circleAH':
-                distance = int(int(parameters[2])/2)
+                distance = int(int(parameters[2]))
                 radius = int(parameters[3])
                 nbCible = int(parameters[4])
                 if nbCible %2 == 0: 
@@ -283,7 +283,7 @@ def readFileExperiment(filename, width, height, title = None, fullscreen = True)
                     list_experiences.append(experiment)
                 
             elif type_experience == 'circle':
-                distance = int(int(parameters[2])/2)
+                distance = int(int(parameters[2]))
                 radius = int(parameters[3])
                 nbCible = int(parameters[4])
                 if nbCible %2 == 0: 

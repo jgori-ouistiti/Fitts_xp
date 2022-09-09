@@ -318,10 +318,10 @@ class CircleExp(Experiment):
     The target's order is specified and not random.
     Every time a target is hit, the next one is at the most opposite of the circle.'''
     
-    def __init__(self, width, height, exp_name, nb_target, rad_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False, default_cursor = True, input_device = None, force_target_clic = False):
+    def __init__(self, width, height, exp_name, nb_target, diam_circle, exp_id = 0, way_H = True, maxTrials = 20, target_radius = 20,dx_sens = 1, dy_sens = 1, target_color = Colors.GRAY, cursor = None, noPause = False, default_cursor = True, input_device = None, force_target_clic = False):
         super().__init__([], exp_name, exp_id, maxTrials = maxTrials, dx_sens = dx_sens, dy_sens = dy_sens, cursor = cursor, noPause = noPause, default_cursor = default_cursor, input_device = input_device)
         self.data['number_of_targets'] = nb_target
-        self.data['radius of the circle'] = rad_circle
+        self.data['radius of the circle'] = diam_circle/2
         self.data["width"] = width
         self.data["height"] = height
         self.force_target_clic = force_target_clic
@@ -335,11 +335,11 @@ class CircleExp(Experiment):
         for i in range(nb_target):
             x,y = (0,0)
             if i%2 == 0:
-                x = int(width/2  + rad_circle*math.cos(theta))
-                y = int(height/2 + rad_circle*math.sin(theta))
+                x = int(width/2  + diam_circle*math.cos(theta))
+                y = int(height/2 + diam_circle*math.sin(theta))
             else:
-                x = int(width/2  + rad_circle*math.cos(math.pi + theta ))
-                y = int(height/2 + rad_circle*math.sin(math.pi + theta ))
+                x = int(width/2  + diam_circle*math.cos(math.pi + theta ))
+                y = int(height/2 + diam_circle*math.sin(math.pi + theta ))
             if i == 0:
                 self.targets.append(Cible((x,y), target_radius, target_color, isTarget = True))
             else:
