@@ -7,6 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os
 import re
+import pickle as pkl
 from pvplib.chi20_lib import *
 from pvplib.data_parser import *
 from fusion import *
@@ -271,7 +272,8 @@ def parse_with_pvp_class(class_ = "PVP_Project"):
             if 'mouse' in exp_names[0]:
                 rows_stats.insert(2,'device',['mouse'], True)
                 pvp_profile['device'] = ['mouse']
-            if 'touchpad' in exp_names[0]:
+            if 'if not os.path.exists(export_path):
+                os.makedirs(export_path)' in exp_names[0]:
                 rows_stats.insert(2,'device',['touchpad'], True)
                 pvp_profile['device'] = ['touchpad']
             if 'controller' in exp_names[0]:
@@ -328,6 +330,13 @@ def parse_with_pvp_class(class_ = "PVP_Project"):
                 plt.tight_layout()
                 plt.savefig(file_name)
                 plt.close()
+                
+                #Saving PVP in pickle file
+                pickle_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/data_extractor/DATA/users/"+str(npart)+'/'+class_+'/pvp_pickle/'
+                if not os.path.exists(pickle_path):
+                    os.makedirs(pickle_path)
+                with open( pickle_path+'PVP_'+str(i)+'.pickle', 'wb') as f:
+                    pkl.dump(containers[i], f)
                 
                 
                 
@@ -436,6 +445,7 @@ def main():
         parse_with_pvp_class()
     else:
         parse_with_pvp_class(args[0])
+    fusion_dataframe()
     return 0
         
 if __name__ == '__main__':
