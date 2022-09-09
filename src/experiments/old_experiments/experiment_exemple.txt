@@ -1,0 +1,46 @@
+;Here is an example of a set of experiments
+; ';' is used for comments
+
+; You can specify if you want a virtual cursor or not by:
+; cursor os
+; cursor virtual
+
+; Formats for experiments are:
+
+; URL : 
+; EXPERIENCE_NAME url https://www.example.com NUMBER_OF_MOUVEMENTS
+
+; line :
+; EXPERIENCE_NAME line DISTANCE RADIUS NUMBER_OF_MOUVEMENTS ANGLE
+
+; line vertical (Angle = PI/2)
+; EXPERIENCE_NAME lineV DISTANCE RADIUS NUMBER_OF_MOUVEMENTS
+
+; line horizontal (Angle = 0)
+; EXPERIENCE_NAME lineH DISTANCE RADIUS NUMBER_OF_MOUVEMENTS
+
+; circle :
+; EXPERIENCE_NAME circle DISTANCE RADIUS NUMBER_OF_TARGETS DIRECTION(Optional)=>(AH for anti-clockwise direction)
+
+; random disposition with same distance between two targets :
+; EXPERIENCE_NAME random DISTANCE RADIUS NUMBER_OF_MOUVEMENTS
+
+
+;Start of experiment
+;experience1 url https://www.jeu.fr/ 5
+;exp_random_avec_list random [5,300,50,100,100,100,100,100,100,100,100,100] 20 20
+
+cursor os
+noPause True
+random True
+ligne_vertical_D300 lineV [50,80,110,130,160,190,220,250,280,310,340,370] 20 15
+;pause : 5 
+
+ligne_horizontal_D300 lineH [200,270,500,800,300,280,300,700,1500,1000,340,370] [5,50,100,150,200,250] 15
+pause : 5
+
+cursor os
+exp_aleatoire_D500 random 500 [50,50,50,5,50,50,50,5,100,20,20,20] 20
+
+;pause : 5
+;exp_en_cercle_D300 circle 300 30 25 AH

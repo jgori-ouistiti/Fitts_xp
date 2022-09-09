@@ -1,0 +1,32 @@
+device mouse
+fitts_exp2 circle 1000 45 21 AH
+device mouse
+fitts_exp3 circle 1200 9 21 H
+device mouse
+fitts_exp4 circle 400 18 21 AH
+device mouse
+fitts_exp5 circle 200 62 21 H
+device controller
+fitts_exp6 circle 400 18 21 AH
+device controller
+fitts_exp7 circle 600 13 21 H
+device controller
+fitts_exp8 circle 800 33 21 AH
+device controller
+fitts_exp9 circle 1000 45 21 H
+device controller
+fitts_exp10 circle 1200 9 21 AH
+device controller
+fitts_exp11 circle 200 62 21 H
+device touchpad
+fitts_exp12 circle 1200 9 21 AH
+device touchpad
+fitts_exp13 circle 800 33 21 H
+device touchpad
+fitts_exp14 circle 600 13 21 AH
+device touchpad
+fitts_exp15 circle 200 62 21 H
+device touchpad
+fitts_exp16 circle 1000 45 21 AH
+device touchpad
+fitts_exp17 circle 400 18 21 H

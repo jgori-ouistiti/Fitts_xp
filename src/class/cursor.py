@@ -10,7 +10,7 @@ class Cursor(Drawable, Listener):
         self.HEIGHT = HEIGHT
         self.visible = visible
         self.cursorImage = pygame.image.load(cursorImage)
-        self.cursorImage = pygame.transform.scale(self.cursorImage, (13, 20))
+        self.cursorImage = pygame.transform.scale(self.cursorImage, (26, 40))
         self.imagePath = cursorImage
         
     def move(self, dx, dy):

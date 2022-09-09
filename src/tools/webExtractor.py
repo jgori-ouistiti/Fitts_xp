@@ -4,8 +4,8 @@ from cibleRect import *
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from pygeckodriver import geckodriver_path
 import colors
+
 
 URL = "https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal"
 
@@ -18,8 +18,7 @@ def extractPosition(url,WIDTH = 1080, HEIGHT = 1920, displayInfo = True):
     options.add_argument("--width="+str(WIDTH))
     options.add_argument("--height="+str(HEIGHT))
     
-    
-    driver = webdriver.Firefox(options = options, executable_path=geckodriver_path)
+    driver = webdriver.Firefox(options = options)
     driver.get(url)
     
     #elements = driver.find_elements(By.XPATH, '//button')

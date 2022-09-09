@@ -12,9 +12,12 @@ import colors as Colors
 import textInputBox 
 
 class Game :
-    def __init__(self, width, height, bg_color = Colors.WHITE, title = 'TEST_CIBLES'):
+    def __init__(self, width, height, bg_color = Colors.WHITE, title = 'TEST_CIBLES', fullscreen = True):
         self.font = pygame.font.SysFont("aerial", 60)
-        self.screen    = pygame.display.set_mode((width, height))
+        if fullscreen:
+            self.screen    = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            self.screen    = pygame.display.set_mode((width, height),0)
         pygame.display.set_caption(title)
         self.width     = width
         self.height    = height

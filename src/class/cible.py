@@ -4,6 +4,8 @@ from colors import *
 import gameExperiment as gE
 import pygame
 
+GREEN_CIRCLE_RADIUS = 30
+
 class Cible(Drawable, Listener):
     def __init__(self, pos , r, color, isTarget = False):
         if not isinstance(pos[0], int):
@@ -50,6 +52,7 @@ class Cible(Drawable, Listener):
         
     def draw(self, game):
         if self.isTarget :
+            pygame.draw.circle(game.screen, GREEN , (self.x,self.y), self.r + GREEN_CIRCLE_RADIUS)
             pygame.draw.circle(game.screen, RED , (self.x,self.y), self.r)
         else:
             pygame.draw.circle(game.screen, self.color, (self.x,self.y), self.r)
@@ -59,7 +62,7 @@ class Cible(Drawable, Listener):
         
     def action(self, game, event):
          
-        if event.type == pygame.MOUSEBUTTONDOWN and not isinstance(game, gE.GameExperiment):
+        if (event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN) and not isinstance(game, gE.GameExperiment):
             if self.isInside(pygame.mouse.get_pos()):
                 tmp = self.isTarget
                 if (self.isTarget) :
@@ -69,8 +72,8 @@ class Cible(Drawable, Listener):
                 else:
                     return("not cible", tmp)
         else:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.isInside((game.cursor.x, game.cursor.y)):
+            if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN:
+                if self.isInside((game.getCursorPos())):
                     tmp = self.isTarget
                     if (self.isTarget) :
                         self.isTarget = False

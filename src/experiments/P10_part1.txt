@@ -1,0 +1,40 @@
+device controller
+pvp_exp0 random 1200 7 21
+device controller
+pvp_exp1 random 200 7 21
+device controller
+pvp_exp2 random 600 7 21
+device controller
+pvp_exp3 random 800 7 21
+device controller
+pvp_exp4 random 400 7 21
+device controller
+pvp_exp5 random 1000 7 21
+device mouse
+fitts_exp0 circle 600 13 21 AH
+device mouse
+fitts_exp1 circle 1000 45 21 H
+device mouse
+fitts_exp2 circle 400 18 21 AH
+device mouse
+fitts_exp3 circle 200 62 21 H
+device mouse
+fitts_exp4 circle 1200 9 21 AH
+device mouse
+fitts_exp5 circle 800 33 21 H
+device touchpad
+pvp_exp6 random 1000 7 21
+device touchpad
+pvp_exp7 random 800 7 21
+device touchpad
+pvp_exp8 random 200 7 21
+device touchpad
+pvp_exp9 random 1200 7 21
+device touchpad
+pvp_exp10 random 400 7 21
+device touchpad
+pvp_exp11 random 600 7 21
+device touchpad
+fitts_exp6 circle 200 62 21 AH
+device touchpad
+fitts_exp7 circle 1200 9 21 H

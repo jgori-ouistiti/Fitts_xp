@@ -116,12 +116,12 @@ class Button(Drawable, Listener):
             
     def action(self, game, event):
         if not isinstance(game, gE.GameExperiment): 
-            if event.type == pygame.MOUSEBUTTONDOWN:    
+            if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN:    
                 if (self.isInside(pygame.mouse.get_pos())):
                     return "button", self.mode   
         else: 
-            if event.type == pygame.MOUSEBUTTONDOWN:    
-                if (self.isInside((game.cursor.x, game.cursor.y))):
+            if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN:    
+                if (self.isInside(game.getCursorPos())):
                     return "button", self.mode 
           
         
