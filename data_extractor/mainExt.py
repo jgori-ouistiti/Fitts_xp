@@ -56,7 +56,7 @@ def parse_with_pvp_class(class_ = "PVP_Project"):
     #DISTANCE_CONVERSION = 9.5/1000
     #DISTANCE_CONVERSION_CONDITIONS = 1
     
-    W = [14.0, 18.0, 26.0, 36.0, 66.0, 90.0, 124.0]
+    W = [14.0, 18.0, 26.0, 36.0, 38.0, 66.0, 90.0, 124.0]
     
     def neg(x):
         return [-u for u in x]
@@ -159,10 +159,18 @@ def parse_with_pvp_class(class_ = "PVP_Project"):
                     fitts_stats['y_end'].append(y[-1])
                     fitts_stats['x0'].append(x[0])
                     fitts_stats['y0'].append(y[0])
-                if class_ == "PVP_Project":
-                    container.add_2D_traj_raw_x(x, y, t,3,tx,ty)
-                else:
-                    container.add_2D_traj_raw(x, y, t,3,tx,ty)
+                    
+                try:
+                    if class_ == "PVP_Project":
+                        container.add_2D_traj_raw_x(x, y, t,3,tx,ty)
+                    else:
+                        container.add_2D_traj_raw(x, y, t,3,tx,ty)
+                except:
+                    print("Can't add 2D traj with :")
+                    print("len(x) : ",len(x))
+                    print("len(y) : ",len(y))
+                    print("len(t) : ",len(t))
+                    print("tx :",tx, "| ty:",ty)
                 #plt.plot(x,y)
                 #plt.show()
                 traj_x += x
@@ -272,8 +280,7 @@ def parse_with_pvp_class(class_ = "PVP_Project"):
             if 'mouse' in exp_names[0]:
                 rows_stats.insert(2,'device',['mouse'], True)
                 pvp_profile['device'] = ['mouse']
-            if 'if not os.path.exists(export_path):
-                os.makedirs(export_path)' in exp_names[0]:
+            if 'touchpad' in exp_names[0]:
                 rows_stats.insert(2,'device',['touchpad'], True)
                 pvp_profile['device'] = ['touchpad']
             if 'controller' in exp_names[0]:
