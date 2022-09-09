@@ -1,32 +1,32 @@
 device touchpad
-fitts_exp8 circle 400 18 21 AH
+fitts_exp8 circle 920 38 21 AH
 device touchpad
-fitts_exp9 circle 600 13 21 H
+fitts_exp9 circle 1400 14 21 H
 device touchpad
-fitts_exp10 circle 1000 45 21 AH
+fitts_exp10 circle 440 66 21 AH
 device touchpad
-fitts_exp11 circle 1200 9 21 H
+fitts_exp11 circle 1160 90 21 H
 device mouse
-pvp_exp12 random 1200 7 21
+pvp_exp12 random 200 14 21
 device mouse
-pvp_exp13 random 800 7 21
+pvp_exp13 random 1160 14 21
 device mouse
-pvp_exp14 random 200 7 21
+pvp_exp14 random 920 14 21
 device mouse
-pvp_exp15 random 400 7 21
+pvp_exp15 random 1400 14 21
 device mouse
-pvp_exp16 random 1000 7 21
+pvp_exp16 random 440 14 21
 device mouse
-pvp_exp17 random 600 7 21
+pvp_exp17 random 680 14 21
 device controller
-fitts_exp12 circle 1200 9 21 AH
+fitts_exp12 circle 1160 90 21 AH
 device controller
-fitts_exp13 circle 600 13 21 H
+fitts_exp13 circle 1400 14 21 H
 device controller
-fitts_exp14 circle 800 33 21 AH
+fitts_exp14 circle 200 124 21 AH
 device controller
-fitts_exp15 circle 1000 45 21 H
+fitts_exp15 circle 920 38 21 H
 device controller
-fitts_exp16 circle 200 62 21 AH
+fitts_exp16 circle 680 18 21 AH
 device controller
-fitts_exp17 circle 400 18 21 H
+fitts_exp17 circle 440 66 21 H

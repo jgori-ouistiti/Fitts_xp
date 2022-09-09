@@ -34,7 +34,7 @@ def makeExperiments(data):
                         id_fitts += 1
                         cpt += 1
                     elif name[:3] == 'PVP':
-                        experiment_file += 'pvp_exp'+str(id_pvp)+' random '+str(D) +' 7 ' + str(nb_of_movements)+'\n'
+                        experiment_file += 'pvp_exp'+str(id_pvp)+' random '+str(D) +' 14 ' + str(nb_of_movements)+'\n'
                         id_pvp += 1
                         cpt += 1
                     if cpt == max_exp:
