@@ -31,16 +31,23 @@ def readJsonData(filename):
     f.close()
     return res
     
-def readDirectory(directory):
+def readDirectory(directory, fusion = False):
     res = []
     filenames = next(os.walk(directory), (None, None, []))[2]  # [] if no file
     for file in filenames:
         file = directory+file
-        if file[-5:] == '.json':
-            try:
-                res.append(readJsonData(file))
-            except Exception:
-                print('Could not read file \"'+file+'\"')
+        if fusion:
+            if file[-12:] == '_fusion.json':
+                try:
+                    res.append(readJsonData(file))
+                except Exception:
+                    print('Could not read file \"'+file+'\"')
+        else:
+            if file[-5:] == '.json':
+                try:
+                    res.append(readJsonData(file))
+                except Exception:
+                    print('Could not read file \"'+file+'\"')
     return res
     
 def getTrajectories(data):
