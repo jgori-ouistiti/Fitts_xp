@@ -7,13 +7,13 @@ import pygame
 GREEN_CIRCLE_RADIUS = 30
 
 class Cible(Drawable, Listener):
-    def __init__(self, pos , r, color, isTarget = False):
+    def __init__(self, pos , D, color, isTarget = False):
         if not isinstance(pos[0], int):
             raise Exception("x is not an int")
         if not isinstance(pos[1], int):
             raise Exception("y is not an int")
-        if not isinstance(r, int):
-            raise Exception("r is not an int")
+        if not isinstance(D, int):
+            raise Exception("D is not an int")
         if len(color) != 3:
             raise Exception("color must be a tuple like (R,G,B)")
         for c in color:
@@ -25,7 +25,7 @@ class Cible(Drawable, Listener):
             raise Exception("isTarget must be a boolean")
         self.x = pos[0]
         self.y = pos[1]
-        self.r = r
+        self.r = round(D/2)
         self.color = color
         self.isTarget = isTarget
 
