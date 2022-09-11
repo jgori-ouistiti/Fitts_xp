@@ -40,7 +40,7 @@ def fusion_dataframe(data_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts
     dataframes_stats.to_csv(export_path + "pvp_stats.csv")
     dataframes_profile.to_csv(export_path + "pvp_profile.csv")
 
-def fusion_user(data_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/users_data/saved/"):
+def fusion_user(data_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/users_data/saved/", export_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/users_data/data_fusion/"):
     datas = readDirectory(data_path)
     
     for i, d1 in enumerate(datas):
@@ -60,7 +60,7 @@ def fusion_user(data_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/u
                 d_max[str(int(k)+last_key)] = v
             d1['experiments'] = d_max
             
-            with open(data_path+str(d1['user_id'])+'_fusion.json', 'w') as file_:
+            with open(export_path+str(d1['user_id'])+'_fusion.json', 'w') as file_:
                 json.dump(d1, file_)
     return 1
 

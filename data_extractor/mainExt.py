@@ -42,7 +42,7 @@ def parse_with_pvp_class(class_ = "PVP_Project"):
     if pvp_class == None:
         raise Exception("class "+class_+" is not recognized")
     
-    data_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/users_data/saved/"
+    data_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0/users_data/data_fusion/"
     fusion_user()
     datas = readDirectory(data_path, fusion = True)#Read only files with _fusion.json in the name
    
@@ -133,8 +133,12 @@ def parse_with_pvp_class(class_ = "PVP_Project"):
             
             
             for trial in experiment['trials'].values():
+                if len(trial['mouse_tracks']) < 30 :
+                    print('Skipped trial : len(mouse_tracks) = ',len(trial['mouse_tracks']))
+                    continue
                 x = [v[0]*DISTANCE_CONVERSION_CONDITIONS for v in trial['mouse_tracks'][1:]] # We suppress the first movement because it is used to position the mouse
                 y = [v[1]*DISTANCE_CONVERSION_CONDITIONS for v in trial['mouse_tracks'][1:]]
+                
                 #print('x:',x)
                 #print('y:',y)
                 t = np.arange(0, len(x)*0.01 + 0.01, 0.01)[:len(x)] # (... + 0.01, ...) and [:len(x)] used to prevent wrong size caused by numpy 

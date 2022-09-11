@@ -441,7 +441,7 @@ class GameExperiment(Game):
         
         self.refreshScreen()
         print('L')
-        if self.cursor != None:
+        if self.experiments[self.activeExperiment].input_device == 'controller':
             print('M')
             pygame.mouse.set_visible(False)
             pygame.event.set_grab(True)
@@ -500,11 +500,9 @@ class GameExperiment(Game):
         self.refreshScreen()
         
         if self.cursor != None:
-            pygame.mouse.set_visible(False)
-            pygame.event.set_grab(True)
-        else:
             pygame.mouse.set_visible(True)
             pygame.event.set_grab(False)
+            self.cursor = None
         
         group = pygame.sprite.Group(self.inputBoxAvis) 
         running = True
@@ -587,7 +585,7 @@ class GameExperiment(Game):
                         return self.quitApp()
                 if event.type == pygame.KEYDOWN or event.type == pygame.JOYBUTTONDOWN:
                     if event.key == pygame.K_ESCAPE or event.key == pygame.K_SPACE:
-                        if self.cursor != None:
+                        if self.experiments[self.activeExperiment].input_device == 'controller':
                             pygame.mouse.set_visible(False)
                             pygame.event.set_grab(True)
                         else:
@@ -656,4 +654,5 @@ class GameExperiment(Game):
                 self.menu("play")
             except:
                 print("CRASH ON EXPERIMENT N°",self.activeExperiment)
+                self.activeExperiment += 1
                 self.save_data_in_file("../users_data/user_"+str(self.experiments_data['user_id'])+".json")

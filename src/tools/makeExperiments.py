@@ -335,11 +335,11 @@ class CircleExp(Experiment):
         for i in range(nb_target):
             x,y = (0,0)
             if i%2 == 0:
-                x = int(width/2  + diam_circle*math.cos(theta))
-                y = int(height/2 + diam_circle*math.sin(theta))
+                x = int(width/2  + self.data['radius of the circle']*math.cos(theta))
+                y = int(height/2 + self.data['radius of the circle']*math.sin(theta))
             else:
-                x = int(width/2  + diam_circle*math.cos(math.pi + theta ))
-                y = int(height/2 + diam_circle*math.sin(math.pi + theta ))
+                x = int(width/2  + self.data['radius of the circle']*math.cos(math.pi + theta ))
+                y = int(height/2 + self.data['radius of the circle']*math.sin(math.pi + theta ))
             if i == 0:
                 self.targets.append(Cible((x,y), target_radius, target_color, isTarget = True))
             else:
