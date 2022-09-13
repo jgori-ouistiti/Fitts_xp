@@ -43,20 +43,30 @@ def parse_with_pvp_class(class_="PVP_Project"):
     if pvp_class == None:
         raise Exception("class " + class_ + " is not recognized")
 
+    TESTFLAG = 0
+    if TESTFLAG:
+        data_folder = "test"
+    else:
+        data_folder = "data_fusion"
+
+    FUSION = 0
+    OUTLIERS = 4.2
+
     JULIEN_FLAG = 1
     if JULIEN_FLAG:
         root_path = "/home/juliengori/Documents/VC/ANDROIDE_Project_HCI_Fitts2.0"
     else:
         root_path = "/home/quentin/Cours/ANDROIDE_Project_HCI_Fitts2.0"
 
-    data_path = "/".join([root_path, "users_data/data_fusion/"])
-    fusion_user()
+    data_path = "/".join([root_path, f"users_data/{data_folder}/"])
+    if FUSION:
+        fusion_user()
     datas = readDirectory(
         data_path, fusion=True
     )  # Read only files with _fusion.json in the name
 
     SHOW_ALL_FLAG = 0
-    SHOW_FLAG = 1
+    SHOW_FLAG = 0
     EXPORT_FLAG = 1
     WRITE_FLAG = 1
 
@@ -137,20 +147,29 @@ def parse_with_pvp_class(class_="PVP_Project"):
             traj_x = []
             traj_y = []
 
-            for trial in experiment["trials"].values():
+            for n, trial in enumerate(experiment["trials"].values()):
+                if n == 0:
+                    continue
                 if len(trial["mouse_tracks"]) < 30:
                     print(
                         "Skipped trial : len(mouse_tracks) = ",
                         len(trial["mouse_tracks"]),
                     )
                     continue
+                # x = [
+                #     v[0] * DISTANCE_CONVERSION_CONDITIONS
+                #     for v in trial["mouse_tracks"][1:]
+                # ]  # We suppress the first movement because it is used to position the mouse
+                # y = [
+                #     v[1] * DISTANCE_CONVERSION_CONDITIONS
+                #     for v in trial["mouse_tracks"][1:]
+                # ]
+
                 x = [
-                    v[0] * DISTANCE_CONVERSION_CONDITIONS
-                    for v in trial["mouse_tracks"][1:]
+                    v[0] * DISTANCE_CONVERSION_CONDITIONS for v in trial["mouse_tracks"]
                 ]  # We suppress the first movement because it is used to position the mouse
                 y = [
-                    v[1] * DISTANCE_CONVERSION_CONDITIONS
-                    for v in trial["mouse_tracks"][1:]
+                    v[1] * DISTANCE_CONVERSION_CONDITIONS for v in trial["mouse_tracks"]
                 ]
 
                 # print('x:',x)
@@ -182,22 +201,28 @@ def parse_with_pvp_class(class_="PVP_Project"):
                     fitts_stats["x0"].append(x[0])
                     fitts_stats["y0"].append(y[0])
 
-                # try:
-                if class_ == "PVP_Project":
-                    container.add_2D_traj_raw_x(x, y, t, 3, tx, ty, correct_start="no")
-                else:
-                    container.add_2D_traj_raw(x, y, t, 3, tx, ty, correct_start="no")
-                    container.add_2D_traj_raw(x, y, t, 3, tx, ty, correct_start="no")
-                # except:
-                #     print("Can't add 2D traj with :")
-                #     print("len(x) : ", len(x))
-                #     print("len(y) : ", len(y))
-                #     print("len(t) : ", len(t))
-                #     print("tx :", tx, "| ty:", ty)
-                # plt.plot(x,y)
-                # plt.show()
-                traj_x += x
-                traj_y += y
+                try:
+                    if class_ == "PVP_Project":
+                        container.add_2D_traj_raw_x(
+                            x, y, t, 3, tx, ty, correct_start="no"
+                        )
+                    else:
+                        container.add_2D_traj_raw(
+                            x, y, t, 3, tx, ty, correct_start="no"
+                        )
+                        container.add_2D_traj_raw(
+                            x, y, t, 3, tx, ty, correct_start="no"
+                        )
+                except:
+                    print("Can't add 2D traj with :")
+                    print("len(x) : ", len(x))
+                    print("len(y) : ", len(y))
+                    print("len(t) : ", len(t))
+                    print("tx :", tx, "| ty:", ty)
+                    # plt.plot(x, y)
+                    # plt.show()
+                    # traj_x += x
+                    # traj_y += y
 
             # if 'Random' in exp_name:
             #    plt.plot(traj_x, traj_y)
@@ -205,9 +230,9 @@ def parse_with_pvp_class(class_="PVP_Project"):
 
             container.removed = 0
             if class_ == "PVP_Project":
-                container.pvp_routine(4.2)
+                container.pvp_routine(OUTLIERS)
             else:
-                container.pvp_routine(4.2)
+                container.pvp_routine(OUTLIERS)
             container._print_pvp_params()
             print("removed {}".format(container.removed))
             fig = plt.figure()
@@ -478,6 +503,70 @@ def parse_with_pvp_class(class_="PVP_Project"):
             axs[1, 2].title.set_text("pvp touchpad")
             plt.tight_layout()
 
+            ###### scale
+            fig_scaled, axs = plt.subplots(2, 3, figsize=(16, 12))
+            print("fitts_controller_container :", len(fitts_controller_container))
+            print("fitts_mouse_container :", len(fitts_mouse_container))
+            print("fitts_touchpad_container :", len(fitts_touchpad_container))
+            print("pvp_controller_container :", len(pvp_controller_container))
+            print("pvp_mouse_container :", len(pvp_mouse_container))
+            print("pvp_touchpad_container :", len(pvp_touchpad_container))
+
+            pvp_container = PVP_container(
+                npart, [k[0] for k in fitts_controller_container]
+            )
+            pvp_container.plot_all_pvps(
+                axs[0, 0], [k[1] for k in fitts_controller_container]
+            )
+            axs[0, 0].title.set_text("fitts controller")
+
+            pvp_container = PVP_container(npart, [k[0] for k in fitts_mouse_container])
+            pvp_container.plot_all_pvps(
+                axs[0, 1], [k[1] for k in fitts_mouse_container]
+            )
+            axs[0, 1].title.set_text("fitts mouse")
+
+            pvp_container = PVP_container(
+                npart, [k[0] for k in fitts_touchpad_container]
+            )
+            pvp_container.plot_all_pvps(
+                axs[0, 2], [k[1] for k in fitts_touchpad_container]
+            )
+            axs[0, 2].title.set_text("fitts touchpad")
+
+            pvp_container = PVP_container(
+                npart, [k[0] for k in pvp_controller_container]
+            )
+            pvp_container.plot_all_pvps(
+                axs[1, 0], [k[1] for k in pvp_controller_container]
+            )
+            axs[1, 0].title.set_text("pvp controller")
+
+            pvp_container = PVP_container(npart, [k[0] for k in pvp_mouse_container])
+            pvp_container.plot_all_pvps(axs[1, 1], [k[1] for k in pvp_mouse_container])
+            axs[1, 1].title.set_text("pvp mouse")
+
+            pvp_container = PVP_container(npart, [k[0] for k in pvp_touchpad_container])
+            pvp_container.plot_all_pvps(
+                axs[1, 2], [k[1] for k in pvp_touchpad_container]
+            )
+            axs[1, 2].title.set_text("pvp touchpad")
+
+            axs[0, 0].set_xlim([0, 4])
+            axs[0, 0].set_ylim([0.1, 100])
+            axs[0, 1].set_xlim([0, 4])
+            axs[0, 1].set_ylim([0.1, 100])
+            axs[0, 2].set_xlim([0, 4])
+            axs[0, 2].set_ylim([0.1, 100])
+            axs[1, 0].set_xlim([0, 4])
+            axs[1, 0].set_ylim([0.1, 100])
+            axs[1, 1].set_xlim([0, 4])
+            axs[1, 1].set_ylim([0.1, 100])
+            axs[1, 2].set_xlim([0, 4])
+            axs[1, 2].set_ylim([0.1, 100])
+
+            plt.tight_layout()
+
         ndata += 1
         if EXPORT_FLAG:
             export_path = (
@@ -495,13 +584,17 @@ def parse_with_pvp_class(class_="PVP_Project"):
                 os.makedirs(export_path)
             file_name = export_path + "pvps"
             plt.tight_layout()
-            plt.savefig(file_name)
+            fig.savefig(file_name + ".pdf")
+            fig_scaled.savefig(file_name + "_scaled.pdf")
         if SHOW_FLAG:
             plt.show()
 
     if WRITE_FLAG:
         export_path = root_path + "/data_extractor/DATA/export/"
-        export_path += class_ + "/"
+        print('##################################""')
+        print(export_path + "fitts_stats.csv")
+        print('##################################""')
+
         if not os.path.exists(export_path):
             os.makedirs(export_path)
         data_f = pandas.DataFrame(fitts_stats)
