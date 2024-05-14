@@ -441,6 +441,8 @@ class Game :
                         self.running = False
                         self.removeListenerDrawable(targets)
                         self.menu("pause")
+                    if event.key == pygame.K_BACKSPACE:
+                        exit()
         
                 if ("cible",True) in L:#On a cliqué sur une cible
                     if not self.infiniteTime:
