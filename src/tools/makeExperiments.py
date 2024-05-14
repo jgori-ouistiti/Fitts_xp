@@ -468,6 +468,8 @@ class TwoTargetsExp(Experiment):
                             game.menu("quit", data=self.data)
                             return game.quitApp()
                         game.addListenerDrawable(targets)
+                    elif event.key == pygame.K_BACKSPACE:
+                        exit()
 
                 if ("cible", True) in L:  # On a cliqué sur une cible
 
@@ -670,6 +672,8 @@ class CircleExp(Experiment):
                             game.menu("quit", data=self.data)
                             return game.quitApp()
                         game.addListenerDrawable(self.targets)
+                    elif event.key == pygame.K_BACKSPACE:
+                        exit()
 
                 if (("cible", True) in L) or (
                     (

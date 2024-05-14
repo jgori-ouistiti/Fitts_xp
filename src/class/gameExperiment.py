@@ -208,6 +208,8 @@ class GameExperiment(Game):
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         return
+                    elif event.type == pygame.K_BACKSPACE:
+                            exit()
                 if len(L) >= 1 and len(L[0]) == 2:
                     print("L :", L)
                     print("flags :", flags)
@@ -284,6 +286,8 @@ class GameExperiment(Game):
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         return
+                    elif event.type == pygame.K_BACKSPACE:
+                        exit()
                 if len(L) >= 1 and len(L[0]) == 2:
                     print("L :", L)
                     print("devices :", devices)
@@ -444,6 +448,8 @@ class GameExperiment(Game):
                             self.removeListenerDrawable(buttons)
                         self.running = False
                         return
+                    elif event.type == pygame.K_BACKSPACE:
+                        exit()
                 if ("button", 1) in L:
                     if buttons != None:
                         self.removeListenerDrawable(buttons)
@@ -509,6 +515,8 @@ class GameExperiment(Game):
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE:
                             running = False
+                        elif event.type == pygame.K_BACKSPACE:
+                            exit()
         pygame.time.set_timer(pygame.USEREVENT, 0)  # Desactive
 
     def endExperimentScreen(self, noPause=False):
@@ -719,6 +727,8 @@ class GameExperiment(Game):
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                         return self.quitApp()
+                    elif event.type == pygame.K_BACKSPACE:
+                        exit()
                 if (
                     event.type == pygame.MOUSEBUTTONDOWN
                     or event.type == pygame.JOYBUTTONDOWN
@@ -800,6 +810,8 @@ class GameExperiment(Game):
                         self.showAllDrawable()
                         self.showAllListener()
                         return
+                    elif event.type == pygame.K_BACKSPACE:
+                        exit()
 
     def cursorMove(self):
         if self.cursor != None:
