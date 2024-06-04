@@ -22,7 +22,7 @@ import math
 URLS = {
     "moodle": "https://moodle-sciences.upmc.fr/moodle-2021/",  # "wikipedia":"https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal",\
     # "google_search":"https://www.google.com/search?channel=fs&client=ubuntu&q=wikipedia",\
-    # "amazon":"https://www.amazon.fr/gp/bestsellers/?ref_=nav_cs_bestsellers",\
+    # "amazon":"https://www.amazon.fr/gp/bestsellers/?ref_=nav_cs_bestseller if people are interesteds",\
     # "bnp":"https://mabanque.bnpparibas/"
 }
 
@@ -39,10 +39,14 @@ def main():
     pygame.event.set_grab(True)
 
     # Get user's screen resolution
-    infoObject = pygame.display.Info()
+    # infoObject = pygame.display.Info()
+    desktop_sizes = pygame.display.get_desktop_sizes()
 
-    WIDTH = infoObject.current_w
-    HEIGHT = infoObject.current_h
+    # WIDTH = infoObject.current_w
+    # HEIGHT = infoObject.current_h
+
+    WIDTH, HEIGHT = desktop_sizes[0]
+
     fullscreen = True
 
     if "--windowed" in sys.argv:
