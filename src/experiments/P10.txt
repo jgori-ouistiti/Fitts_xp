@@ -1,33 +1,33 @@
 device mouse
-fitts_exp0 circle 700 18 15 H Balanced/Natural
+fitts_exp0 circle 600 12 15 H Balanced/Natural
 device mouse
-fitts_exp1 circle 700 18 15 AH Slow/precise
+fitts_exp1 circle 600 12 15 AH Slow/precise
 device mouse
-fitts_exp2 circle 700 18 15 H Fast/imprecise
+fitts_exp2 circle 600 12 15 H Fast/imprecise
 device mouse
-fitts_exp3 circle 700 18 15 AH Fast/imprecise
+fitts_exp3 circle 600 12 15 AH Fast/imprecise
 device mouse
-fitts_exp4 circle 533 22 15 H Slow/precise
+fitts_exp4 circle 467 22 15 H Slow/precise
 device mouse
-fitts_exp5 circle 700 18 15 AH Balanced/Natural
+fitts_exp5 circle 600 12 15 AH Balanced/Natural
 device mouse
-fitts_exp6 circle 533 22 15 H Balanced/Natural
+fitts_exp6 circle 467 22 15 H Balanced/Natural
 device mouse
-fitts_exp7 circle 700 18 15 AH Slow/precise
+fitts_exp7 circle 600 12 15 AH Slow/precise
 device mouse
-fitts_exp8 circle 533 22 15 H Fast/imprecise
+fitts_exp8 circle 467 22 15 H Fast/imprecise
 device mouse
-fitts_exp9 circle 700 18 15 AH Fast/imprecise
+fitts_exp9 circle 600 12 15 AH Fast/imprecise
 device mouse
-fitts_exp10 circle 367 38 15 H Slow/precise
+fitts_exp10 circle 333 38 15 H Slow/precise
 device mouse
-fitts_exp11 circle 700 18 15 AH Balanced/Natural
+fitts_exp11 circle 600 12 15 AH Balanced/Natural
 device mouse
-fitts_exp12 circle 367 38 15 H Balanced/Natural
+fitts_exp12 circle 333 38 15 H Balanced/Natural
 device mouse
-fitts_exp13 circle 700 18 15 AH Slow/precise
+fitts_exp13 circle 600 12 15 AH Slow/precise
 device mouse
-fitts_exp14 circle 367 38 15 H Fast/imprecise
+fitts_exp14 circle 333 38 15 H Fast/imprecise
 device mouse
 fitts_exp15 circle 200 120 15 AH Fast/imprecise
 device mouse
