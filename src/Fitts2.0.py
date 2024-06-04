@@ -39,13 +39,11 @@ def main():
     pygame.event.set_grab(True)
 
     # Get user's screen resolution
-    # infoObject = pygame.display.Info()
-    desktop_sizes = pygame.display.get_desktop_sizes()
-
-    # WIDTH = infoObject.current_w
-    # HEIGHT = infoObject.current_h
-
-    WIDTH, HEIGHT = desktop_sizes[0]
+    # May not work on Windows with high PPI, see https://stackoverflow.com/questions/27421391/pygame-display-info-giving-wrong-resolution-size
+    # either follow stackoverflow thread, or reduce the resolution of the display.
+    infoObject = pygame.display.Info()
+    WIDTH = infoObject.current_w
+    HEIGHT = infoObject.current_h
 
     fullscreen = True
 
