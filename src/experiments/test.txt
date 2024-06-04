@@ -1,4 +1,0 @@
-device 
-fitts_exp1 circle 440 66 5 AH 1
-device 
-fitts_exp1 circle 440 66 5 AH 2

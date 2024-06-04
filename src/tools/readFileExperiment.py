@@ -437,7 +437,7 @@ def readFileExperiment(filename, width, height, title=None, fullscreen=True):
                 nbCible = int(parameters[4])
                 # 0 = ultra fast, 1 = fast, 2 = medium, 3 = precise, 4 = ultra precise
                 try:
-                    strategy = int(parameters[6])
+                    strategy = str(parameters[6])
                 except IndexError:
                     strategy = None
                 if nbCible % 2 == 0:
