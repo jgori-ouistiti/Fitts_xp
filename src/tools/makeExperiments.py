@@ -525,6 +525,7 @@ class CircleExp(Experiment):
         input_device=None,
         force_target_clic=False,
         strategy=None,
+        correct = False
     ):
         super().__init__(
             [],
@@ -539,6 +540,7 @@ class CircleExp(Experiment):
             input_device=input_device,
             strategy=strategy,
         )
+        self.correct = correct
         self.data["number_of_targets"] = nb_target
         self.data["radius of the circle"] = diam_circle / 2
         self.data["width"] = width
@@ -592,6 +594,7 @@ class CircleExp(Experiment):
         game.active_target = self.actual_target[0]
 
     def correct_clic(self, game):
+        
 
         x_cursor, y_cursor = game.getCursorPos()
 
@@ -685,7 +688,8 @@ class CircleExp(Experiment):
 
                     self.iterateData(game)
 
-                    self.correct_clic(game)
+                    if self.correct:
+                        self.correct_clic(game)
 
                     self.swap_target(game)
 

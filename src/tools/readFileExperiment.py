@@ -10,7 +10,7 @@ from gameExperiment import *
 from makeExperiments import *
 
 
-def readFileExperiment(filename, width, height, title=None, fullscreen=True):
+def readFileExperiment(filename, width, height, title=None, fullscreen=True, correct = False):
     f = open(filename, "r")
 
     if title == None:
@@ -394,6 +394,7 @@ def readFileExperiment(filename, width, height, title=None, fullscreen=True):
                     noPause=noPause,
                     default_cursor=default_cursor,
                     input_device=device_used,
+                    correct = correct,
                 )
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -425,6 +426,7 @@ def readFileExperiment(filename, width, height, title=None, fullscreen=True):
                     noPause=noPause,
                     default_cursor=default_cursor,
                     input_device=device_used,
+                    correct = correct,
                 )
                 if isRandom:
                     list_random_experiences.append(experiment)
@@ -466,6 +468,7 @@ def readFileExperiment(filename, width, height, title=None, fullscreen=True):
                     default_cursor=default_cursor,
                     input_device=device_used,
                     strategy=strategy,
+                    correct = correct,
                 )
                 if isRandom:
                     list_random_experiences.append(experiment)

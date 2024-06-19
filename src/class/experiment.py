@@ -24,7 +24,10 @@ class Experiment:
         default_cursor=True,
         input_device=None,
         strategy=None,
+        correct = False,
     ):
+        self.correct = correct
+        
         print('Creating experiment "' + exp_name + '" with cursor =', cursor)
         self.targets = targets
 
@@ -127,7 +130,8 @@ class Experiment:
         """Start the experience
         WARNING : we can pause the experience so we can exit this method at any time
         We must use trial variable to know where we are on the experiment
-        """
+        """ 
+        print('BEGINNING    =====================================')
 
         self.init_begin(game)
 
@@ -201,8 +205,9 @@ class Experiment:
                 if ("cible", True) in L:  # On a cliqué sur une cible
 
                     self.iterateData(game)
-
-                    self.correct_clic(game)
+                    if self.correct:
+                        print('yes=========')
+                        self.correct_clic(game)
 
                     game.assignRandomTarget()
 

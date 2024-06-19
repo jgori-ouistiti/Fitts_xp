@@ -175,6 +175,10 @@ def main():
                 ]
                 break
     elif "--file" in sys.argv:
+        if '--correct' in sys.argv:
+            correct = True
+        else:
+            correct = False
         for i in range(len(sys.argv)):
             if sys.argv[i] == "--file":
                 if i + 1 >= len(sys.argv):
@@ -184,6 +188,7 @@ def main():
                     WIDTH,
                     HEIGHT,
                     fullscreen=fullscreen,
+                    correct = correct
                 )
 
     # Add experiments
